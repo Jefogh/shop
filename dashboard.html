@@ -223,14 +223,13 @@
                         </div>
                     </div>
                 `;
-                card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => { e.stopPropagation(); promptForQuantity(product.id); });
-                card.addEventListener('click', () => showProductDetails(product.id));
+                card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => { e.stopPropagation(); promptForQuantity(product); });
+                card.addEventListener('click', () => showProductDetails(product));
                 productsGrid.appendChild(card);
             });
         }
         
-        async function showProductDetails(productId) {
-            const product = productsCache.find(p => p.id === productId);
+        async function showProductDetails(product) {
             if (!product) return;
             const name = product.get(`name_${currentLang}`);
             const description = product.get(`description_${currentLang}`);
@@ -246,19 +245,18 @@
             Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); }});
         }
         
-        async function promptForQuantity(productId) {
+        async function promptForQuantity(product) {
              if(!currentUser) { Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.', 'warning'); return; }
             const { value: quantity } = await Swal.fire({ title: translations[currentLang].add_item_title, input: 'number', inputLabel: translations[currentLang].add_item_label, inputValue: 1, inputAttributes: { min: 1, step: 1 }, showCancelButton: true, inputValidator: (value) => { if (!value || value < 1) { return 'الرجاء إدخال كمية صالحة!' } } });
-            if (quantity) { addToCart(productId, parseInt(quantity)); }
+            if (quantity) { addToCart(product, parseInt(quantity)); }
         }
         
-        async function addToCart(productId, quantityToAdd) {
+        async function addToCart(product, quantityToAdd) {
             Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
-            const productPointer = Parse.Object.createWithoutData("Things", productId);
             query.equalTo("guest", currentUser);
-            query.equalTo("product", productPointer);
+            query.equalTo("product", product);
             try {
                 let cartItem = await query.first();
                 if (cartItem) {
@@ -266,7 +264,7 @@
                 } else {
                     cartItem = new Net();
                     cartItem.set("guest", currentUser);
-                    cartItem.set("product", productPointer);
+                    cartItem.set("product", product);
                     cartItem.set("quantity", quantityToAdd);
                 }
                 await cartItem.save();
@@ -276,7 +274,7 @@
                  console.error("Error adding to cart:", error);
                  let errorMessage = 'فشلت إضافة المنتج للسلة.';
                  if (error.code === 119) { errorMessage = `<strong>خطأ في الأذونات!</strong><br>الرجاء التأكد من إعدادات الأمان لجدول "Net" بشكل صحيح.`; }
-                 Swal.fire({ title: 'خطأ', html: errorMessage + `<br><br><code class="text-xs">${error.message}</code>`, icon: 'error' });
+                 Swal.fire({ title: 'خطأ', html: errorMessage + `<br><br><code class="text-xs text-left block" dir="ltr">${error.message}</code>`, icon: 'error' });
             }
         }
         
@@ -286,9 +284,10 @@
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
             try {
-                const count = await query.count();
-                if(count > 0) {
-                    cartCountSpan.textContent = count;
+                const cartItems = await query.find();
+                const totalItems = cartItems.reduce((sum, item) => sum + item.get('quantity'), 0);
+                if(totalItems > 0) {
+                    cartCountSpan.textContent = totalItems;
                     cartCountSpan.classList.remove('hidden');
                 } else {
                     cartCountSpan.classList.add('hidden');
@@ -314,10 +313,9 @@
                 if (cartItems.length === 0) {
                      cartHTML = `<p class="text-center p-4">${translations[currentLang].empty_cart}</p>`;
                 } else {
-                    cartHTML = `<table class="w-full text-sm text-left text-gray-500">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr>
+                    cartHTML = `<div class="max-h-64 overflow-y-auto"><table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0"><tr>
                         <th scope="col" class="px-6 py-3">${translations[currentLang].product}</th>
-                        <th scope="col" class="px-6 py-3">${translations[currentLang].price}</th>
                         <th scope="col" class="px-6 py-3">${translations[currentLang].quantity}</th>
                         <th scope="col" class="px-6 py-3">${translations[currentLang].total}</th>
                     </tr></thead><tbody>`;
@@ -327,9 +325,9 @@
                         const quantity = item.get("quantity");
                         const total = price * quantity;
                         subtotal += total;
-                        cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td><td class="px-6 py-4">$${price.toFixed(2)}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td></tr>`;
+                        cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td></tr>`;
                     });
-                     cartHTML += `</tbody></table>`;
+                     cartHTML += `</tbody></table></div>`;
                 }
                 const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition">${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition">${translations[currentLang].pay_card}</button></div></div>`;
                 Swal.fire({ title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const payWalletBtn = document.getElementById('pay-wallet'); if (payWalletBtn && cartItems.length > 0) { payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems)); } } });
