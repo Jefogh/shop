@@ -152,7 +152,11 @@
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 loadingIndicator.style.display = 'none';
-                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.</p>`;
+                Swal.fire({
+                    title: 'خطأ في تحميل المنتجات',
+                    html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.<br><code class="text-xs text-gray-500">${error.message}</code>`,
+                    icon: 'error'
+                });
             } finally {
                 loadingIndicator.style.display = 'none';
             }
@@ -280,41 +284,58 @@
             }
         }
         
-        // --- FIXED: POINTER CREATION LOGIC ---
+        // --- DEBUGGING VERSION of addToCart ---
         async function addToCart(productId, quantityToAdd) {
+            console.log("--- DEBUG: Starting addToCart ---");
             Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
             
-            // Create a valid Pointer object for the product
+            if (!currentUser) {
+                console.error("DEBUG: currentUser is null. Cannot add to cart.");
+                Swal.fire('خطأ', 'المستخدم غير مسجل. لا يمكن الإضافة للسلة.', 'error');
+                return;
+            }
+            console.log(`DEBUG: Current User ID: ${currentUser.id}`);
+
             const productPointer = Parse.Object.createWithoutData("Things", productId);
+            console.log(`DEBUG: Created Pointer for Product ID: ${productId}`, productPointer);
 
             query.equalTo("guest", currentUser);
             query.equalTo("product", productPointer);
             
             try {
+                console.log("DEBUG: Checking if item already exists in cart...");
                 let cartItem = await query.first();
+                
                 if (cartItem) {
+                    console.log("DEBUG: Item exists. Incrementing quantity.");
                     cartItem.increment("quantity", quantityToAdd);
                 } else {
+                    console.log("DEBUG: Item does not exist. Creating new cart item.");
                     cartItem = new Cart();
                     cartItem.set("guest", currentUser);
                     cartItem.set("product", productPointer);
                     cartItem.set("quantity", quantityToAdd);
                 }
+                
+                console.log("DEBUG: Attempting to save cart item...", cartItem);
                 await cartItem.save();
+                console.log("DEBUG: Cart item saved successfully!");
+
                 updateCartCount();
                 Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
+
             } catch (error) {
-                 console.error("Error adding to cart:", error);
-                 let errorMessage = 'فشلت إضافة المنتج للسلة.';
-                 if (error.code === 119) {
-                     errorMessage = '<strong>خطأ في الأذونات!</strong><br>هذا الخطأ يعني أن إعدادات الأمان لجدول "Cart" في Back4App غير صحيحة. الرجاء اتباع دليل الإعداد بدقة للسماح للمستخدمين المسجلين بالكتابة في سلاتهم الخاصة.';
-                 }
+                 console.error("--- DEBUG: DETAILED ERROR ---", error);
                  Swal.fire({
-                    title: 'خطأ',
-                    html: errorMessage + `<br><br><code class="text-xs text-gray-500">الخطأ التقني: ${error.message}</code>`,
+                    title: 'فشلت إضافة المنتج للسلة',
+                    html: `حدث خطأ غير متوقع.<br><br>
+                           <strong>الرجاء التأكد من التالي:</strong><br>
+                           1. مفاتيح الربط (API Keys) صحيحة.<br>
+                           2. بنية جدول 'Cart' وأذوناته صحيحة تمامًا كما في دليل الشرح.<br><br>
+                           <code class="text-xs text-left block" dir="ltr">الخطأ التقني: ${error.code} - ${error.message}</code>`,
                     icon: 'error'
                 });
             }
