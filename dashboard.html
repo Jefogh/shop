@@ -305,11 +305,15 @@
             } catch (error) {
                  console.error("Error adding to cart:", error);
                  let errorMessage = 'فشلت إضافة المنتج للسلة.';
-                 // Parse error code for 'Operation forbidden' is 119, often due to CLPs
+                 // FIX: Added clearer error message for permission issues
                  if (error.code === 119) {
-                     errorMessage = 'خطأ في الأذونات! الرجاء مراجعة إعدادات الأمان لجدول "Cart" في Back4App والتأكد من أنها تسمح للمستخدم بالكتابة.';
+                     errorMessage = '<strong>خطأ في الأذونات!</strong><br>هذا الخطأ يعني أن إعدادات الأمان لجدول "Cart" في Back4App غير صحيحة. الرجاء اتباع دليل الإعداد بدقة للسماح للمستخدمين المسجلين بالكتابة في سلاتهم الخاصة.';
                  }
-                 Swal.fire('خطأ', errorMessage, 'error');
+                 Swal.fire({
+                    title: 'خطأ',
+                    html: errorMessage, // Use html property to render the bold tag
+                    icon: 'error'
+                });
             }
         }
         
