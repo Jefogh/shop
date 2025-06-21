@@ -97,14 +97,8 @@
         let currentLang = 'ar'; 
 
         // --- BACK4APP INITIALIZATION ---
-        // FIX: The 'unauthorized' error is caused by incorrect keys here.
-        // هام: خطأ "unauthorized" يعني أن هذه المفاتيح غير صحيحة.
-        // الرجاء استبدالها بالمعلومات الصحيحة من حسابك في Back4App.
-        // 1. اذهب إلى 'App Settings' -> 'Security & Keys' في لوحة تحكم تطبيقك.
-        // 2. انسخ 'Application ID' و 'JavaScript Key' والصقهما هنا.
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
-        
         const currentUser = Parse.User.current();
 
         // --- GLOBAL UI ELEMENTS & CACHE ---
@@ -158,8 +152,9 @@
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 loadingIndicator.style.display = 'none';
-                // FIX: More descriptive error message
-                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات (خطأ: ${error.message}).<br>الرجاء التأكد من 1) صحة مفاتيح الربط (API Keys) في الكود، و 2) أن أذونات جدول 'Things' تسمح بالقراءة للعامة (Public Read).</p>`;
+                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات.</p>`;
+            } finally {
+                loadingIndicator.style.display = 'none';
             }
         }
         
@@ -220,15 +215,12 @@
             const price = product.get('price');
             const mainImageFile = product.get('imageFile');
             const mainImageUrl = mainImageFile ? mainImageFile.url() : '';
-            
-            // FIX: Ensure 'photos' is an array before trying to spread it.
-            const photos = product.get('photos');
+            const photos = product.get('photos') || [];
             const photoArray = Array.isArray(photos) ? photos : [];
             let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
 
             let thumbnailsHTML = '';
             allImages.forEach((imgFile, index) => {
-                // FIX: Check if imgFile exists and has a url method before calling it.
                 if (imgFile && typeof imgFile.url === 'function') {
                     thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500" data-index="${index}">`;
                 }
@@ -237,7 +229,7 @@
             const modalHTML = `
                 <div class="flex flex-col md:flex-row gap-6">
                     <div class="md:w-1/2">
-                        <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4">
+                        <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain">
                         <div class="flex gap-2 justify-center">${thumbnailsHTML}</div>
                     </div>
                     <div class="md:w-1/2 text-right">
@@ -268,8 +260,162 @@
                 Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.', 'warning');
                 return;
             }
-            Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
+            
+            Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+            const Cart = Parse.Object.extend("Cart");
+            const query = new Parse.Query(Cart);
+            query.equalTo("user", currentUser);
+            query.equalTo("product", { __type: "Pointer", className: "Things", objectId: productId });
+            
+            try {
+                const cartItem = await query.first();
+                if (cartItem) {
+                    // Item exists, increment quantity
+                    cartItem.increment("quantity");
+                    await cartItem.save();
+                } else {
+                    // Item does not exist, create new
+                    const newCartItem = new Cart();
+                    newCartItem.set("user", currentUser);
+                    newCartItem.set("product", Parse.Object.createWithoutData("Things", productId));
+                    newCartItem.set("quantity", 1);
+                    await newCartItem.save();
+                }
+                updateCartCount();
+                Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
+            } catch (error) {
+                 console.error("Error adding to cart:", error);
+                 Swal.fire('خطأ', 'فشلت إضافة المنتج للسلة.', 'error');
+            }
         }
+        
+        async function updateCartCount() {
+            if(!currentUser) return;
+            const Cart = Parse.Object.extend("Cart");
+            const query = new Parse.Query(Cart);
+            query.equalTo("user", currentUser);
+            try {
+                const count = await query.count();
+                if(count > 0) {
+                    cartCountSpan.textContent = count;
+                    cartCountSpan.classList.remove('hidden');
+                } else {
+                    cartCountSpan.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error("Error updating cart count:", error);
+            }
+        }
+        
+        cartButton.addEventListener('click', async () => {
+             if(!currentUser) {
+                Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لعرض السلة.', 'warning');
+                return;
+            }
+            showCartModal();
+        });
+
+        async function showCartModal() {
+            const Cart = Parse.Object.extend("Cart");
+            const query = new Parse.Query(Cart);
+            query.equalTo("user", currentUser);
+            query.include("product"); // IMPORTANT: fetch the full product object
+
+            Swal.fire({ title: 'جارِ تحميل السلة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+            try {
+                const cartItems = await query.find();
+                let subtotal = 0;
+                let cartHTML = `<table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].product}</th>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].price}</th>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].quantity}</th>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].total}</th>
+                    </tr></thead><tbody>`;
+
+                if (cartItems.length === 0) {
+                     cartHTML = `<p class="text-center p-4">${translations[currentLang].empty_cart}</p>`;
+                } else {
+                    cartItems.forEach(item => {
+                        const product = item.get("product");
+                        const price = product.get("price") || 0;
+                        const quantity = item.get("quantity");
+                        const total = price * quantity;
+                        subtotal += total;
+
+                        cartHTML += `<tr class="bg-white border-b">
+                            <td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td>
+                            <td class="px-6 py-4">$${price.toFixed(2)}</td>
+                            <td class="px-6 py-4">${quantity}</td>
+                            <td class="px-6 py-4">$${total.toFixed(2)}</td>
+                        </tr>`;
+                    });
+                     cartHTML += `</tbody></table>`;
+                }
+
+                const footerHTML = `
+                    <div class="mt-6 text-right">
+                        <p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p>
+                    </div>
+                    <div class="mt-4 border-t pt-4">
+                        <h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                           <button id="pay-wallet" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button>
+                           <button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition">${translations[currentLang].pay_paypal}</button>
+                           <button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition">${translations[currentLang].pay_card}</button>
+                        </div>
+                    </div>`;
+
+                Swal.fire({
+                    title: translations[currentLang].cart_title,
+                    html: cartHTML + footerHTML,
+                    width: '800px',
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    didOpen: () => {
+                        const payWalletBtn = document.getElementById('pay-wallet');
+                        if (payWalletBtn) {
+                            payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems));
+                        }
+                    }
+                });
+
+            } catch(error) {
+                console.error("Error showing cart:", error);
+                Swal.fire('خطأ', 'فشل عرض السلة.', 'error');
+            }
+        }
+        
+        async function handleWalletPayment(totalCost, cartItems) {
+            Swal.fire({ title: 'جارِ معالجة الدفع...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            try {
+                const user = await currentUser.fetch();
+                const balance = user.get('walletBalance') || 0;
+                
+                if (balance < totalCost) {
+                     Swal.fire('خطأ', 'رصيدك في المحفظة غير كافٍ.', 'error');
+                     return;
+                }
+
+                const newBalance = balance - totalCost;
+                currentUser.set('walletBalance', newBalance);
+                
+                await currentUser.save();
+                await Parse.Object.destroyAll(cartItems);
+
+                fetchUserWallet();
+                updateCartCount();
+
+                Swal.fire('تم الدفع بنجاح!', `تم خصم $${totalCost.toFixed(2)} من محفظتك.`, 'success');
+
+            } catch (error) {
+                 console.error("Error during wallet payment:", error);
+                 Swal.fire('خطأ', 'فشلت عملية الدفع.', 'error');
+            }
+        }
+
 
         // --- AUTH & PAGE SETUP ---
         document.querySelectorAll('.lang-switcher').forEach(s => s.addEventListener('click', e => setLanguage(e.target.dataset.lang)));
@@ -284,11 +430,13 @@
             if(walletLink) walletLink.style.display = 'none';
         } else {
             fetchUserWallet();
+            updateCartCount();
         }
 
         // Initial Load
         setLanguage('ar');
-        fetchProducts(); // Initial fetch
+        fetchProducts();
+
     });
     </script>
 </body>
