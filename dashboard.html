@@ -152,11 +152,7 @@
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 loadingIndicator.style.display = 'none';
-                Swal.fire({
-                    title: 'خطأ في تحميل المنتجات',
-                    html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات جدول 'Things'.<br><code class="text-xs text-gray-500">${error.message}</code>`,
-                    icon: 'error'
-                });
+                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.</p>`;
             } finally {
                 loadingIndicator.style.display = 'none';
             }
@@ -284,28 +280,30 @@
             }
         }
         
+        // --- FIXED: POINTER CREATION LOGIC ---
         async function addToCart(productId, quantityToAdd) {
             Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
-            // FIX: Use 'guest' instead of 'user'
+            
+            // Create a valid Pointer object for the product
+            const productPointer = Parse.Object.createWithoutData("Things", productId);
+
             query.equalTo("guest", currentUser);
-            query.equalTo("product", { __type: "Pointer", className: "Things", objectId: productId });
+            query.equalTo("product", productPointer);
             
             try {
-                const cartItem = await query.first();
+                let cartItem = await query.first();
                 if (cartItem) {
                     cartItem.increment("quantity", quantityToAdd);
-                    await cartItem.save();
                 } else {
-                    const newCartItem = new Cart();
-                    // FIX: Use 'guest' instead of 'user'
-                    newCartItem.set("guest", currentUser);
-                    newCartItem.set("product", Parse.Object.createWithoutData("Things", productId));
-                    newCartItem.set("quantity", quantityToAdd);
-                    await newCartItem.save();
+                    cartItem = new Cart();
+                    cartItem.set("guest", currentUser);
+                    cartItem.set("product", productPointer);
+                    cartItem.set("quantity", quantityToAdd);
                 }
+                await cartItem.save();
                 updateCartCount();
                 Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
             } catch (error) {
@@ -326,7 +324,6 @@
             if(!currentUser) return;
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
-             // FIX: Use 'guest' instead of 'user'
             query.equalTo("guest", currentUser);
             try {
                 const count = await query.count();
@@ -352,7 +349,6 @@
         async function showCartModal() {
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
-            // FIX: Use 'guest' instead of 'user'
             query.equalTo("guest", currentUser);
             query.include("product"); 
 
