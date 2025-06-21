@@ -118,9 +118,9 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const translations = {
-            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart." },
-            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة." },
-            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta." }
+            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity" },
+            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية" },
+            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad" }
         };
         let currentLang = 'ar'; 
 
@@ -206,12 +206,13 @@
                     <div class="card-body"> <div class="product-desc"> <span class="product-title">${name}</span> <span class="product-caption">${category}</span> <span class="product-caption">${translations[lang].shipping_time}: ${shippingTime}</span> </div> <div class="product-properties"> <span class="product-price">$<b>${price.toFixed(2)}</b></span> <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}"> ${translations[lang].add_to_cart} </button> </div> </div>
                 `;
                 card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => { e.stopPropagation(); promptForQuantity(product.id); });
-                card.addEventListener('click', () => showProductDetails(product));
+                card.addEventListener('click', () => showProductDetails(product.id));
                 productsGrid.appendChild(card);
             });
         }
         
-        async function showProductDetails(product) {
+        async function showProductDetails(productId) {
+            const product = productsCache.find(p => p.id === productId);
             if (!product) return;
             const name = product.get(`name_${currentLang}`);
             const description = product.get(`description_${currentLang}`);
@@ -233,6 +234,7 @@
             if (quantity) { addToCart(productId, parseInt(quantity)); }
         }
         
+        // --- FIXED: CART LOGIC to use createWithoutData ---
         async function addToCart(productId, quantityToAdd) {
             Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             const Net = Parse.Object.extend("Net");
@@ -298,10 +300,10 @@
                 } else {
                     cartHTML = `<div class="max-h-64 overflow-y-auto"><table class="w-full text-sm text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0"><tr>
-                        <th scope="col" class="px-4 py-3">${translations[currentLang].product}</th>
-                        <th scope="col" class="px-4 py-3">${translations[currentLang].quantity}</th>
-                        <th scope="col" class="px-4 py-3">${translations[currentLang].total}</th>
-                        <th scope="col" class="px-4 py-3"></th>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].product}</th>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].price}</th>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].quantity}</th>
+                        <th scope="col" class="px-6 py-3">${translations[currentLang].total}</th>
                     </tr></thead><tbody>`;
                     cartItems.forEach(item => {
                         const product = item.get("product");
@@ -309,59 +311,15 @@
                         const quantity = item.get("quantity");
                         const total = price * quantity;
                         subtotal += total;
-                        cartHTML += `<tr class="bg-white border-b">
-                            <td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td>
-                            <td class="px-6 py-4">${quantity}</td>
-                            <td class="px-6 py-4">$${total.toFixed(2)}</td>
-                            <td class="px-6 py-4">
-                                <button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-cart-item-id="${item.id}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        </tr>`;
+                        cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td><td class="px-6 py-4">$${price.toFixed(2)}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td></tr>`;
                     });
                      cartHTML += `</tbody></table></div>`;
                 }
                 const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition">${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition">${translations[currentLang].pay_card}</button></div></div>`;
-                Swal.fire({ title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { 
-                    const payWalletBtn = document.getElementById('pay-wallet'); 
-                    if (payWalletBtn && cartItems.length > 0) { payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems)); }
-                    document.querySelectorAll('.remove-from-cart-btn').forEach(btn => btn.addEventListener('click', (e) => confirmRemoveFromCart(e.currentTarget.dataset.cartItemId)));
-                }});
+                Swal.fire({ title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const payWalletBtn = document.getElementById('pay-wallet'); if (payWalletBtn && cartItems.length > 0) { payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems)); } } });
             } catch(error) {
                 console.error("Error showing cart:", error);
                 Swal.fire('خطأ', 'فشل عرض السلة.', 'error');
-            }
-        }
-        
-        async function confirmRemoveFromCart(cartItemId) {
-            const result = await Swal.fire({
-                title: translations[currentLang].remove_item_title,
-                text: translations[currentLang].remove_item_text,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: translations[currentLang].remove_item_confirm,
-                cancelButtonText: translations[currentLang].remove_item_cancel
-            });
-            if (result.isConfirmed) {
-                removeFromCart(cartItemId);
-            }
-        }
-
-        async function removeFromCart(cartItemId) {
-            Swal.fire({ title: 'جارِ الحذف...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-            const Net = Parse.Object.extend("Net");
-            const cartItem = Net.createWithoutData(cartItemId);
-            try {
-                await cartItem.destroy();
-                updateCartCount();
-                showCartModal(); // Refresh the cart modal
-                Swal.fire(translations[currentLang].item_removed_title, translations[currentLang].item_removed_text, 'success');
-            } catch (error) {
-                console.error("Error removing from cart:", error);
-                Swal.fire('خطأ', 'فشل حذف المنتج.', 'error');
             }
         }
         
