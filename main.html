@@ -28,45 +28,33 @@
         .card-body { height: 248px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 17px; font-weight: 500; text-transform: uppercase; }
-        .product-title b { font-weight: 900; }
         .product-caption { display: block; font-size: 11px; color: #888; text-transform: uppercase; margin-top: 5px; }
         .product-properties { display: flex; justify-content: space-between; align-items: center; }
         .product-price { font-size: 26px; font-weight: 700; color: #3B82F6; }
-        .product-price b { font-weight: 900; }
         .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
+        .product-rating { font-size: 14px; color: #facc15; /* yellow-400 */ }
+        .product-rating .grey { color: #d1d5db; /* gray-300 */ }
+        /* Interactive stars in review modal */
+        .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
     </style>
 </head>
 <body class="bg-[#212534]">
 
-    <!-- Navbar -->
     <nav class="bg-gray-900 bg-opacity-80 shadow-lg backdrop-blur-md sticky top-0 z-40">
         <div class="container mx-auto px-4 sm:px-6 py-4">
             <div class="flex justify-between items-center">
                 <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
-                
-                <!-- Desktop Nav Links -->
                 <div class="hidden md:flex items-center space-x-4 space-x-reverse">
                     <a href="main.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
                     <a href="local.html" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                     <a href="wallet.html" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
                     <a href="track.html" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
                     <a href="us.html" class="text-gray-300 hover:text-white" data-translate-key="about_us">من نحن</a>
-                    <a href="contact.html" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
+                    <a href="info.html" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
                 </div>
-
                 <div class="flex items-center">
-                     <!-- Cart Icon -->
-                     <button id="cart-button" class="text-white text-2xl relative mx-2">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span id="cart-count" class="cart-badge hidden">0</span>
-                     </button>
-                    <!-- Mobile Menu Button -->
-                    <div class="md:hidden">
-                        <button id="mobile-menu-button" class="text-white p-2">
-                            <i class="fas fa-bars"></i>
-                        </button>
-                    </div>
-                     <!-- Language Switcher for larger screens -->
+                     <button id="cart-button" class="text-white text-2xl relative mx-2"> <i class="fas fa-shopping-cart"></i> <span id="cart-count" class="cart-badge hidden">0</span> </button>
+                    <div class="md:hidden"> <button id="mobile-menu-button" class="text-white p-2"> <i class="fas fa-bars"></i> </button> </div>
                     <div class="hidden md:flex items-center space-x-2 space-x-reverse ml-4">
                         <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
                         <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
@@ -75,15 +63,13 @@
                      <button id="logout-button" class="hidden md:block bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
                 </div>
             </div>
-
-            <!-- Mobile Menu Dropdown -->
             <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <a href="main" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
-                <a href="local" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
-                <a href="wallet" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
-                <a href="track" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
-                <a href="us" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="about_us">من نحن</a>
-                <a href="info" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="contact_info">معلومات الاتصال</a>
+                <a href="main.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
+                <a href="local.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
+                <a href="wallet.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
+                <a href="track.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
+                <a href="us.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="about_us">من نحن</a>
+                <a href="info.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="contact_info">معلومات الاتصال</a>
                 <hr class="my-2 border-gray-700">
                 <div class="px-4 py-2">
                     <p class="text-gray-400 text-xs mb-2">اللغة</p>
@@ -99,16 +85,9 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="container mx-auto p-4 sm:p-8">
         <h1 data-translate-key="products_title" class="text-3xl sm:text-4xl font-bold text-center text-white mb-12">منتجاتنا</h1>
-
-        <!-- Products Grid -->
-        <div id="products-grid" class="products-grid-container">
-            <!-- Product cards will be inserted here by JavaScript -->
-        </div>
-
-        <!-- Loading Indicator -->
+        <div id="products-grid" class="products-grid-container"></div>
         <div id="loading-indicator" class="text-center py-10">
             <p data-translate-key="loading" class="text-gray-400">جارِ تحميل المنتجات...</p>
         </div>
@@ -118,13 +97,13 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const translations = {
-            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart." },
-            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة." },
-            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta." }
+            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart.", reviews: "Reviews", write_review: "Write a Review", your_rating: "Your Rating", your_comment: "Your Comment", submit_review: "Submit Review", already_rated: "You have already rated this product.", no_reviews: "No reviews yet." },
+            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة.", reviews: "التقييمات", write_review: "كتابة تقييم", your_rating: "تقييمك", your_comment: "تعليقك", submit_review: "إرسال التقييم", already_rated: "لقد قمت بتقييم هذا المنتج مسبقًا.", no_reviews: "لا توجد تقييمات بعد." },
+            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.", reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas." }
         };
         let currentLang = 'ar'; 
 
-        Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
+        Parse.initialize("YOUR_APP_ID", "YOUR_JAVASCRIPT_KEY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
 
@@ -171,6 +150,7 @@
             productsGrid.innerHTML = '';
             const Product = Parse.Object.extend("Things");
             const query = new Parse.Query(Product);
+            query.select("name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", "category_ar", "category_en", "category_es", "price", "imageFile", "photos", "shippingTime", "averageRating", "ratingCount");
             try {
                 const products = await query.find();
                 productsCache = products;
@@ -198,12 +178,32 @@
                 const shippingTime = product.get('shippingTime') || 'N/A';
                 const imageFile = product.get('imageFile');
                 const imageUrl = imageFile ? imageFile.url() : 'https://s5.postimg.cc/j9r8yf9gn/sws1.png';
+                const averageRating = product.get('averageRating') || 0;
+                const ratingCount = product.get('ratingCount') || 0;
+                
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHTML += `<i class="fa fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`;
+                }
                 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-head"> <img src="${imageUrl}" alt="${name}" class="product-img"> <div class="product-detail"> <h2>${name}</h2> ${description} </div> </div>
-                    <div class="card-body"> <div class="product-desc"> <span class="product-title">${name}</span> <span class="product-caption">${category}</span> <span class="product-caption">${translations[lang].shipping_time}: ${shippingTime}</span> </div> <div class="product-properties"> <span class="product-price">$<b>${price.toFixed(2)}</b></span> <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}"> ${translations[lang].add_to_cart} </button> </div> </div>
+                    <div class="card-head"> <img src="${imageUrl}" alt="${name}" class="product-img"> </div>
+                    <div class="card-body"> 
+                        <div class="product-desc"> 
+                            <span class="product-title">${name}</span> 
+                            <span class="product-caption">${category}</span>
+                            <div class="product-rating mt-2 flex items-center">
+                                ${starsHTML}
+                                <span class="text-xs text-gray-500 mr-2">(${ratingCount})</span>
+                            </div>
+                        </div> 
+                        <div class="product-properties"> 
+                            <span class="product-price">$<b>${price.toFixed(2)}</b></span> 
+                            <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}"> ${translations[lang].add_to_cart} </button> 
+                        </div> 
+                    </div>
                 `;
                 card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => { e.stopPropagation(); promptForQuantity(product); });
                 card.addEventListener('click', () => showProductDetails(product));
@@ -223,8 +223,72 @@
             let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
             let thumbnailsHTML = '';
             allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
-            const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p></div></div>`;
-            Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); }});
+            
+            const Ratings = Parse.Object.extend("Ratings");
+            const query = new Parse.Query(Ratings);
+            query.equalTo("product", product);
+            query.include("guest");
+            query.descending("createdAt");
+            let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
+            
+            try {
+                const reviews = await query.find();
+                if (reviews.length === 0) {
+                    reviewsHTML += `<p class="text-gray-500">${translations[currentLang].no_reviews}</p>`;
+                } else {
+                    reviews.forEach(review => {
+                        const user = review.get("guest");
+                        const username = user ? user.get("username") : "مستخدم";
+                        const stars = review.get("stars");
+                        const comment = review.get("comment");
+                        let reviewStars = '';
+                        for (let i = 1; i <= 5; i++) { reviewStars += `<i class="fa fa-star ${i <= stars ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
+                        reviewsHTML += `<div class="p-3 bg-gray-100 rounded-lg"><p class="font-semibold text-gray-800">${username}</p><div class="my-1">${reviewStars}</div><p class="text-gray-700">${comment}</p></div>`;
+                    });
+                }
+            } catch(e) {
+                reviewsHTML += `<p class="text-red-500">فشل تحميل التقييمات.</p>`;
+            }
+            reviewsHTML += `</div></div>`;
+            
+            const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p><button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600">${translations[currentLang].write_review}</button></div></div>` + reviewsHTML;
+            Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product)); }});
+        }
+        
+        async function promptForReview(product) {
+            if(!currentUser) { Swal.fire('تنبيه', 'يجب تسجيل الدخول لتقييم المنتجات.', 'warning'); return; }
+            const Ratings = Parse.Object.extend("Ratings");
+            const query = new Parse.Query(Ratings);
+            query.equalTo("product", product);
+            query.equalTo("guest", currentUser);
+            const existingRating = await query.first();
+            if (existingRating) { Swal.fire('', translations[currentLang].already_rated, 'info'); return; }
+            const { value: formValues } = await Swal.fire({
+                title: translations[currentLang].write_review,
+                html: `<div class="rating-stars text-3xl mb-4"><i class="fa fa-star text-gray-400" data-value="1"></i><i class="fa fa-star text-gray-400" data-value="2"></i><i class="fa fa-star text-gray-400" data-value="3"></i><i class="fa fa-star text-gray-400" data-value="4"></i><i class="fa fa-star text-gray-400" data-value="5"></i></div><textarea id="swal-comment" class="swal2-textarea" placeholder="${translations[currentLang].your_comment}"></textarea>`,
+                focusConfirm: false,
+                preConfirm: () => { return { stars: document.querySelector('.rating-stars').dataset.rating || 0, comment: document.getElementById('swal-comment').value } },
+                didOpen: () => {
+                    const stars = document.querySelectorAll('.rating-stars .fa-star');
+                    stars.forEach(star => {
+                        star.addEventListener('mouseover', (e) => { const rating = parseInt(e.target.dataset.value); stars.forEach((s, i) => s.classList.toggle('text-yellow-400', i < rating)); });
+                        star.addEventListener('mouseout', () => { const currentRating = parseInt(document.querySelector('.rating-stars').dataset.rating || 0); stars.forEach((s, i) => s.classList.toggle('text-yellow-400', i < currentRating)); });
+                        star.addEventListener('click', (e) => { const rating = parseInt(e.target.dataset.value); document.querySelector('.rating-stars').dataset.rating = rating; });
+                    });
+                }
+            });
+            if (formValues && formValues.stars > 0) {
+                const Rating = Parse.Object.extend("Ratings");
+                const newRating = new Rating();
+                newRating.set("stars", parseInt(formValues.stars));
+                newRating.set("comment", formValues.comment);
+                newRating.set("product", product);
+                newRating.set("guest", currentUser);
+                try {
+                    await newRating.save();
+                    Swal.fire('شكراً لك!', 'تم إرسال تقييمك بنجاح.', 'success').then(() => fetchProducts());
+                } catch(error) { Swal.fire('خطأ', 'فشل إرسال التقييم.', 'error'); }
+            }
         }
         
         async function promptForQuantity(product) {
@@ -241,14 +305,8 @@
             query.equalTo("product", product);
             try {
                 let cartItem = await query.first();
-                if (cartItem) {
-                    cartItem.increment("quantity", quantityToAdd);
-                } else {
-                    cartItem = new Net();
-                    cartItem.set("guest", currentUser);
-                    cartItem.set("product", product);
-                    cartItem.set("quantity", quantityToAdd);
-                }
+                if (cartItem) { cartItem.increment("quantity", quantityToAdd); } 
+                else { cartItem = new Net(); cartItem.set("guest", currentUser); cartItem.set("product", product); cartItem.set("quantity", quantityToAdd); }
                 await cartItem.save();
                 updateCartCount();
                 Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
