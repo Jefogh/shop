@@ -152,7 +152,16 @@
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 loadingIndicator.style.display = 'none';
-                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.</p>`;
+                // MODIFIED: Show error in a SweetAlert instead of the grid
+                Swal.fire({
+                    title: 'خطأ فادح في تحميل المنتجات',
+                    html: `لم نتمكن من جلب قائمة المنتجات من قاعدة البيانات.<br><br>
+                           <strong>السبب المحتمل:</strong><br>
+                           1. مفاتيح الربط (API Keys) في الكود غير صحيحة.<br>
+                           2. أذونات جدول 'Things' لا تسمح بالقراءة للعامة (Public Read).<br><br>
+                           <code class="text-xs text-gray-500">الخطأ التقني: ${error.message}</code>`,
+                    icon: 'error'
+                });
             } finally {
                 loadingIndicator.style.display = 'none';
             }
@@ -305,13 +314,12 @@
             } catch (error) {
                  console.error("Error adding to cart:", error);
                  let errorMessage = 'فشلت إضافة المنتج للسلة.';
-                 // FIX: Added clearer error message for permission issues
                  if (error.code === 119) {
                      errorMessage = '<strong>خطأ في الأذونات!</strong><br>هذا الخطأ يعني أن إعدادات الأمان لجدول "Cart" في Back4App غير صحيحة. الرجاء اتباع دليل الإعداد بدقة للسماح للمستخدمين المسجلين بالكتابة في سلاتهم الخاصة.';
                  }
                  Swal.fire({
                     title: 'خطأ',
-                    html: errorMessage + `<br><br><small>الخطأ التقني: ${error.message}</small>`, // Display the technical error
+                    html: errorMessage + `<br><br><code class="text-xs text-gray-500">الخطأ التقني: ${error.message}</code>`,
                     icon: 'error'
                 });
             }
