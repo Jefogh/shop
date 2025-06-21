@@ -34,7 +34,6 @@
         .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
         .product-rating { font-size: 14px; color: #facc15; /* yellow-400 */ }
         .product-rating .grey { color: #d1d5db; /* gray-300 */ }
-        /* Interactive stars in review modal */
         .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
     </style>
 </head>
@@ -102,7 +101,6 @@
             es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.", reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas." }
         };
         let currentLang = 'ar'; 
-
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
@@ -182,9 +180,7 @@
                 const ratingCount = product.get('ratingCount') || 0;
                 
                 let starsHTML = '';
-                for (let i = 1; i <= 5; i++) {
-                    starsHTML += `<i class="fa fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`;
-                }
+                for (let i = 1; i <= 5; i++) { starsHTML += `<i class="fa fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
                 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -194,9 +190,9 @@
                         <div class="product-desc"> 
                             <span class="product-title">${name}</span> 
                             <span class="product-caption">${category}</span>
-                            <div class="product-rating mt-2 flex items-center">
+                            <div class="product-rating mt-2 flex items-center" dir="ltr">
                                 ${starsHTML}
-                                <span class="text-xs text-gray-500 mr-2">(${ratingCount})</span>
+                                <span class="text-xs text-gray-500 ml-2">(${ratingCount})</span>
                             </div>
                         </div> 
                         <div class="product-properties"> 
@@ -229,7 +225,7 @@
             query.equalTo("product", product);
             query.include("guest");
             query.descending("createdAt");
-            let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
+            let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
             
             try {
                 const reviews = await query.find();
@@ -238,12 +234,13 @@
                 } else {
                     reviews.forEach(review => {
                         const user = review.get("guest");
-                        const username = user ? user.get("username") : "مستخدم";
+                        // Use user's name if available, otherwise fallback to username
+                        const username = user ? (user.get("name") || user.get("username")) : "مستخدم";
                         const stars = review.get("stars");
                         const comment = review.get("comment");
                         let reviewStars = '';
-                        for (let i = 1; i <= 5; i++) { reviewStars += `<i class="fa fa-star ${i <= stars ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
-                        reviewsHTML += `<div class="p-3 bg-gray-100 rounded-lg"><p class="font-semibold text-gray-800">${username}</p><div class="my-1">${reviewStars}</div><p class="text-gray-700">${comment}</p></div>`;
+                        for (let i = 1; i <= 5; i++) { reviewStars += `<i class="fa-solid fa-star ${i <= stars ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
+                        reviewsHTML += `<div class="p-3 bg-gray-100 rounded-lg"><p class="font-semibold text-gray-800">${username}</p><div class="my-1" dir="ltr">${reviewStars}</div><p class="text-gray-700">${comment}</p></div>`;
                     });
                 }
             } catch(e) {
@@ -251,7 +248,7 @@
             }
             reviewsHTML += `</div></div>`;
             
-            const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p><button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600">${translations[currentLang].write_review}</button></div></div>` + reviewsHTML;
+            const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p><button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600">${translations[currentLang].write_review}</button></div></div>` + reviewsHTML;
             Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product)); }});
         }
         
@@ -267,6 +264,9 @@
                 title: translations[currentLang].write_review,
                 html: `<div class="rating-stars text-3xl mb-4"><i class="fa fa-star text-gray-400" data-value="1"></i><i class="fa fa-star text-gray-400" data-value="2"></i><i class="fa fa-star text-gray-400" data-value="3"></i><i class="fa fa-star text-gray-400" data-value="4"></i><i class="fa fa-star text-gray-400" data-value="5"></i></div><textarea id="swal-comment" class="swal2-textarea" placeholder="${translations[currentLang].your_comment}"></textarea>`,
                 focusConfirm: false,
+                confirmButtonText: translations[currentLang].submit_review,
+                showCancelButton: true,
+                cancelButtonText: translations[currentLang].remove_item_cancel,
                 preConfirm: () => { return { stars: document.querySelector('.rating-stars').dataset.rating || 0, comment: document.getElementById('swal-comment').value } },
                 didOpen: () => {
                     const stars = document.querySelectorAll('.rating-stars .fa-star');
