@@ -40,41 +40,61 @@
 
     <!-- Navbar -->
     <nav class="bg-gray-900 bg-opacity-80 shadow-lg backdrop-blur-md sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-            <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
-            
-             <!-- Desktop Nav Links -->
-            <div class="hidden md:flex items-center space-x-4 space-x-reverse">
-                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
-                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
-                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
-                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
-                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="about_us">من نحن</a>
-                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
+        <div class="container mx-auto px-4 sm:px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
+                
+                <!-- Desktop Nav Links -->
+                <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                    <a href="#" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
+                    <a href="#" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
+                    <a href="#" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
+                    <a href="#" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
+                    <a href="#" class="text-gray-300 hover:text-white" data-translate-key="about_us">من نحن</a>
+                    <a href="#" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
+                </div>
+
+                <div class="flex items-center">
+                     <!-- Cart Icon -->
+                     <button id="cart-button" class="text-white text-2xl relative mx-2">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="cart-badge hidden">0</span>
+                     </button>
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" class="text-white p-2">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                     <!-- Language Switcher for larger screens -->
+                    <div class="hidden md:flex items-center space-x-2 space-x-reverse ml-4">
+                        <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
+                        <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
+                        <button data-lang="es" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">Español</button>
+                    </div>
+                     <button id="logout-button" class="hidden md:block bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
+                </div>
             </div>
 
-            <div class="flex items-center">
-                 <!-- Cart Icon -->
-                 <button id="cart-button" class="text-white text-2xl relative mx-2">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-count" class="cart-badge hidden">0</span>
-                 </button>
-                 <!-- Language Switcher for smaller screens -->
-                <div class="relative md:hidden">
-                    <button id="lang-menu-button" class="text-white px-2"><i class="fas fa-globe"></i></button>
-                    <div id="lang-menu" class="hidden absolute top-full left-0 mt-2 bg-gray-800 rounded-md shadow-lg py-1">
-                        <button data-lang="ar" class="lang-switcher block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">العربية</button>
-                        <button data-lang="en" class="lang-switcher block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">English</button>
-                        <button data-lang="es" class="lang-switcher block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700">Español</button>
+            <!-- Mobile Menu Dropdown -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4">
+                <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
+                <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
+                <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
+                <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
+                <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="about_us">من نحن</a>
+                <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="contact_info">معلومات الاتصال</a>
+                <hr class="my-2 border-gray-700">
+                <div class="px-4 py-2">
+                    <p class="text-gray-400 text-xs mb-2">اللغة</p>
+                    <div class="flex justify-around">
+                        <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
+                        <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
+                        <button data-lang="es" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">Español</button>
                     </div>
                 </div>
-                 <!-- Language Switcher for larger screens -->
-                <div class="hidden md:flex items-center space-x-2 space-x-reverse ml-4">
-                    <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
-                    <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
-                    <button data-lang="es" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">Español</button>
-                </div>
-                 <button id="logout-button" class="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
+                 <hr class="my-2 border-gray-700">
+                <button id="logout-button-mobile" class="w-full text-left py-2 px-4 text-sm text-red-400 hover:bg-gray-700 rounded-md" data-translate-key="logout">تسجيل الخروج</button>
             </div>
         </div>
     </nav>
@@ -97,8 +117,13 @@
     <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const translations = { /* ... translation data remains the same ... */ };
+        const translations = {
+            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity" },
+            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية" },
+            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad" }
+        };
         let currentLang = 'ar'; 
+
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
@@ -109,9 +134,37 @@
         const cartCountSpan = document.getElementById('cart-count');
         let productsCache = [];
 
-        function setLanguage(lang) { /* ... setLanguage logic remains the same ... */ }
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-translate-key]').forEach(el => {
+                const key = el.getAttribute('data-translate-key');
+                if (!translations[lang][key]) return;
+                if (key === 'my_wallet') {
+                    const balanceSpan = el.querySelector('#wallet-balance, #wallet-balance-mobile');
+                    el.textContent = translations[lang][key] + ' ';
+                    if (balanceSpan) el.appendChild(balanceSpan);
+                } else {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            renderProducts(productsCache, lang);
+        }
 
-        async function fetchUserWallet() { /* ... fetchUserWallet logic remains the same ... */ }
+        async function fetchUserWallet() {
+             try {
+                const user = await currentUser.fetch();
+                const balance = user.get('walletBalance') || 0;
+                const formattedBalance = `$${balance.toFixed(2)}`;
+                document.getElementById('wallet-balance').textContent = formattedBalance;
+                document.getElementById('wallet-balance-mobile').textContent = formattedBalance;
+            } catch (error) {
+                console.error("Error fetching wallet:", error);
+                document.getElementById('wallet-balance').textContent = '$0.00';
+                document.getElementById('wallet-balance-mobile').textContent = '$0.00';
+            }
+        }
 
         async function fetchProducts() {
             loadingIndicator.style.display = 'block';
@@ -125,19 +178,15 @@
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 loadingIndicator.style.display = 'none';
-                Swal.fire({
-                    title: 'خطأ في تحميل المنتجات',
-                    html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.<br><code class="text-xs text-gray-500">${error.message}</code>`,
-                    icon: 'error'
-                });
+                Swal.fire({ title: 'خطأ', html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.<br><code class="text-xs">${error.message}</code>`, icon: 'error' });
             } finally {
                 loadingIndicator.style.display = 'none';
             }
         }
         
         function renderProducts(products, lang) {
-             productsGrid.innerHTML = '';
-            if (products.length === 0 && productsCache.length > 0) {
+            productsGrid.innerHTML = '';
+            if (products.length === 0) {
                  productsGrid.innerHTML = `<p class="text-center col-span-full text-gray-400">لا توجد منتجات لعرضها حاليًا.</p>`;
                  return;
             }
@@ -174,41 +223,37 @@
                         </div>
                     </div>
                 `;
-                card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    promptForQuantity(product.id);
-                });
+                card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => { e.stopPropagation(); promptForQuantity(product.id); });
                 card.addEventListener('click', () => showProductDetails(product.id));
                 productsGrid.appendChild(card);
             });
         }
         
-        async function showProductDetails(productId) { /* ... showProductDetails logic remains the same ... */ }
-        
-        async function promptForQuantity(productId) {
-             if(!currentUser) {
-                Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.', 'warning');
-                return;
-            }
-            const { value: quantity } = await Swal.fire({
-                title: translations[currentLang].add_item_title,
-                input: 'number',
-                inputLabel: translations[currentLang].add_item_label,
-                inputValue: 1,
-                inputAttributes: { min: 1, step: 1 },
-                showCancelButton: true,
-                inputValidator: (value) => { if (!value || value < 1) { return 'الرجاء إدخال كمية صالحة!' } }
-            });
-
-            if (quantity) {
-                addToCart(productId, parseInt(quantity));
-            }
+        async function showProductDetails(productId) {
+            const product = productsCache.find(p => p.id === productId);
+            if (!product) return;
+            const name = product.get(`name_${currentLang}`);
+            const description = product.get(`description_${currentLang}`);
+            const price = product.get('price');
+            const mainImageFile = product.get('imageFile');
+            const mainImageUrl = mainImageFile ? mainImageFile.url() : '';
+            const photos = product.get('photos') || [];
+            const photoArray = Array.isArray(photos) ? photos : [];
+            let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
+            let thumbnailsHTML = '';
+            allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
+            const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p></div></div>`;
+            Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); }});
         }
         
-        // --- CART LOGIC with 'Net' class ---
+        async function promptForQuantity(productId) {
+             if(!currentUser) { Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.', 'warning'); return; }
+            const { value: quantity } = await Swal.fire({ title: translations[currentLang].add_item_title, input: 'number', inputLabel: translations[currentLang].add_item_label, inputValue: 1, inputAttributes: { min: 1, step: 1 }, showCancelButton: true, inputValidator: (value) => { if (!value || value < 1) { return 'الرجاء إدخال كمية صالحة!' } } });
+            if (quantity) { addToCart(productId, parseInt(quantity)); }
+        }
+        
         async function addToCart(productId, quantityToAdd) {
             Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-            // FIX: Changed "Cart" to "Net"
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             const productPointer = Parse.Object.createWithoutData("Things", productId);
@@ -230,16 +275,13 @@
             } catch (error) {
                  console.error("Error adding to cart:", error);
                  let errorMessage = 'فشلت إضافة المنتج للسلة.';
-                 if (error.code === 119) {
-                     errorMessage = `<strong>خطأ في الأذونات!</strong><br>الرجاء التأكد من إعدادات الأمان لجدول "Net" بشكل صحيح.`;
-                 }
-                 Swal.fire({ title: 'خطأ', html: errorMessage + `<br><br><code class="text-xs text-gray-500">الخطأ: ${error.message}</code>`, icon: 'error' });
+                 if (error.code === 119) { errorMessage = `<strong>خطأ في الأذونات!</strong><br>الرجاء التأكد من إعدادات الأمان لجدول "Net" بشكل صحيح.`; }
+                 Swal.fire({ title: 'خطأ', html: errorMessage + `<br><br><code class="text-xs">${error.message}</code>`, icon: 'error' });
             }
         }
         
         async function updateCartCount() {
             if(!currentUser) return;
-            // FIX: Changed "Cart" to "Net"
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
@@ -251,21 +293,15 @@
                 } else {
                     cartCountSpan.classList.add('hidden');
                 }
-            } catch (error) {
-                console.error("Error updating cart count:", error);
-            }
+            } catch (error) { console.error("Error updating cart count:", error); }
         }
         
         cartButton.addEventListener('click', async () => {
-             if(!currentUser) {
-                Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لعرض السلة.', 'warning');
-                return;
-            }
+             if(!currentUser) { Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لعرض السلة.', 'warning'); return; }
             showCartModal();
         });
 
         async function showCartModal() {
-            // FIX: Changed "Cart" to "Net"
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
@@ -274,7 +310,7 @@
             try {
                 const cartItems = await query.find();
                 let subtotal = 0;
-                let cartHTML = `...`; // Cart HTML rendering logic
+                let cartHTML;
                 if (cartItems.length === 0) {
                      cartHTML = `<p class="text-center p-4">${translations[currentLang].empty_cart}</p>`;
                 } else {
@@ -291,24 +327,12 @@
                         const quantity = item.get("quantity");
                         const total = price * quantity;
                         subtotal += total;
-                        cartHTML += `...`; // table row
+                        cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td><td class="px-6 py-4">$${price.toFixed(2)}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td></tr>`;
                     });
                      cartHTML += `</tbody></table>`;
                 }
-                const footerHTML = `...`; // Footer HTML logic
-                Swal.fire({
-                    title: translations[currentLang].cart_title,
-                    html: cartHTML + footerHTML,
-                    width: window.innerWidth > 768 ? '800px' : '95%',
-                    showConfirmButton: false,
-                    showCloseButton: true,
-                    didOpen: () => {
-                        const payWalletBtn = document.getElementById('pay-wallet');
-                        if (payWalletBtn && cartItems.length > 0) {
-                            payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems));
-                        }
-                    }
-                });
+                const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition">${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition">${translations[currentLang].pay_card}</button></div></div>`;
+                Swal.fire({ title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const payWalletBtn = document.getElementById('pay-wallet'); if (payWalletBtn && cartItems.length > 0) { payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems)); } } });
             } catch(error) {
                 console.error("Error showing cart:", error);
                 Swal.fire('خطأ', 'فشل عرض السلة.', 'error');
@@ -316,38 +340,48 @@
         }
         
         async function handleWalletPayment(totalCost, cartItems) {
-            // ... (Payment logic remains the same, but uses the 'Net' object)
+            Swal.fire({ title: 'جارِ معالجة الدفع...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            try {
+                const user = await currentUser.fetch();
+                const balance = user.get('walletBalance') || 0;
+                if (balance < totalCost) { Swal.fire('خطأ', 'رصيدك في المحفظة غير كافٍ.', 'error'); return; }
+                const newBalance = balance - totalCost;
+                currentUser.set('walletBalance', newBalance);
+                await currentUser.save();
+                await Parse.Object.destroyAll(cartItems);
+                fetchUserWallet();
+                updateCartCount();
+                Swal.fire('تم الدفع بنجاح!', `تم خصم $${totalCost.toFixed(2)} من محفظتك.`, 'success');
+            } catch (error) {
+                 console.error("Error during wallet payment:", error);
+                 Swal.fire('خطأ', 'فشلت عملية الدفع.', 'error');
+            }
         }
 
         // --- AUTH & PAGE SETUP ---
-        const langMenuButton = document.getElementById('lang-menu-button');
-        const langMenu = document.getElementById('lang-menu');
-        if(langMenuButton) {
-            langMenuButton.addEventListener('click', () => langMenu.classList.toggle('hidden'));
-        }
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if(mobileMenuButton) { mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden')); }
+        
         document.querySelectorAll('.lang-switcher').forEach(s => s.addEventListener('click', e => {
             setLanguage(e.target.dataset.lang);
-            if(langMenu) langMenu.classList.add('hidden');
+            if(mobileMenu) mobileMenu.classList.add('hidden');
         }));
         
-        document.getElementById('logout-button').addEventListener('click', async () => {
-            await Parse.User.logOut();
-            window.location.reload();
-        });
+        const logoutButtons = [document.getElementById('logout-button'), document.getElementById('logout-button-mobile')];
+        logoutButtons.forEach(btn => btn.addEventListener('click', async () => { await Parse.User.logOut(); window.location.reload(); }));
         
         if (!currentUser) {
-            document.getElementById('logout-button').style.display = 'none';
-            const walletLink = document.querySelector('[data-translate-key="my_wallet"]');
-            if(walletLink) walletLink.style.display = 'none';
+            logoutButtons.forEach(btn => btn.style.display = 'none');
+            document.querySelector('[data-translate-key="my_wallet"]').style.display = 'none';
+            document.querySelector('#mobile-menu [data-translate-key="my_wallet"]').style.display = 'none';
         } else {
             fetchUserWallet();
             updateCartCount();
         }
 
-        // Initial Load
         setLanguage('ar');
         fetchProducts();
-
     });
     </script>
 </body>
