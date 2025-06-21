@@ -304,7 +304,12 @@
                 Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
             } catch (error) {
                  console.error("Error adding to cart:", error);
-                 Swal.fire('خطأ', 'فشلت إضافة المنتج للسلة. تأكد من إعداد أذونات جدول السلة بشكل صحيح.', 'error');
+                 let errorMessage = 'فشلت إضافة المنتج للسلة.';
+                 // Parse error code for 'Operation forbidden' is 119, often due to CLPs
+                 if (error.code === 119) {
+                     errorMessage = 'خطأ في الأذونات! الرجاء مراجعة إعدادات الأمان لجدول "Cart" في Back4App والتأكد من أنها تسمح للمستخدم بالكتابة.';
+                 }
+                 Swal.fire('خطأ', errorMessage, 'error');
             }
         }
         
