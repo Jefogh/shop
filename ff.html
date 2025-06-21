@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<!-- The lang and dir attributes will be set by JavaScript -->
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المتجر العالمي</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background: #212534; color: #fff; }
+        .swal2-popup { font-family: 'Tajawal', sans-serif; }
+        .products-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 4rem 2rem; padding: 2rem; justify-items: center; }
+        .card { width: 280px; height: 500px; border-radius: 25px; box-shadow: -11px 11px 1px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease; cursor: pointer; }
+        .card:hover { transform: scale(1.03); }
+        .card-head { position: relative; height: 252px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 20px; }
+        .product-img { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 260px; filter: drop-shadow(0 30px 20px rgba(0,0,0,0.2)); }
+        .product-detail { position: absolute; bottom: 20px; left: 20px; right: 20px; font-size: 12px; color: rgba(255,255,255,0.8); }
+        .product-detail h2 { font-size: 20px; font-weight: 700; letter-spacing: 1px; padding-bottom: 8px; text-transform: uppercase; color: #fff; }
+        .card-body { height: 248px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-desc { padding: 5px 0; }
+        .product-title { display: block; font-size: 17px; font-weight: 500; text-transform: uppercase; }
+        .product-title b { font-weight: 900; }
+        .product-caption { display: block; font-size: 11px; color: #888; text-transform: uppercase; margin-top: 5px; }
+        .product-properties { display: flex; justify-content: space-between; align-items: center; }
+        .product-price { font-size: 26px; font-weight: 700; color: #3B82F6; }
+        .product-price b { font-weight: 900; }
+        .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
+    </style>
+</head>
+<body class="bg-[#212534]">
+
+    <!-- Navbar -->
+    <nav class="bg-gray-900 bg-opacity-80 shadow-lg backdrop-blur-md sticky top-0 z-40">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div data-translate-key="store_name" class="font-bold text-2xl text-white">المتجر العالمي</div>
+            
+             <!-- Desktop Nav Links -->
+            <div class="hidden md:flex items-center space-x-4 space-x-reverse">
+                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
+                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
+                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
+                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
+                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="about_us">من نحن</a>
+                <a href="#" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
+            </div>
+
+            <div class="flex items-center">
+                 <!-- Cart Icon -->
+                 <button id="cart-button" class="text-white text-2xl relative mx-4">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count" class="cart-badge hidden">0</span>
+                 </button>
+                 <!-- Language Switcher -->
+                <div class="flex items-center space-x-2 space-x-reverse ml-4">
+                    <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
+                    <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
+                    <button data-lang="es" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">Español</button>
+                </div>
+                 <button id="logout-button" class="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 sm:p-8">
+        <h1 data-translate-key="products_title" class="text-4xl font-bold text-center text-white mb-12">منتجاتنا</h1>
+
+        <!-- Products Grid -->
+        <div id="products-grid" class="products-grid-container">
+            <!-- Product cards will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-10">
+            <p data-translate-key="loading" class="text-gray-400">جارِ تحميل المنتجات...</p>
+        </div>
+    </main>
+
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- MULTI-LANGUAGE SETUP ---
+        const translations = {
+            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card" },
+            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة" },
+            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta" }
+        };
+        let currentLang = 'ar'; 
+
+        // --- BACK4APP INITIALIZATION ---
+        // FIX: The 'unauthorized' error is caused by incorrect keys here.
+        // هام: خطأ "unauthorized" يعني أن هذه المفاتيح غير صحيحة.
+        // الرجاء استبدالها بالمعلومات الصحيحة من حسابك في Back4App.
+        // 1. اذهب إلى 'App Settings' -> 'Security & Keys' في لوحة تحكم تطبيقك.
+        // 2. انسخ 'Application ID' و 'JavaScript Key' والصقهما هنا.
+        Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
+        Parse.serverURL = "https://parseapi.back4app.com/";
+        
+        const currentUser = Parse.User.current();
+
+        // --- GLOBAL UI ELEMENTS & CACHE ---
+        const productsGrid = document.getElementById('products-grid');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const cartButton = document.getElementById('cart-button');
+        const cartCountSpan = document.getElementById('cart-count');
+        let productsCache = [];
+
+        // --- CORE FUNCTIONS ---
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-translate-key]').forEach(el => {
+                const key = el.getAttribute('data-translate-key');
+                if (!translations[lang][key]) return;
+                if (key === 'my_wallet') {
+                    const balanceSpan = el.querySelector('#wallet-balance');
+                    el.textContent = translations[lang][key] + ' ';
+                    if (balanceSpan) el.appendChild(balanceSpan);
+                } else {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            renderProducts(productsCache, lang);
+        }
+
+        async function fetchUserWallet() {
+             try {
+                const user = await currentUser.fetch();
+                const balance = user.get('walletBalance') || 0;
+                document.getElementById('wallet-balance').textContent = `$${balance.toFixed(2)}`;
+            } catch (error) {
+                console.error("Error fetching wallet:", error);
+                const span = document.getElementById('wallet-balance');
+                if(span) span.textContent = '$0.00';
+            }
+        }
+
+        async function fetchProducts() {
+            loadingIndicator.style.display = 'block';
+            productsGrid.innerHTML = '';
+            const Product = Parse.Object.extend("Things");
+            const query = new Parse.Query(Product);
+            try {
+                const products = await query.find();
+                productsCache = products;
+                renderProducts(products, currentLang);
+            } catch (error) {
+                console.error("Error fetching products: ", error);
+                loadingIndicator.style.display = 'none';
+                // FIX: More descriptive error message
+                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات (خطأ: ${error.message}).<br>الرجاء التأكد من 1) صحة مفاتيح الربط (API Keys) في الكود، و 2) أن أذونات جدول 'Things' تسمح بالقراءة للعامة (Public Read).</p>`;
+            }
+        }
+        
+        function renderProducts(products, lang) {
+            productsGrid.innerHTML = '';
+            if (products.length === 0 && productsCache.length > 0) {
+                 productsGrid.innerHTML = `<p class="text-center col-span-full text-gray-400">لا توجد منتجات لعرضها حاليًا.</p>`;
+                 return;
+            }
+            products.forEach(product => {
+                const name = product.get(`name_${lang}`) || 'Product Name';
+                const description = product.get(`description_${lang}`) || 'Description unavailable.';
+                const category = product.get(`category_${lang}`) || 'Collection';
+                const price = product.get('price') || 0;
+                const shippingTime = product.get('shippingTime') || 'N/A';
+                const imageFile = product.get('imageFile');
+                const imageUrl = imageFile ? imageFile.url() : 'https://s5.postimg.cc/j9r8yf9gn/sws1.png';
+                
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-head">
+                        <img src="${imageUrl}" alt="${name}" class="product-img">
+                        <div class="product-detail">
+                            <h2>${name}</h2>
+                            ${description}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="product-desc">
+                            <span class="product-title">${name}</span>
+                            <span class="product-caption">${category}</span>
+                            <span class="product-caption">${translations[lang].shipping_time}: ${shippingTime}</span>
+                        </div>
+                        <div class="product-properties">
+                            <span class="product-price">$<b>${price.toFixed(2)}</b></span>
+                            <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}">
+                                ${translations[lang].add_to_cart}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addToCart(product.id);
+                });
+                card.addEventListener('click', () => showProductDetails(product.id));
+                productsGrid.appendChild(card);
+            });
+        }
+        
+        async function showProductDetails(productId) {
+            const product = productsCache.find(p => p.id === productId);
+            if (!product) return;
+
+            const name = product.get(`name_${currentLang}`);
+            const description = product.get(`description_${currentLang}`);
+            const price = product.get('price');
+            const mainImageFile = product.get('imageFile');
+            const mainImageUrl = mainImageFile ? mainImageFile.url() : '';
+            
+            // FIX: Ensure 'photos' is an array before trying to spread it.
+            const photos = product.get('photos');
+            const photoArray = Array.isArray(photos) ? photos : [];
+            let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
+
+            let thumbnailsHTML = '';
+            allImages.forEach((imgFile, index) => {
+                // FIX: Check if imgFile exists and has a url method before calling it.
+                if (imgFile && typeof imgFile.url === 'function') {
+                    thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500" data-index="${index}">`;
+                }
+            });
+            
+            const modalHTML = `
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-1/2">
+                        <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4">
+                        <div class="flex gap-2 justify-center">${thumbnailsHTML}</div>
+                    </div>
+                    <div class="md:w-1/2 text-right">
+                        <h2 class="text-3xl font-bold mb-2">${name}</h2>
+                        <p class="text-gray-600 mb-4">${description}</p>
+                        <p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p>
+                    </div>
+                </div>`;
+            
+            Swal.fire({
+                html: modalHTML,
+                width: '800px',
+                showConfirmButton: false,
+                showCloseButton: true,
+                didOpen: () => {
+                    const mainImage = document.getElementById('main-product-image');
+                    document.querySelectorAll('.swal2-container img[data-index]').forEach(thumb => {
+                        thumb.addEventListener('click', () => {
+                           mainImage.src = thumb.src;
+                        });
+                    });
+                }
+            });
+        }
+
+        async function addToCart(productId) {
+            if(!currentUser) {
+                Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.', 'warning');
+                return;
+            }
+            Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
+        }
+
+        // --- AUTH & PAGE SETUP ---
+        document.querySelectorAll('.lang-switcher').forEach(s => s.addEventListener('click', e => setLanguage(e.target.dataset.lang)));
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            await Parse.User.logOut();
+            window.location.reload();
+        });
+        
+        if (!currentUser) {
+            document.getElementById('logout-button').style.display = 'none';
+            const walletLink = document.querySelector('[data-translate-key="my_wallet"]');
+            if(walletLink) walletLink.style.display = 'none';
+        } else {
+            fetchUserWallet();
+        }
+
+        // Initial Load
+        setLanguage('ar');
+        fetchProducts(); // Initial fetch
+    });
+    </script>
+</body>
+</html>
