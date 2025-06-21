@@ -152,14 +152,9 @@
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 loadingIndicator.style.display = 'none';
-                // MODIFIED: Show error in a SweetAlert instead of the grid
                 Swal.fire({
-                    title: 'خطأ فادح في تحميل المنتجات',
-                    html: `لم نتمكن من جلب قائمة المنتجات من قاعدة البيانات.<br><br>
-                           <strong>السبب المحتمل:</strong><br>
-                           1. مفاتيح الربط (API Keys) في الكود غير صحيحة.<br>
-                           2. أذونات جدول 'Things' لا تسمح بالقراءة للعامة (Public Read).<br><br>
-                           <code class="text-xs text-gray-500">الخطأ التقني: ${error.message}</code>`,
+                    title: 'خطأ في تحميل المنتجات',
+                    html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات جدول 'Things'.<br><code class="text-xs text-gray-500">${error.message}</code>`,
                     icon: 'error'
                 });
             } finally {
@@ -294,7 +289,8 @@
 
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
-            query.equalTo("user", currentUser);
+            // FIX: Use 'guest' instead of 'user'
+            query.equalTo("guest", currentUser);
             query.equalTo("product", { __type: "Pointer", className: "Things", objectId: productId });
             
             try {
@@ -304,7 +300,8 @@
                     await cartItem.save();
                 } else {
                     const newCartItem = new Cart();
-                    newCartItem.set("user", currentUser);
+                    // FIX: Use 'guest' instead of 'user'
+                    newCartItem.set("guest", currentUser);
                     newCartItem.set("product", Parse.Object.createWithoutData("Things", productId));
                     newCartItem.set("quantity", quantityToAdd);
                     await newCartItem.save();
@@ -329,7 +326,8 @@
             if(!currentUser) return;
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
-            query.equalTo("user", currentUser);
+             // FIX: Use 'guest' instead of 'user'
+            query.equalTo("guest", currentUser);
             try {
                 const count = await query.count();
                 if(count > 0) {
@@ -354,7 +352,8 @@
         async function showCartModal() {
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
-            query.equalTo("user", currentUser);
+            // FIX: Use 'guest' instead of 'user'
+            query.equalTo("guest", currentUser);
             query.include("product"); 
 
             Swal.fire({ title: 'جارِ تحميل السلة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
