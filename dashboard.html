@@ -90,9 +90,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- MULTI-LANGUAGE SETUP ---
         const translations = {
-            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card" },
-            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة" },
-            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta" }
+            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity" },
+            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية" },
+            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad" }
         };
         let currentLang = 'ar'; 
 
@@ -152,7 +152,7 @@
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 loadingIndicator.style.display = 'none';
-                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات.</p>`;
+                productsGrid.innerHTML = `<p class="text-center col-span-full text-red-500">فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.</p>`;
             } finally {
                 loadingIndicator.style.display = 'none';
             }
@@ -199,7 +199,7 @@
                 `;
                 card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => {
                     e.stopPropagation();
-                    addToCart(product.id);
+                    promptForQuantity(product.id);
                 });
                 card.addEventListener('click', () => showProductDetails(product.id));
                 productsGrid.appendChild(card);
@@ -254,13 +254,33 @@
                 }
             });
         }
-
-        async function addToCart(productId) {
-            if(!currentUser) {
+        
+        // --- CART LOGIC ---
+        async function promptForQuantity(productId) {
+             if(!currentUser) {
                 Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.', 'warning');
                 return;
             }
-            
+            const { value: quantity } = await Swal.fire({
+                title: translations[currentLang].add_item_title,
+                input: 'number',
+                inputLabel: translations[currentLang].add_item_label,
+                inputValue: 1,
+                inputAttributes: { min: 1, step: 1 },
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value || value < 1) {
+                        return 'الرجاء إدخال كمية صالحة!'
+                    }
+                }
+            });
+
+            if (quantity) {
+                addToCart(productId, parseInt(quantity));
+            }
+        }
+        
+        async function addToCart(productId, quantityToAdd) {
             Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
             const Cart = Parse.Object.extend("Cart");
@@ -271,22 +291,20 @@
             try {
                 const cartItem = await query.first();
                 if (cartItem) {
-                    // Item exists, increment quantity
-                    cartItem.increment("quantity");
+                    cartItem.increment("quantity", quantityToAdd);
                     await cartItem.save();
                 } else {
-                    // Item does not exist, create new
                     const newCartItem = new Cart();
                     newCartItem.set("user", currentUser);
                     newCartItem.set("product", Parse.Object.createWithoutData("Things", productId));
-                    newCartItem.set("quantity", 1);
+                    newCartItem.set("quantity", quantityToAdd);
                     await newCartItem.save();
                 }
                 updateCartCount();
                 Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
             } catch (error) {
                  console.error("Error adding to cart:", error);
-                 Swal.fire('خطأ', 'فشلت إضافة المنتج للسلة.', 'error');
+                 Swal.fire('خطأ', 'فشلت إضافة المنتج للسلة. تأكد من إعداد أذونات جدول السلة بشكل صحيح.', 'error');
             }
         }
         
@@ -320,7 +338,7 @@
             const Cart = Parse.Object.extend("Cart");
             const query = new Parse.Query(Cart);
             query.equalTo("user", currentUser);
-            query.include("product"); // IMPORTANT: fetch the full product object
+            query.include("product"); 
 
             Swal.fire({ title: 'جارِ تحميل السلة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 
@@ -376,7 +394,7 @@
                     showCloseButton: true,
                     didOpen: () => {
                         const payWalletBtn = document.getElementById('pay-wallet');
-                        if (payWalletBtn) {
+                        if (payWalletBtn && cartItems.length > 0) {
                             payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems));
                         }
                     }
@@ -415,7 +433,6 @@
                  Swal.fire('خطأ', 'فشلت عملية الدفع.', 'error');
             }
         }
-
 
         // --- AUTH & PAGE SETUP ---
         document.querySelectorAll('.lang-switcher').forEach(s => s.addEventListener('click', e => setLanguage(e.target.dataset.lang)));
