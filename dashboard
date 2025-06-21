@@ -46,7 +46,7 @@
                 
                 <!-- Desktop Nav Links -->
                 <div class="hidden md:flex items-center space-x-4 space-x-reverse">
-                    <a href="#" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
+                    <a href="dashboard.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
                     <a href="#" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                     <a href="#" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
                     <a href="#" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
@@ -78,7 +78,7 @@
 
             <!-- Mobile Menu Dropdown -->
             <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
+                <a href="dashboard.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
                 <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                 <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
                 <a href="#" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
@@ -123,6 +123,7 @@
             es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta." }
         };
         let currentLang = 'ar'; 
+
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
@@ -323,7 +324,7 @@
                 Swal.fire('خطأ', 'فشل عرض السلة.', 'error');
             }
         }
-
+        
         async function confirmRemoveFromCart(cartItemId) {
             const result = await Swal.fire({
                 title: translations[currentLang].remove_item_title,
@@ -347,7 +348,7 @@
             try {
                 await cartItem.destroy();
                 updateCartCount();
-                showCartModal(); // Refresh the cart modal
+                showCartModal(); 
                 Swal.close();
             } catch (error) {
                 console.error("Error removing from cart:", error);
