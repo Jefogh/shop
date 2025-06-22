@@ -27,16 +27,16 @@
         }
         .card { 
             width: 260px; 
-            height: 440px; /* Reduced height */
+            height: 440px; 
             border-radius: 25px; 
             box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
             transition: transform 0.3s ease; 
             cursor: pointer; 
         }
         .card:hover { transform: scale(1.05); }
-        .card-head { position: relative; height: 220px; /* Reduced height */ background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
+        .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body { height: 220px; /* Adjusted height */ background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-body { height: 220px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-caption { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-top: 4px; }
@@ -44,7 +44,6 @@
         .product-price { font-size: 24px; font-weight: 700; color: #3B82F6; }
         .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
         .product-rating { font-size: 13px; color: #facc15; }
-        .product-rating .grey { color: #d1d5db; }
         .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
     </style>
 </head>
@@ -115,6 +114,7 @@
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
+
         let productsCache = [];
 
         function setLanguage(lang) {
@@ -143,6 +143,7 @@
                 document.getElementById('wallet-balance').textContent = formattedBalance;
                 document.getElementById('wallet-balance-mobile').textContent = formattedBalance;
             } catch (error) {
+                console.error("Error fetching wallet:", error);
                 document.getElementById('wallet-balance').textContent = '$0.00';
                 document.getElementById('wallet-balance-mobile').textContent = '$0.00';
             }
@@ -184,14 +185,19 @@
                 const imageUrl = imageFile ? imageFile.url() : 'https://s5.postimg.cc/j9r8yf9gn/sws1.png';
                 const averageRating = Math.round(product.get('averageRating') || 0);
                 const ratingCount = product.get('ratingCount') || 0;
+                const shippingTime = product.get('shippingTime') || '—';
                 
                 let starsHTML = '';
-                for (let i = 1; i <= 5; i++) { starsHTML += `<i class="fa fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
+                for (let i = 1; i <= 5; i++) {
+                    starsHTML += `<i class="fa-solid fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`;
+                }
                 
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-head"> <img src="${imageUrl}" alt="${name}" class="product-img"> </div>
+                    <div class="card-head">
+                        <img src="${imageUrl}" alt="${name}" class="product-img">
+                    </div>
                     <div class="card-body"> 
                         <div class="product-desc"> 
                             <span class="product-title">${name}</span> 
