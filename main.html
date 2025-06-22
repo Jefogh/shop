@@ -27,7 +27,7 @@
         }
         .card { 
             width: 260px; 
-            height: 440px; 
+            height: 480px; 
             border-radius: 25px; 
             box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
             transition: transform 0.3s ease; 
@@ -36,7 +36,7 @@
         .card:hover { transform: scale(1.05); }
         .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body { height: 220px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-body { height: 260px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-caption { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-top: 4px; }
@@ -73,7 +73,7 @@
                 </div>
             </div>
             <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <a href="dashboard.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
+                <a href="main.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
                 <a href="local.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                 <a href="bank.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
                 <a href="track.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
@@ -195,9 +195,7 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-head">
-                        <img src="${imageUrl}" alt="${name}" class="product-img">
-                    </div>
+                    <div class="card-head"> <img src="${imageUrl}" alt="${name}" class="product-img"> </div>
                     <div class="card-body"> 
                         <div class="product-desc"> 
                             <span class="product-title">${name}</span> 
@@ -206,8 +204,9 @@
                                 ${starsHTML}
                                 <span class="text-xs text-gray-500 ml-2">(${ratingCount})</span>
                             </div>
+                            <p class="text-xs text-gray-500 mt-1">${translations[lang].shipping_time}: ${shippingTime}</p>
                         </div> 
-                        <div class="product-properties"> 
+                        <div class="product-properties mt-2"> 
                             <span class="product-price">$<b>${price.toFixed(2)}</b></span> 
                             <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}"> ${translations[lang].add_to_cart} </button> 
                         </div> 
