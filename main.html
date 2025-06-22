@@ -23,50 +23,35 @@
         .card:hover { transform: scale(1.03); }
         .card-head { position: relative; height: 252px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 20px; }
         .product-img { position: absolute; left: 50%; top: 45%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 260px; filter: drop-shadow(0 30px 20px rgba(0,0,0,0.2)); }
-        .product-detail { position: absolute; bottom: 20px; left: 20px; right: 20px; font-size: 12px; color: rgba(255,255,255,0.8); }
-        .product-detail h2 { font-size: 20px; font-weight: 700; letter-spacing: 1px; padding-bottom: 8px; text-transform: uppercase; color: #fff; }
         .card-body { height: 248px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
         .product-desc { padding: 5px 0; }
-        .product-title { display: block; font-size: 17px; font-weight: 500; text-transform: uppercase; }
-        .product-title b { font-weight: 900; }
+        .product-title { display: block; font-size: 17px; font-weight: 500; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-caption { display: block; font-size: 11px; color: #888; text-transform: uppercase; margin-top: 5px; }
         .product-properties { display: flex; justify-content: space-between; align-items: center; }
         .product-price { font-size: 26px; font-weight: 700; color: #3B82F6; }
-        .product-price b { font-weight: 900; }
         .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
+        .product-rating { font-size: 14px; color: #facc15; }
+        .product-rating .grey { color: #d1d5db; }
+        .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
     </style>
 </head>
 <body class="bg-[#212534]">
 
-    <!-- Navbar -->
     <nav class="bg-gray-900 bg-opacity-80 shadow-lg backdrop-blur-md sticky top-0 z-40">
         <div class="container mx-auto px-4 sm:px-6 py-4">
             <div class="flex justify-between items-center">
                 <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
-                
-                <!-- Desktop Nav Links -->
                 <div class="hidden md:flex items-center space-x-4 space-x-reverse">
-                    <a href="main.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
+                    <a href="dashboard.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
                     <a href="local.html" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
-                    <a href="wallet.html" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
+                    <a href="bank.html" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
                     <a href="track.html" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
                     <a href="us.html" class="text-gray-300 hover:text-white" data-translate-key="about_us">من نحن</a>
-                    <a href="info.html" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
+                    <a href="connect.html" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
                 </div>
-
                 <div class="flex items-center">
-                     <!-- Cart Icon -->
-                     <button id="cart-button" class="text-white text-2xl relative mx-2">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span id="cart-count" class="cart-badge hidden">0</span>
-                     </button>
-                    <!-- Mobile Menu Button -->
-                    <div class="md:hidden">
-                        <button id="mobile-menu-button" class="text-white p-2">
-                            <i class="fas fa-bars"></i>
-                        </button>
-                    </div>
-                     <!-- Language Switcher for larger screens -->
+                     <button id="cart-button" class="text-white text-2xl relative mx-2"> <i class="fas fa-shopping-cart"></i> <span id="cart-count" class="cart-badge hidden">0</span> </button>
+                    <div class="md:hidden"> <button id="mobile-menu-button" class="text-white p-2"> <i class="fas fa-bars"></i> </button> </div>
                     <div class="hidden md:flex items-center space-x-2 space-x-reverse ml-4">
                         <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
                         <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
@@ -75,15 +60,13 @@
                      <button id="logout-button" class="hidden md:block bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
                 </div>
             </div>
-
-            <!-- Mobile Menu Dropdown -->
             <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <a href="main.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
+                <a href="dashboard.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
                 <a href="local.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
-                <a href="wallet.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
+                <a href="bank.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
                 <a href="track.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
                 <a href="us.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="about_us">من نحن</a>
-                <a href="info.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="contact_info">معلومات الاتصال</a>
+                <a href="connect.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="contact_info">معلومات الاتصال</a>
                 <hr class="my-2 border-gray-700">
                 <div class="px-4 py-2">
                     <p class="text-gray-400 text-xs mb-2">اللغة</p>
@@ -194,7 +177,7 @@
                 const ratingCount = product.get('ratingCount') || 0;
                 
                 let starsHTML = '';
-                for (let i = 1; i <= 5; i++) { starsHTML += `<i class="fa fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
+                for (let i = 1; i <= 5; i++) { starsHTML += `<i class="fa-solid fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
                 
                 const card = document.createElement('div');
                 card.className = 'card';
