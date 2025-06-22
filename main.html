@@ -18,27 +18,12 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background: #212534; color: #fff; }
         .swal2-popup { font-family: 'Tajawal', sans-serif; }
-        /* Adjusted grid to better fit cards */
-        .products-grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-            gap: 3rem 1.5rem; 
-            padding: 1rem; 
-            justify-items: center; 
-        }
-        /* Adjusted card size */
-        .card { 
-            width: 260px; 
-            height: 440px; /* Reduced height */
-            border-radius: 25px; 
-            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
-            transition: transform 0.3s ease; 
-            cursor: pointer; 
-        }
+        .products-grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 3rem 1.5rem; padding: 1rem; justify-items: center; }
+        .card { width: 260px; height: 440px; border-radius: 25px; box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease; cursor: pointer; }
         .card:hover { transform: scale(1.05); }
-        .card-head { position: relative; height: 220px; /* Reduced height */ background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
+        .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body { height: 220px; /* Adjusted height */ background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-body { height: 220px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-caption { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-top: 4px; }
@@ -47,7 +32,6 @@
         .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
         .product-rating { font-size: 13px; color: #facc15; }
         .product-rating .grey { color: #d1d5db; }
-        .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
     </style>
 </head>
 <body class="bg-[#212534]">
