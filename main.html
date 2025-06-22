@@ -54,7 +54,7 @@
             <div class="flex justify-between items-center">
                 <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
                 <div class="hidden md:flex items-center space-x-4 space-x-reverse">
-                    <a href="main.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
+                    <a href="dashboard.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
                     <a href="local.html" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                     <a href="bank.html" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
                     <a href="track.html" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
@@ -161,7 +161,7 @@
             try {
                 const products = await query.find();
                 productsCache = products;
-                renderProducts(products, currentLang);
+                await renderProducts(products, currentLang);
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 Swal.fire({ title: 'خطأ', html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.<br><code class="text-xs">${error.message}</code>`, icon: 'error' });
@@ -170,23 +170,24 @@
             }
         }
         
-        function renderProducts(products, lang) {
+        async function renderProducts(products, lang) {
             const productsGrid = document.getElementById('products-grid');
             productsGrid.innerHTML = '';
             if (products.length === 0) {
                  productsGrid.innerHTML = `<p class="text-center col-span-full text-gray-400">لا توجد منتجات لعرضها حاليًا.</p>`;
                  return;
             }
-            products.forEach(product => {
+
+            for (const product of products) {
                 const name = product.get(`name_${lang}`) || 'Product Name';
                 const category = product.get(`category_${lang}`) || 'Collection';
                 const price = product.get('price') || 0;
                 const imageFile = product.get('imageFile');
                 const imageUrl = imageFile ? imageFile.url() : 'https://s5.postimg.cc/j9r8yf9gn/sws1.png';
+                const shippingTime = product.get('shippingTime') || '—';
                 const averageRating = Math.round(product.get('averageRating') || 0);
                 const ratingCount = product.get('ratingCount') || 0;
-                const shippingTime = product.get('shippingTime') || '—';
-                
+
                 let starsHTML = '';
                 for (let i = 1; i <= 5; i++) {
                     starsHTML += `<i class="fa-solid fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`;
@@ -195,7 +196,9 @@
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-head"> <img src="${imageUrl}" alt="${name}" class="product-img"> </div>
+                    <div class="card-head">
+                        <img src="${imageUrl}" alt="${name}" class="product-img">
+                    </div>
                     <div class="card-body"> 
                         <div class="product-desc"> 
                             <span class="product-title">${name}</span> 
@@ -204,7 +207,7 @@
                                 ${starsHTML}
                                 <span class="text-xs text-gray-500 ml-2">(${ratingCount})</span>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1">${translations[lang].shipping_time}: ${shippingTime}</p>
+                            <p class="product-caption mt-1">${translations[lang].shipping_time}: ${shippingTime}</p>
                         </div> 
                         <div class="product-properties mt-2"> 
                             <span class="product-price">$<b>${price.toFixed(2)}</b></span> 
@@ -212,10 +215,10 @@
                         </div> 
                     </div>
                 `;
-                card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => { e.stopPropagation(); promptForQuantity(product); });
+                card.querySelector('.add-to-cart-btn').addEventListener('click', e => { e.stopPropagation(); promptForQuantity(product); });
                 card.addEventListener('click', () => showProductDetails(product));
                 productsGrid.appendChild(card);
-            });
+            }
         }
         
         async function showProductDetails(product) {
