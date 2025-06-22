@@ -42,7 +42,7 @@
             <div class="flex justify-between items-center">
                 <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
                 <div class="hidden md:flex items-center space-x-4 space-x-reverse">
-                    <a href="dashboard.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
+                    <a href="main.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
                     <a href="local.html" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                     <a href="bank.html" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
                     <a href="track.html" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <a href="main.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
+                <a href="dashboard.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
                 <a href="local.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                 <a href="bank.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
                 <a href="track.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
@@ -99,7 +99,6 @@
             es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.", reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas." }
         };
         let currentLang = 'ar'; 
-
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
@@ -177,7 +176,7 @@
                 const ratingCount = product.get('ratingCount') || 0;
                 
                 let starsHTML = '';
-                for (let i = 1; i <= 5; i++) { starsHTML += `<i class="fa-solid fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
+                for (let i = 1; i <= 5; i++) { starsHTML += `<i class="fa fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
                 
                 const card = document.createElement('div');
                 card.className = 'card';
@@ -331,7 +330,7 @@
             } catch (error) { console.error("Error updating cart count:", error); }
         }
         
-        cartButton.addEventListener('click', async () => {
+        document.getElementById('cart-button').addEventListener('click', async () => {
              if(!currentUser) { Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لعرض السلة.', 'warning'); return; }
             showCartModal();
         });
