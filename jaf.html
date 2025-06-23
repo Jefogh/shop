@@ -27,10 +27,8 @@
 </head>
 <body class="bg-gray-100">
 
-    <div id="auth-gate">
-        <div class="flex items-center justify-center h-screen">
-            <p>جارِ التحقق من الصلاحيات...</p>
-        </div>
+    <div id="auth-gate" class="flex items-center justify-center h-screen">
+        <p>جارِ التحقق من الصلاحيات...</p>
     </div>
 
     <div id="admin-panel" class="hidden">
@@ -56,7 +54,13 @@
             <div id="products-tab" class="tab-content">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-gray-700">المنتجات</h2>
-                    <button id="add-product-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"><i class="fas fa-plus mr-2"></i>إضافة منتج جديد</button>
+                    <div class="flex items-center gap-4">
+                         <select id="product-store-select" class="bg-white border border-gray-300 rounded-md py-2 px-3">
+                            <option value="Things">المتجر العالمي</option>
+                            <option value="Thingssy">متجر سوريا ولبنان</option>
+                        </select>
+                        <button id="add-product-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"><i class="fas fa-plus mr-2"></i>إضافة منتج جديد</button>
+                    </div>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500">
@@ -98,11 +102,8 @@
         const authGate = document.getElementById('auth-gate');
         const adminPanel = document.getElementById('admin-panel');
 
-        // --- SECURITY CHECK ---
         if (!currentUser) {
-            Swal.fire({ title: 'غير مصرح به', text: 'يجب عليك تسجيل الدخول أولاً.', icon: 'error' }).then(() => {
-                window.location.href = 'index.html';
-            });
+            Swal.fire({ title: 'غير مصرح به', text: 'يجب عليك تسجيل الدخول أولاً.', icon: 'error' }).then(() => { window.location.href = 'index.html'; });
             return;
         }
 
@@ -110,30 +111,23 @@
             const query = new Parse.Query(Parse.Role);
             query.equalTo("name", "Admin");
             query.equalTo("users", currentUser);
-            const adminRole = await query.first();
+            const adminRole = await query.first({ useMasterKey: true });
 
-            if (!adminRole) {
-                throw new Error("You are not an admin.");
-            }
+            if (!adminRole) { throw new Error("You are not an admin."); }
             
-            // If user is admin, show the panel
             authGate.style.display = 'none';
             adminPanel.style.display = 'block';
-            loadProducts(); // Load initial tab
+            loadProducts(); 
 
         } catch (error) {
             console.error("Permission check failed:", error);
-            Swal.fire({ title: 'فشل الوصول', text: 'ليس لديك الصلاحيات اللازمة للوصول لهذه الصفحة.', icon: 'error' }).then(() => {
-                window.location.href = 'main.html';
-            });
+            Swal.fire({ title: 'فشل الوصول', text: 'ليس لديك الصلاحيات اللازمة للوصول لهذه الصفحة.', icon: 'error' }).then(() => { window.location.href = 'main.html'; });
             return;
         }
         
-        // Tab switching logic
-        const tabs = document.querySelectorAll('.tab-button');
-        tabs.forEach(tab => {
+        document.querySelectorAll('.tab-button').forEach(tab => {
             tab.addEventListener('click', (e) => {
-                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
                 e.currentTarget.classList.add('active');
                 
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
@@ -146,35 +140,50 @@
             });
         });
         
-        // --- Product Management ---
+        const productStoreSelect = document.getElementById('product-store-select');
+        productStoreSelect.addEventListener('change', loadProducts);
+
         async function loadProducts() {
             const tableBody = document.getElementById('products-table-body');
+            const className = productStoreSelect.value;
             tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-4">جارِ تحميل المنتجات...</td></tr>`;
-            const Product = Parse.Object.extend("Things");
+            const Product = Parse.Object.extend(className);
             const query = new Parse.Query(Product);
             query.descending("createdAt");
             try {
                 const products = await query.find();
                 tableBody.innerHTML = '';
                 products.forEach(p => {
-                    tableBody.innerHTML += `
-                        <tr class="bg-white border-b">
-                            <td class="px-6 py-4">${p.get('name_en')}</td>
-                            <td class="px-6 py-4">$${p.get('price')}</td>
-                            <td class="px-6 py-4 space-x-2 space-x-reverse">
-                                <button class="text-blue-500 hover:underline edit-product-btn" data-id="${p.id}">تعديل</button>
-                                <button class="text-red-500 hover:underline delete-product-btn" data-id="${p.id}">حذف</button>
-                            </td>
-                        </tr>`;
+                    tableBody.innerHTML += `<tr class="bg-white border-b"><td class="px-6 py-4">${p.get('name_en')}</td><td class="px-6 py-4">$${p.get('price')}</td><td class="px-6 py-4 space-x-2 space-x-reverse"><button class="text-blue-500 hover:underline edit-product-btn" data-id="${p.id}" data-class="${className}">تعديل</button><button class="text-red-500 hover:underline delete-product-btn" data-id="${p.id}" data-class="${className}">حذف</button></td></tr>`;
                 });
-            } catch(e) { /* error handling */ }
+                attachProductActionListeners();
+            } catch(e) { console.error("Failed to load products", e); tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-red-500">فشل تحميل المنتجات.</td></tr>`;}
         }
 
-        // --- Order Management ---
+        function attachProductActionListeners() {
+            document.querySelectorAll('.delete-product-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const className = e.currentTarget.dataset.class;
+                    const result = await Swal.fire({ title: 'هل أنت متأكد؟', text: "لا يمكن التراجع عن هذا الإجراء!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'نعم، احذفه!', cancelButtonText: 'إلغاء' });
+                    if (result.isConfirmed) {
+                        const Product = Parse.Object.extend(className);
+                        const product = Product.createWithoutData(id);
+                        try {
+                            await product.destroy();
+                            Swal.fire('تم الحذف!', 'تم حذف المنتج بنجاح.', 'success');
+                            loadProducts();
+                        } catch (e) { Swal.fire('خطأ!', 'فشل حذف المنتج.', 'error'); }
+                    }
+                };
+            });
+            // Add event listeners for edit buttons here...
+        }
+        
         async function loadOrders() {
             const tableBody = document.getElementById('orders-table-body');
             tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4">جارِ تحميل الطلبات...</td></tr>`;
-            const Order = Parse.Object.extend("Orders");
+            const Order = Parse.Object.extend("Orders"); // Assuming you named the class "Orders"
             const query = new Parse.Query(Order);
             query.include("customer");
             query.descending("createdAt");
@@ -186,18 +195,17 @@
                     tableBody.innerHTML += `
                         <tr class="bg-white border-b">
                             <td class="px-6 py-4">${customer ? customer.get('username') : 'مستخدم محذوف'}</td>
-                            <td class="px-6 py-4">$${o.get('totalAmount').toFixed(2)}</td>
+                            <td class="px-6 py-4">$${(o.get('totalAmount') || 0).toFixed(2)}</td>
                             <td class="px-6 py-4">${o.get('status')}</td>
                             <td class="px-6 py-4">${new Date(o.get('createdAt')).toLocaleDateString()}</td>
                             <td class="px-6 py-4"><button class="text-blue-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
                         </tr>`;
                 });
-            } catch(e) { /* error handling */ }
+            } catch(e) { console.error("Failed to load orders", e); tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-red-500">فشل تحميل الطلبات.</td></tr>`;}
         }
 
-        // --- User Management ---
         async function loadUsers() {
-            const tableBody = document.getElementById('users-table-body');
+             const tableBody = document.getElementById('users-table-body');
             tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4">جارِ تحميل المستخدمين...</td></tr>`;
             const query = new Parse.Query(Parse.User);
             try {
@@ -209,14 +217,71 @@
                             <td class="px-6 py-4">${u.get('name') || u.get('username')}</td>
                             <td class="px-6 py-4">${u.get('email')}</td>
                             <td class="px-6 py-4">$${(u.get('walletBalance') || 0).toFixed(2)}</td>
-                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل</button></td>
+                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td>
                         </tr>`;
                 });
-            } catch(e) { /* error handling */ }
+            } catch(e) { console.error("Failed to load users", e); tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-500">فشل تحميل المستخدمين.</td></tr>`;}
         }
+        
+        document.getElementById('add-product-btn').addEventListener('click', () => {
+             Swal.fire({
+                title: 'إضافة منتج جديد',
+                html: `
+                    <div class="text-right">
+                        <input id="name_ar" class="swal2-input" placeholder="الاسم (عربي)">
+                        <input id="name_en" class="swal2-input" placeholder="Name (English)">
+                        <input id="price" type="number" class="swal2-input" placeholder="السعر">
+                        <textarea id="desc_ar" class="swal2-textarea" placeholder="الوصف (عربي)"></textarea>
+                        <textarea id="desc_en" class="swal2-textarea" placeholder="Description (English)"></textarea>
+                        <p class="text-sm mt-2">الصورة الرئيسية:</p>
+                        <input id="imageFile" type="file" class="swal2-file">
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'إضافة',
+                cancelButtonText: 'إلغاء',
+                preConfirm: async () => {
+                    const nameAr = document.getElementById('name_ar').value;
+                    const nameEn = document.getElementById('name_en').value;
+                    const price = parseFloat(document.getElementById('price').value);
+                    const descAr = document.getElementById('desc_ar').value;
+                    const descEn = document.getElementById('desc_en').value;
+                    const imageInput = document.getElementById('imageFile');
+                    
+                    if (!nameEn || !price) {
+                        Swal.showValidationMessage(`الرجاء ملء حقل الاسم الإنجليزي والسعر`);
+                        return false;
+                    }
+                    if (imageInput.files.length === 0) {
+                        Swal.showValidationMessage(`الرجاء اختيار صورة رئيسية`);
+                        return false;
+                    }
 
-        // --- Event Listeners for Actions ---
-        // (Add, Edit, Delete logic for each section will go here, using Swal.fire for modals)
+                    const imageFile = new Parse.File(imageInput.files[0].name, imageInput.files[0]);
+                    await imageFile.save();
+                    
+                    return { nameAr, nameEn, price, descAr, descEn, imageFile };
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const className = productStoreSelect.value;
+                    const Product = Parse.Object.extend(className);
+                    const newProduct = new Product();
+                    newProduct.set('name_ar', result.value.nameAr);
+                    newProduct.set('name_en', result.value.nameEn);
+                    newProduct.set('price', result.value.price);
+                    newProduct.set('description_ar', result.value.descAr);
+                    newProduct.set('description_en', result.value.descEn);
+                    newProduct.set('imageFile', result.value.imageFile);
+                    try {
+                        await newProduct.save();
+                        Swal.fire('نجاح!', 'تم إضافة المنتج بنجاح.', 'success');
+                        loadProducts();
+                    } catch (e) {
+                        Swal.fire('خطأ!', `فشلت إضافة المنتج: ${e.message}`, 'error');
+                    }
+                }
+            });
+        });
 
         document.getElementById('logout-button').addEventListener('click', async () => {
             await Parse.User.logOut();
