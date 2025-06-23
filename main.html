@@ -62,7 +62,7 @@
             background-color: #2d3748; color: white; font-size: 16px; cursor: pointer; transition: background-color 0.2s;
         }
         .lang-modal-btn:hover { background-color: #4a5568; }
-        #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; }
+        #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; margin-bottom: 1rem; }
         .delivery-form-input {
             width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc;
             border-radius: 5px; padding: 8px; margin-top: 4px; box-sizing: border-box;
@@ -146,7 +146,8 @@
         const translations = {
             en: {
                 store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track My Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", login: "Login", language: "Language",
-                delivery_info_title: "Delivery Information", delivery_syria_lebanon: "(Optional, for Syria & Lebanon only)", fullname: "Full Name", country: "Country", city: "City", address_details: "Address Details (Street, Building...)", phone_number: "Phone Number", map_location: "Location on Map", select_on_map: "Select on Map", location_not_set: "Not Set", confirm_and_pay: "Confirm & Pay",
+                delivery_info_title: "Delivery Information", delivery_syria_lebanon: "(Map service is for Syria & Lebanon only)", fullname: "Full Name", country: "Country", city: "City", address_details: "Address Details (Street, Building...)", phone_number: "Phone Number", map_location: "Location on Map", select_on_map: "Select on Map", location_not_set: "Not Set", confirm_and_pay: "Confirm & Pay",
+                detect_my_location: "Detect My Location", save_location: "Save Location", map_syria_lebanon_only: "Map delivery service is currently available for Syria and Lebanon.",
                 form_field_required: "This field is required",
                 tracking_modal_title: "My Orders", order_id: "Order ID", order_date: "Date", order_total: "Total", order_status: "Status",
                 status_processing: "Processing", status_shipped: "Shipped", status_delivered: "Delivered", no_orders_yet: "You have no orders yet.",
@@ -178,7 +179,8 @@
             },
             ar: {
                 store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", login: "تسجيل الدخول", language: "اللغة",
-                delivery_info_title: "معلومات التسليم", delivery_syria_lebanon: "(اختياري، لسوريا ولبنان فقط)", fullname: "الاسم الكامل", country: "البلد", city: "المدينة", address_details: "تفاصيل العنوان (شارع، بناء...)", phone_number: "رقم الهاتف", map_location: "الموقع على الخريطة", select_on_map: "تحديد على الخريطة", location_not_set: "لم يتم التحديد", confirm_and_pay: "تأكيد والدفع",
+                delivery_info_title: "معلومات التسليم", delivery_syria_lebanon: "(خدمة الخريطة لسوريا ولبنان فقط)", fullname: "الاسم الكامل", country: "البلد", city: "المدينة", address_details: "تفاصيل العنوان (شارع، بناء...)", phone_number: "رقم الهاتف", map_location: "الموقع على الخريطة", select_on_map: "تحديد على الخريطة", location_not_set: "لم يتم التحديد", confirm_and_pay: "تأكيد والدفع",
+                detect_my_location: "تحديد موقعي", save_location: "حفظ الموقع", map_syria_lebanon_only: "خدمة التوصيل عبر الخريطة متاحة حالياً لسوريا ولبنان.",
                 form_field_required: "هذا الحقل مطلوب",
                 tracking_modal_title: "طلباتي", order_id: "رقم الطلب", order_date: "التاريخ", order_total: "المجموع", order_status: "الحالة",
                 status_processing: "قيد المعالجة", status_shipped: "تم الشحن", status_delivered: "تم التسليم", no_orders_yet: "لا يوجد لديك طلبات بعد.",
@@ -210,7 +212,8 @@
             },
             es: {
                 store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Mis Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", login: "Iniciar Sesión", language: "Idioma",
-                delivery_info_title: "Información de Entrega", delivery_syria_lebanon: "(Opcional, solo para Siria y Líbano)", fullname: "Nombre Completo", country: "País", city: "Ciudad", address_details: "Detalles de la Dirección (Calle, Edificio...)", phone_number: "Número de Teléfono", map_location: "Ubicación en el Mapa", select_on_map: "Seleccionar en el Mapa", location_not_set: "No establecido", confirm_and_pay: "Confirmar y Pagar",
+                delivery_info_title: "Información de Entrega", delivery_syria_lebanon: "(Servicio de mapa solo para Siria y Líbano)", fullname: "Nombre Completo", country: "País", city: "Ciudad", address_details: "Detalles de la Dirección (Calle, Edificio...)", phone_number: "Número de Teléfono", map_location: "Ubicación en el Mapa", select_on_map: "Seleccionar en el Mapa", location_not_set: "No establecido", confirm_and_pay: "Confirmar y Pagar",
+                detect_my_location: "Detectar mi Ubicación", save_location: "Guardar Ubicación", map_syria_lebanon_only: "El servicio de entrega por mapa está actualmente disponible para Siria y Líbano.",
                 form_field_required: "Este campo es obligatorio",
                 tracking_modal_title: "Mis Pedidos", order_id: "ID de Pedido", order_date: "Fecha", order_total: "Total", order_status: "Estado",
                 status_processing: "Procesando", status_shipped: "Enviado", status_delivered: "Entregado", no_orders_yet: "Aún no tienes pedidos.",
@@ -241,26 +244,28 @@
                 alert_payment_fail: "El proceso de pago falló."
             }
         };
+        
+        const countryList = [ "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo, Democratic Republic of the", "Congo, Republic of the", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+
         let currentLang = 'ar';
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
 
-        // Caching and state variables
         let productsCache = [];
         let uniqueCategories = [];
-        let deliveryLocation = null; // To store lat/lng from map
+        let deliveryLocation = null;
 
-        // DOM Elements
         const searchInput = document.getElementById('search-input');
         const categoryFilter = document.getElementById('category-filter');
         const noResultsDiv = document.getElementById('no-results');
+        
+        // --- START OF ALL FUNCTIONS ---
 
         function setLanguage(lang) {
             currentLang = lang;
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-
             document.querySelectorAll('[data-translate-key]').forEach(el => {
                 const key = el.getAttribute('data-translate-key');
                 if (translations[lang] && translations[lang][key]) {
@@ -273,7 +278,6 @@
                     }
                 }
             });
-
             searchInput.placeholder = translations[lang].search_placeholder;
             populateCategoryFilter(lang);
             applyFiltersAndRender();
@@ -284,30 +288,24 @@
             const productsGrid = document.getElementById('products-grid');
             loadingIndicator.style.display = 'block';
             productsGrid.innerHTML = '';
-
             const Product = Parse.Object.extend("Things");
             const query = new Parse.Query(Product);
             query.select("name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", "category_ar", "category_en", "category_es", "price", "imageFile", "photos", "shippingTime", "averageRating", "ratingCount");
             try {
                 const products = await query.find();
                 productsCache = products;
-
                 const categoryMap = new Map();
                 productsCache.forEach(p => {
                     const cat_en = p.get('category_en');
                     if (cat_en && !categoryMap.has(cat_en)) {
                         categoryMap.set(cat_en, {
-                            en: cat_en,
-                            ar: p.get('category_ar'),
-                            es: p.get('category_es')
+                            en: cat_en, ar: p.get('category_ar'), es: p.get('category_es')
                         });
                     }
                 });
                 uniqueCategories = Array.from(categoryMap.values());
-
                 populateCategoryFilter(currentLang);
                 applyFiltersAndRender();
-
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 Swal.fire({
@@ -323,91 +321,68 @@
         function populateCategoryFilter(lang) {
             const selectedValue = categoryFilter.value;
             categoryFilter.innerHTML = '';
-
             const allOption = document.createElement('option');
             allOption.value = 'all';
             allOption.textContent = translations[lang].all_categories;
             categoryFilter.appendChild(allOption);
-
             uniqueCategories.forEach(cat => {
                 const option = document.createElement('option');
                 option.value = cat.en;
                 option.textContent = cat[lang] || cat.en;
                 categoryFilter.appendChild(option);
             });
-
             categoryFilter.value = selectedValue || 'all';
         }
 
         function applyFiltersAndRender() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const selectedCategory = categoryFilter.value;
-
             let filteredProducts = productsCache;
-
             if (searchTerm) {
                 filteredProducts = filteredProducts.filter(product => {
                     const name = product.get(`name_${currentLang}`) || '';
                     return name.toLowerCase().includes(searchTerm);
                 });
             }
-
             if (selectedCategory !== 'all') {
-                filteredProducts = filteredProducts.filter(product => {
-                    return product.get('category_en') === selectedCategory;
-                });
+                filteredProducts = filteredProducts.filter(product => product.get('category_en') === selectedCategory);
             }
-
             renderProducts(filteredProducts, currentLang);
         }
 
         function renderProducts(products, lang) {
             const productsGrid = document.getElementById('products-grid');
             productsGrid.innerHTML = '';
-
-            if (products.length === 0) {
-                 noResultsDiv.style.display = 'block';
-            } else {
-                 noResultsDiv.style.display = 'none';
-            }
-
+            noResultsDiv.style.display = products.length === 0 ? 'block' : 'none';
             for (const product of products) {
                 const name = product.get(`name_${lang}`) || 'Product Name';
                 const category = product.get(`category_${lang}`) || 'Collection';
                 const price = product.get('price') || 0;
                 const imageFile = product.get('imageFile');
-                const imageUrl = imageFile ? imageFile.url() : 'https://s5.postimg.cc/j9r8yf9gn/sws1.png';
+                const imageUrl = imageFile ? imageFile.url() : 'https://via.placeholder.com/220';
                 const shippingTime = product.get('shippingTime') || '—';
                 const averageRating = Math.round(product.get('averageRating') || 0);
                 const ratingCount = product.get('ratingCount') || 0;
-
                 let starsHTML = '';
                 for (let i = 1; i <= 5; i++) {
                     starsHTML += `<i class="fa-solid fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`;
                 }
-
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-head">
-                        <img src="${imageUrl}" alt="${name}" class="product-img">
-                    </div>
+                    <div class="card-head"><img src="${imageUrl}" alt="${name}" class="product-img"></div>
                     <div class="card-body">
                         <div class="product-desc">
                             <span class="product-title">${name}</span>
                             <span class="product-caption">${category}</span>
-                            <div class="product-rating mt-2 flex items-center" dir="ltr">
-                                ${starsHTML}
-                                <span class="text-xs text-gray-500 ml-2">(${ratingCount})</span>
-                            </div>
+                            <div class="product-rating mt-2 flex items-center" dir="ltr">${starsHTML}<span class="text-xs text-gray-500 ml-2">(${ratingCount})</span></div>
                             <p class="product-caption mt-1">${translations[lang].shipping_time}: ${shippingTime}</p>
                         </div>
                         <div class="product-properties mt-2">
                             <span class="product-price">$<b>${price.toFixed(2)}</b></span>
-                            <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}"> ${translations[lang].add_to_cart} </button>
+                            <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}">${translations[lang].add_to_cart}</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                 card.querySelector('.add-to-cart-btn').addEventListener('click', e => { e.stopPropagation(); promptForQuantity(product); });
                 card.addEventListener('click', () => showProductDetails(product));
                 productsGrid.appendChild(card);
@@ -415,7 +390,7 @@
         }
 
         async function fetchUserWallet() {
-             try {
+            try {
                 const user = await currentUser.fetch();
                 const balance = user.get('walletBalance') || 0;
                 const formattedBalance = `$${balance.toFixed(2)}`;
@@ -440,14 +415,12 @@
             let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
             let thumbnailsHTML = '';
             allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
-
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
             query.equalTo("product", product);
             query.include("guest");
             query.descending("createdAt");
             let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
-
             try {
                 const reviews = await query.find();
                 if (reviews.length === 0) {
@@ -467,7 +440,6 @@
                 reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
             }
             reviewsHTML += `</div></div>`;
-
             const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p><button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600">${translations[currentLang].write_review}</button></div></div>` + reviewsHTML;
             Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product)); }});
         }
@@ -512,7 +484,7 @@
         }
 
         async function promptForQuantity(product) {
-             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_add, 'warning'); return; }
+            if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_add, 'warning'); return; }
             const { value: quantity } = await Swal.fire({
                 title: translations[currentLang].add_item_title,
                 input: 'number',
@@ -565,11 +537,6 @@
             } catch (error) { console.error("Error updating cart count:", error); }
         }
 
-        document.getElementById('cart-button').addEventListener('click', async () => {
-             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_view_cart, 'warning'); return; }
-            showCartModal();
-        });
-
         async function showCartModal() {
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
@@ -581,7 +548,7 @@
                 let subtotal = 0;
                 let cartHTML;
                 if (cartItems.length === 0) {
-                     cartHTML = `<p class="text-center p-4">${translations[currentLang].empty_cart}</p>`;
+                    cartHTML = `<p class="text-center p-4">${translations[currentLang].empty_cart}</p>`;
                 } else {
                     cartHTML = `<div class="max-h-64 overflow-y-auto"><table class="w-full text-sm text-left text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0"><tr>
@@ -599,47 +566,45 @@
                         subtotal += total;
                         cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td><td class="px-2 py-4 text-center"><button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-cart-item-id="${item.id}"><i class="fas fa-trash-alt"></i></button></td></tr>`;
                     });
-                     cartHTML += `</tbody></table></div>`;
+                    cartHTML += `</tbody></table></div>`;
                 }
-                const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet-btn" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition">${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition">${translations[currentLang].pay_card}</button></div></div>`;
-                Swal.fire({ title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => {
-                    const payWalletBtn = document.getElementById('pay-wallet-btn');
-                    if (payWalletBtn && cartItems.length > 0) {
-                        payWalletBtn.addEventListener('click', () => promptForDeliveryInfo(subtotal, cartItems));
+                const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet-btn" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition" disabled>${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition" disabled>${translations[currentLang].pay_card}</button></div></div>`;
+                Swal.fire({
+                    title: translations[currentLang].cart_title, html: footerHTML + cartHTML, width: '800px', showConfirmButton: false, showCloseButton: true,
+                    didOpen: () => {
+                        const payWalletBtn = document.getElementById('pay-wallet-btn');
+                        if (payWalletBtn && cartItems.length > 0) {
+                            payWalletBtn.addEventListener('click', () => promptForDeliveryInfo(subtotal, cartItems));
+                        }
+                        document.querySelectorAll('.remove-from-cart-btn').forEach(btn => btn.addEventListener('click', (e) => confirmRemoveFromCart(e.currentTarget.dataset.cartItemId)));
                     }
-                    document.querySelectorAll('.remove-from-cart-btn').forEach(btn => btn.addEventListener('click', (e) => confirmRemoveFromCart(e.currentTarget.dataset.cartItemId)));
-                }});
-            } catch(error) {
+                });
+            } catch (error) {
                 console.error("Error showing cart:", error);
                 Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_cart_display_fail, 'error');
             }
         }
-
+        
         function promptForDeliveryInfo(totalCost, cartItems) {
-            deliveryLocation = null; // Reset location each time
+            deliveryLocation = null;
             const formHTML = `
                 <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
-                    <p class="text-sm text-gray-500 text-center mb-4">${translations[currentLang].delivery_syria_lebanon}</p>
                     <label class="font-bold">${translations[currentLang].fullname}:</label>
                     <input type="text" id="fullname" class="delivery-form-input" required>
                     <label class="font-bold mt-2 block">${translations[currentLang].country}:</label>
-                    <select id="country" class="delivery-form-input">
-                        <option value="Syria">Syria</option>
-                        <option value="Lebanon">Lebanon</option>
-                    </select>
+                    <select id="country" class="delivery-form-input"></select>
                     <label class="font-bold mt-2 block">${translations[currentLang].city}:</label>
                     <input type="text" id="city" class="delivery-form-input" required>
                     <label class="font-bold mt-2 block">${translations[currentLang].address_details}:</label>
                     <input type="text" id="address" class="delivery-form-input" required>
                     <label class="font-bold mt-2 block">${translations[currentLang].phone_number}:</label>
                     <input type="tel" id="phone" class="delivery-form-input" required>
-                    <label class="font-bold mt-4 block">${translations[currentLang].map_location}:</label>
+                    <label class="font-bold mt-4 block">${translations[currentLang].map_location}: <span class="text-sm font-normal text-gray-500">${translations[currentLang].delivery_syria_lebanon}</span></label>
                     <div class="flex items-center gap-4 mt-1">
                         <button id="select-on-map-btn" type="button" class="bg-blue-500 text-white py-1 px-3 rounded">${translations[currentLang].select_on_map}</button>
                         <span id="location-display" class="text-sm text-gray-600">${translations[currentLang].location_not_set}</span>
                     </div>
-                </div>
-            `;
+                </div>`;
 
             Swal.fire({
                 title: translations[currentLang].delivery_info_title,
@@ -650,19 +615,25 @@
                 customClass: { popup: 'w-full max-w-lg' },
                 didOpen: () => {
                     document.getElementById('select-on-map-btn').addEventListener('click', showMapModal);
+                    const countryDropdown = document.getElementById('country');
+                    countryList.forEach(countryName => {
+                        const option = document.createElement('option');
+                        option.value = countryName;
+                        option.textContent = countryName;
+                        countryDropdown.appendChild(option);
+                    });
+                    countryDropdown.value = 'Syria';
                 },
                 preConfirm: () => {
-                    const fullname = document.getElementById('fullname').value;
-                    const country = document.getElementById('country').value;
-                    const city = document.getElementById('city').value;
-                    const address = document.getElementById('address').value;
-                    const phone = document.getElementById('phone').value;
-
+                    const fullname = document.getElementById('fullname').value.trim();
+                    const country = document.getElementById('country').value.trim();
+                    const city = document.getElementById('city').value.trim();
+                    const address = document.getElementById('address').value.trim();
+                    const phone = document.getElementById('phone').value.trim();
                     if (!fullname || !city || !address || !phone) {
                         Swal.showValidationMessage(translations[currentLang].form_field_required);
                         return false;
                     }
-
                     const shippingDetails = { fullname, country, city, address, phone };
                     return { shippingDetails, deliveryLocation, totalCost, cartItems };
                 }
@@ -675,34 +646,45 @@
         }
 
         function showMapModal() {
+            const mapHTML = `<div class="text-center">
+                    <p class="text-sm text-gray-600 mb-2">${translations[currentLang].map_syria_lebanon_only}</p>
+                    <div id="map"></div>
+                    <div class="mt-4 flex gap-4 justify-center">
+                        <button id="detect-location-btn" class="bg-blue-500 text-white py-2 px-4 rounded"><i class="fas fa-location-arrow mr-2"></i>${translations[currentLang].detect_my_location}</button>
+                        <button id="save-location-btn" class="bg-green-500 text-white py-2 px-4 rounded">${translations[currentLang].save_location}</button>
+                    </div>
+                </div>`;
             Swal.fire({
                 title: translations[currentLang].select_on_map,
-                html: '<div id="map"></div>',
-                width: '80%',
-                showConfirmButton: false,
-                showCloseButton: true,
+                html: mapHTML, width: '90%', maxWidth: '700px',
+                showConfirmButton: false, showCloseButton: true,
                 didOpen: () => {
-                    // Default to Damascus location
-                    const map = L.map('map').setView([33.5138, 36.2765], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
-
+                    let map = L.map('map').setView([33.5138, 36.2765], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
                     let marker;
-                    map.on('click', function(e) {
-                        if (marker) {
-                            map.removeLayer(marker);
-                        }
-                        marker = L.marker(e.latlng).addTo(map);
-                        deliveryLocation = e.latlng; // Save location
-                        document.getElementById('location-display').textContent = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+                    function placeMarker(lat, lng) {
+                        if (marker) map.removeLayer(marker);
+                        marker = L.marker([lat, lng]).addTo(map);
+                        deliveryLocation = { lat, lng };
+                        document.getElementById('location-display').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                        map.setView([lat, lng], 15);
+                    }
+                    map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
+                    document.getElementById('save-location-btn').addEventListener('click', () => Swal.close());
+                    document.getElementById('detect-location-btn').addEventListener('click', () => {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => placeMarker(position.coords.latitude, position.coords.longitude),
+                                () => alert('Could not get your location.')
+                            );
+                        } else { alert('Geolocation is not supported by this browser.'); }
                     });
                 }
             });
         }
-
+        
         async function processOrder(totalCost, cartItems, shippingDetails, location) {
-             Swal.fire({ title: translations[currentLang].alert_processing_payment, allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+            Swal.fire({ title: translations[currentLang].alert_processing_payment, allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
             try {
                 const user = await currentUser.fetch();
                 const balance = user.get('walletBalance') || 0;
@@ -710,44 +692,29 @@
                     Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_insufficient_funds, 'error');
                     return;
                 }
-
                 const Order = Parse.Object.extend("Orders");
                 const order = new Order();
-
                 const itemsSnapshot = cartItems.map(item => {
                     const product = item.get("product");
-                    return {
-                        objectId: product.id,
-                        name: product.get(`name_en`), // Store a consistent name, e.g., English
-                        quantity: item.get("quantity"),
-                        price: product.get("price")
-                    };
+                    return { objectId: product.id, name: product.get(`name_en`), quantity: item.get("quantity"), price: product.get("price") };
                 });
-
                 order.set("customer", currentUser);
                 order.set("shippingDetails", shippingDetails);
-                if (location) {
-                    order.set("shippingLocation", new Parse.GeoPoint(location.lat, location.lng));
-                }
+                if (location) { order.set("shippingLocation", new Parse.GeoPoint(location.lat, location.lng)); }
                 order.set("items", itemsSnapshot);
                 order.set("totalAmount", totalCost);
                 order.set("status", "Processing");
-
                 await order.save();
-
                 const newBalance = balance - totalCost;
                 currentUser.set('walletBalance', newBalance);
                 await currentUser.save();
                 await Parse.Object.destroyAll(cartItems);
-
                 fetchUserWallet();
                 updateCartCount();
-
                 const amount = `$${totalCost.toFixed(2)}`;
                 const successText = translations[currentLang].alert_payment_success_text.replace('{amount}', amount);
                 await Swal.fire(translations[currentLang].alert_payment_success_title, successText, 'success');
-                showCartModal(); // Refresh cart modal to show it's empty
-
+                showCartModal();
             } catch (error) {
                 console.error("Error during order processing:", error);
                 Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_payment_fail, 'error');
@@ -760,16 +727,13 @@
                 return;
             }
             Swal.fire({ title: translations[currentLang].loading, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
             const Order = Parse.Object.extend("Orders");
             const query = new Parse.Query(Order);
             query.equalTo("customer", currentUser);
             query.descending("createdAt");
-
             try {
                 const orders = await query.find();
                 let ordersHTML;
-
                 if (orders.length === 0) {
                     ordersHTML = `<p class="text-center text-gray-600 p-4">${translations[currentLang].no_orders_yet}</p>`;
                 } else {
@@ -782,7 +746,6 @@
                         if (status === 'Processing') statusColor = 'bg-yellow-500';
                         if (status === 'Shipped') statusColor = 'bg-blue-500';
                         if (status === 'Delivered') statusColor = 'bg-green-500';
-
                         ordersHTML += `
                         <div class="border rounded-lg p-4 bg-white text-gray-800" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
                             <div class="flex justify-between items-center">
@@ -795,37 +758,26 @@
                     });
                     ordersHTML += '</div>';
                 }
-
                 Swal.fire({
                     title: translations[currentLang].tracking_modal_title,
-                    html: ordersHTML,
-                    width: '90%',
-                    maxWidth: '600px',
-                    showConfirmButton: false,
-                    showCloseButton: true,
-                    background: '#f9fafb' // Use a light background for readability
+                    html: ordersHTML, width: '90%', maxWidth: '600px',
+                    showConfirmButton: false, showCloseButton: true, background: '#f9fafb'
                 });
-
             } catch (error) {
                 console.error("Error fetching orders:", error);
                 Swal.fire(translations[currentLang].alert_error_title, "Failed to fetch orders.", 'error');
             }
         }
-
+        
         async function confirmRemoveFromCart(cartItemId) {
             const result = await Swal.fire({
                 title: translations[currentLang].remove_item_title,
                 text: translations[currentLang].remove_item_text,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: translations[currentLang].remove_item_confirm,
+                icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6', confirmButtonText: translations[currentLang].remove_item_confirm,
                 cancelButtonText: translations[currentLang].remove_item_cancel
             });
-            if (result.isConfirmed) {
-                removeFromCart(cartItemId);
-            }
+            if (result.isConfirmed) { removeFromCart(cartItemId); }
         }
 
         async function removeFromCart(cartItemId) {
@@ -846,17 +798,9 @@
         function showLanguageSwitcherModal() {
             Swal.fire({
                 title: translations[currentLang].language,
-                html: `
-                    <button class="lang-modal-btn" data-lang="ar">العربية</button>
-                    <button class="lang-modal-btn" data-lang="en">English</button>
-                    <button class="lang-modal-btn" data-lang="es">Español</button>
-                `,
-                showConfirmButton: false,
-                showCloseButton: true,
-                background: '#212534',
-                customClass: {
-                    title: 'text-white',
-                },
+                html: `<button class="lang-modal-btn" data-lang="ar">العربية</button><button class="lang-modal-btn" data-lang="en">English</button><button class="lang-modal-btn" data-lang="es">Español</button>`,
+                showConfirmButton: false, showCloseButton: true, background: '#212534',
+                customClass: { title: 'text-white' },
                 didOpen: (modal) => {
                     modal.querySelectorAll('.lang-modal-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
@@ -867,8 +811,8 @@
                 }
             });
         }
-
-        // --- AUTH & PAGE SETUP ---
+        
+        // --- FINAL SETUP AND EVENT LISTENERS ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const langGlobeButton = document.getElementById('lang-globe-button');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -885,43 +829,37 @@
             if(mobileMenu) mobileMenu.classList.add('hidden');
         }));
 
+        document.getElementById('cart-button').addEventListener('click', showCartModal);
+        
         const loginButtons = [document.getElementById('login-button'), document.getElementById('login-button-mobile')];
         const logoutButtons = [document.getElementById('logout-button'), document.getElementById('logout-button-mobile')];
         logoutButtons.forEach(btn => {
             if (btn) {
                 btn.addEventListener('click', async () => {
-                    console.log("Logout button clicked!");
-                    try {
-                        await Parse.User.logOut();
-                        console.log("User logged out successfully from Parse.");
-                        window.location.reload();
-                    } catch (error) {
-                        console.error("Logout failed:", error);
-                        alert(`Logout failed! See console for details. Error: ${error.message}`);
-                    }
+                    try { await Parse.User.logOut(); window.location.reload(); }
+                    catch (error) { console.error("Logout failed:", error); alert(`Logout failed: ${error.message}`); }
                 });
             }
         });
+        
         const walletLinks = [document.querySelector('a[href="wallet.html"]'), document.querySelector('#mobile-menu a[href="bank.html"]')];
 
         if (!currentUser) {
             logoutButtons.forEach(btn => btn.style.display = 'none');
             loginButtons.forEach(btn => btn.classList.remove('hidden'));
             walletLinks.forEach(link => { if(link) link.style.display = 'none' });
-            trackOrdersBtn.style.display = 'none';
-            trackOrdersBtnMobile.style.display = 'none';
-
+            if(trackOrdersBtn) trackOrdersBtn.style.display = 'none';
+            if(trackOrdersBtnMobile) trackOrdersBtnMobile.style.display = 'none';
         } else {
             loginButtons.forEach(btn => btn.style.display = 'none');
             logoutButtons.forEach(btn => btn.classList.remove('hidden'));
             walletLinks.forEach(link => { if(link) link.style.display = 'block' });
-            trackOrdersBtn.style.display = 'inline'; // Or 'block' based on your layout
-            trackOrdersBtnMobile.style.display = 'block';
+            if(trackOrdersBtn) trackOrdersBtn.style.display = 'inline-block';
+            if(trackOrdersBtnMobile) trackOrdersBtnMobile.style.display = 'block';
             fetchUserWallet();
             updateCartCount();
         }
 
-        // --- EVENT LISTENERS ---
         searchInput.addEventListener('input', applyFiltersAndRender);
         categoryFilter.addEventListener('change', applyFiltersAndRender);
 
