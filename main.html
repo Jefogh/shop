@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المتجر العالمي</title>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -20,27 +20,27 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background: #212534; color: #fff; }
         .swal2-popup { font-family: 'Tajawal', sans-serif; }
-        .products-grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 3rem 1.5rem;
-            padding: 1rem;
-            justify-items: center;
+        .products-grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 3rem 1.5rem; 
+            padding: 1rem; 
+            justify-items: center; 
         }
-        .card {
-            width: 240px;
-            height: 440px;
-            border-radius: 25px;
-            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-            cursor: pointer;
+        .card { 
+            width: 240px; 
+            height: 440px; 
+            border-radius: 25px; 
+            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
+            transition: transform 0.3s ease; 
+            cursor: pointer; 
         }
         .card:hover { transform: scale(1.05); }
         .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body {
-            height: 220px;
-            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between;
+        .card-body { 
+            height: 220px; 
+            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; 
         }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -62,9 +62,9 @@
             background-color: #2d3748; color: white; font-size: 16px; cursor: pointer; transition: background-color 0.2s;
         }
         .lang-modal-btn:hover { background-color: #4a5568; }
-        #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; margin-bottom: 1rem; }
-        .delivery-form-input {
-            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc;
+        #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; margin-bottom: 1rem;}
+        .delivery-form-input { 
+            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc; 
             border-radius: 5px; padding: 8px; margin-top: 4px; box-sizing: border-box;
         }
         .status-badge { padding: 0.2em 0.6em; border-radius: 10px; font-size: 0.8em; color: white; font-weight: bold; }
@@ -570,7 +570,7 @@
                 }
                 const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet-btn" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition" disabled>${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition" disabled>${translations[currentLang].pay_card}</button></div></div>`;
                 Swal.fire({
-                    title: translations[currentLang].cart_title, html: footerHTML + cartHTML, width: '800px', showConfirmButton: false, showCloseButton: true,
+                    title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true,
                     didOpen: () => {
                         const payWalletBtn = document.getElementById('pay-wallet-btn');
                         if (payWalletBtn && cartItems.length > 0) {
@@ -585,8 +585,7 @@
             }
         }
         
-        function promptForDeliveryInfo(totalCost, cartItems) {
-            deliveryLocation = null;
+        function promptForDeliveryInfo(totalCost, cartItems, prefillData = {}) {
             const formHTML = `
                 <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
                     <label class="font-bold">${translations[currentLang].fullname}:</label>
@@ -614,7 +613,6 @@
                 cancelButtonText: translations[currentLang].remove_item_cancel,
                 customClass: { popup: 'w-full max-w-lg' },
                 didOpen: () => {
-                    document.getElementById('select-on-map-btn').addEventListener('click', showMapModal);
                     const countryDropdown = document.getElementById('country');
                     countryList.forEach(countryName => {
                         const option = document.createElement('option');
@@ -622,7 +620,27 @@
                         option.textContent = countryName;
                         countryDropdown.appendChild(option);
                     });
-                    countryDropdown.value = 'Syria';
+                    
+                    document.getElementById('fullname').value = prefillData.fullname || '';
+                    countryDropdown.value = prefillData.country || 'Syria';
+                    document.getElementById('city').value = prefillData.city || '';
+                    document.getElementById('address').value = prefillData.address || '';
+                    document.getElementById('phone').value = prefillData.phone || '';
+                    
+                    if (deliveryLocation) {
+                        document.getElementById('location-display').textContent = `${deliveryLocation.lat.toFixed(4)}, ${deliveryLocation.lng.toFixed(4)}`;
+                    }
+
+                    document.getElementById('select-on-map-btn').addEventListener('click', () => {
+                        const currentData = {
+                            fullname: document.getElementById('fullname').value,
+                            country: document.getElementById('country').value,
+                            city: document.getElementById('city').value,
+                            address: document.getElementById('address').value,
+                            phone: document.getElementById('phone').value
+                        };
+                        showMapModal(totalCost, cartItems, currentData);
+                    });
                 },
                 preConfirm: () => {
                     const fullname = document.getElementById('fullname').value.trim();
@@ -645,7 +663,7 @@
             });
         }
 
-        function showMapModal() {
+        function showMapModal(totalCost, cartItems, currentData) {
             const mapHTML = `<div class="text-center">
                     <p class="text-sm text-gray-600 mb-2">${translations[currentLang].map_syria_lebanon_only}</p>
                     <div id="map"></div>
@@ -666,16 +684,24 @@
                         if (marker) map.removeLayer(marker);
                         marker = L.marker([lat, lng]).addTo(map);
                         deliveryLocation = { lat, lng };
-                        document.getElementById('location-display').textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
                         map.setView([lat, lng], 15);
                     }
                     map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
-                    document.getElementById('save-location-btn').addEventListener('click', () => Swal.close());
+                    
+                    document.getElementById('save-location-btn').addEventListener('click', () => {
+                        // MODIFIED: This now correctly closes only the top modal (the map)
+                        // by simulating a click on the SweetAlert2's built-in close button.
+                        const closeButton = Swal.getCloseButton();
+                        if(closeButton) closeButton.click();
+                    });
+
                     document.getElementById('detect-location-btn').addEventListener('click', () => {
                         if (navigator.geolocation) {
+                            // MODIFIED: Requesting high accuracy for better results on mobile.
                             navigator.geolocation.getCurrentPosition(
                                 (position) => placeMarker(position.coords.latitude, position.coords.longitude),
-                                () => alert('Could not get your location.')
+                                () => alert('Could not get your location. Please enable location services.'),
+                                { enableHighAccuracy: true }
                             );
                         } else { alert('Geolocation is not supported by this browser.'); }
                     });
