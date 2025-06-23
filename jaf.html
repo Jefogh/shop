@@ -126,11 +126,9 @@
             tab.addEventListener('click', (e) => {
                 document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
                 const tabName = e.currentTarget.dataset.tab;
                 document.getElementById(`${tabName}-tab`).classList.remove('hidden');
-
                 if(tabName === 'products') loadProducts();
                 if(tabName === 'orders') loadOrders();
                 if(tabName === 'users') loadUsers();
@@ -176,8 +174,7 @@
             });
              document.querySelectorAll('.edit-product-btn').forEach(btn => {
                 btn.onclick = async (e) => {
-                     // Edit product logic will go here
-                     Swal.fire('قيد التطوير', 'سيتم تفعيل ميزة تعديل المنتج قريباً.', 'info');
+                    // Edit product logic will be implemented here
                 }
             });
         }
@@ -194,16 +191,36 @@
                 tableBody.innerHTML = '';
                 orders.forEach(o => {
                     const customer = o.get('customer');
-                    tableBody.innerHTML += `
-                        <tr class="bg-white border-b">
-                            <td class="px-6 py-4">${customer ? customer.get('username') : 'مستخدم محذوف'}</td>
-                            <td class="px-6 py-4">$${(o.get('totalAmount') || 0).toFixed(2)}</td>
-                            <td class="px-6 py-4">${o.get('status')}</td>
-                            <td class="px-6 py-4">${new Date(o.get('createdAt')).toLocaleDateString()}</td>
-                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
-                        </tr>`;
+                    tableBody.innerHTML += `<tr class="bg-white border-b"><td class="px-6 py-4">${customer ? customer.get('username') : 'مستخدم محذوف'}</td><td class="px-6 py-4">$${(o.get('totalAmount') || 0).toFixed(2)}</td><td class="px-6 py-4">${o.get('status')}</td><td class="px-6 py-4">${new Date(o.get('createdAt')).toLocaleDateString()}</td><td class="px-6 py-4"><button class="text-blue-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td></tr>`;
                 });
+                attachOrderActionListeners();
             } catch(e) { console.error("Failed to load orders", e); tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-red-500">فشل تحميل الطلبات.</td></tr>`;}
+        }
+        
+        function attachOrderActionListeners() {
+            document.querySelectorAll('.update-status-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const orderId = e.currentTarget.dataset.id;
+                    const { value: status } = await Swal.fire({
+                        title: 'تحديث حالة الطلب',
+                        input: 'select',
+                        inputOptions: { 'Processing': 'قيد المعالجة', 'Shipped': 'تم الشحن', 'Delivered': 'تم التسليم', 'Archived': 'مؤرشف'},
+                        inputPlaceholder: 'اختر الحالة الجديدة',
+                        showCancelButton: true,
+                        confirmButtonText: 'تحديث'
+                    });
+                    if (status) {
+                        const Order = Parse.Object.extend("Orders");
+                        const order = Order.createWithoutData(orderId);
+                        order.set("status", status);
+                        try {
+                            await order.save(null, { useMasterKey: true });
+                            Swal.fire('نجاح', 'تم تحديث حالة الطلب.', 'success');
+                            loadOrders();
+                        } catch (err) { Swal.fire('خطأ', 'فشل تحديث الحالة.', 'error'); }
+                    }
+                }
+            });
         }
 
         async function loadUsers() {
@@ -214,15 +231,36 @@
                 const users = await query.find({ useMasterKey: true });
                 tableBody.innerHTML = '';
                 users.forEach(u => {
-                    tableBody.innerHTML += `
-                        <tr class="bg-white border-b">
-                            <td class="px-6 py-4">${u.get('name') || u.get('username')}</td>
-                            <td class="px-6 py-4">${u.get('email')}</td>
-                            <td class="px-6 py-4">$${(u.get('walletBalance') || 0).toFixed(2)}</td>
-                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td>
-                        </tr>`;
+                    tableBody.innerHTML += `<tr class="bg-white border-b"><td class="px-6 py-4">${u.get('name') || u.get('username')}</td><td class="px-6 py-4">${u.get('email')}</td><td class="px-6 py-4">$${(u.get('walletBalance') || 0).toFixed(2)}</td><td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td></tr>`;
                 });
+                attachUserActionListeners();
             } catch(e) { console.error("Failed to load users", e); tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-500">فشل تحميل المستخدمين.</td></tr>`;}
+        }
+
+        function attachUserActionListeners() {
+            document.querySelectorAll('.edit-user-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const userId = e.currentTarget.dataset.id;
+                    const { value: amount } = await Swal.fire({
+                        title: 'تعديل رصيد المحفظة',
+                        input: 'number',
+                        inputLabel: 'أدخل المبلغ لإضافته (يمكن استخدام رقم سالب للخصم)',
+                        inputPlaceholder: '0.00',
+                        showCancelButton: true,
+                        confirmButtonText: 'إضافة الرصيد',
+                    });
+                    if (amount) {
+                        const query = new Parse.Query(Parse.User);
+                        try {
+                            const user = await query.get(userId, { useMasterKey: true });
+                            user.increment("walletBalance", parseFloat(amount));
+                            await user.save(null, { useMasterKey: true });
+                            Swal.fire('نجاح', 'تم تحديث رصيد المستخدم.', 'success');
+                            loadUsers();
+                        } catch (err) { Swal.fire('خطأ', 'فشل تحديث الرصيد.', 'error'); }
+                    }
+                }
+            });
         }
         
         document.getElementById('add-product-btn').addEventListener('click', () => {
@@ -233,7 +271,11 @@
                         <input id="name_ar" class="swal2-input" placeholder="الاسم (عربي)">
                         <input id="name_en" class="swal2-input" placeholder="Name (English)">
                         <input id="name_es" class="swal2-input" placeholder="Nombre (Español)">
+                        <input id="category_ar" class="swal2-input" placeholder="الصنف (عربي)">
+                        <input id="category_en" class="swal2-input" placeholder="Category (English)">
+                        <input id="category_es" class="swal2-input" placeholder="Categoría (Español)">
                         <input id="price" type="number" class="swal2-input" placeholder="السعر">
+                        <input id="shippingTime" class="swal2-input" placeholder="وقت الشحن (مثال: 5-10 أيام)">
                         <textarea id="desc_ar" class="swal2-textarea" placeholder="الوصف (عربي)"></textarea>
                         <textarea id="desc_en" class="swal2-textarea" placeholder="Description (English)"></textarea>
                         <textarea id="desc_es" class="swal2-textarea" placeholder="Descripción (Español)"></textarea>
@@ -246,44 +288,39 @@
                 confirmButtonText: 'إضافة',
                 cancelButtonText: 'إلغاء',
                 preConfirm: async () => {
-                    const nameAr = document.getElementById('name_ar').value;
-                    const nameEn = document.getElementById('name_en').value;
-                    const nameEs = document.getElementById('name_es').value;
-                    const price = parseFloat(document.getElementById('price').value);
-                    const descAr = document.getElementById('desc_ar').value;
-                    const descEn = document.getElementById('desc_en').value;
-                    const descEs = document.getElementById('desc_es').value;
                     const imageInput = document.getElementById('imageFile');
                     const photosInput = document.getElementById('photos');
-                    
-                    if (!nameEn || !price) { Swal.showValidationMessage(`الرجاء ملء حقل الاسم الإنجليزي والسعر`); return false; }
                     if (imageInput.files.length === 0) { Swal.showValidationMessage(`الرجاء اختيار صورة رئيسية`); return false; }
 
                     const imageFile = new Parse.File(imageInput.files[0].name, imageInput.files[0]);
-                    
-                    const photoFiles = [];
-                    for(let i = 0; i < photosInput.files.length; i++) {
-                        photoFiles.push(new Parse.File(photosInput.files[i].name, photosInput.files[i]));
-                    }
-                    
+                    const photoFiles = Array.from(photosInput.files).map(file => new Parse.File(file.name, file));
                     await Parse.File.saveAll([imageFile, ...photoFiles]);
                     
-                    return { nameAr, nameEn, nameEs, price, descAr, descEn, descEs, imageFile, photoFiles };
+                    return {
+                        name_ar: document.getElementById('name_ar').value,
+                        name_en: document.getElementById('name_en').value,
+                        name_es: document.getElementById('name_es').value,
+                        category_ar: document.getElementById('category_ar').value,
+                        category_en: document.getElementById('category_en').value,
+                        category_es: document.getElementById('category_es').value,
+                        price: parseFloat(document.getElementById('price').value),
+                        shippingTime: document.getElementById('shippingTime').value,
+                        description_ar: document.getElementById('desc_ar').value,
+                        description_en: document.getElementById('desc_en').value,
+                        description_es: document.getElementById('desc_es').value,
+                        imageFile: imageFile,
+                        photos: photoFiles
+                    };
                 }
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     const className = productStoreSelect.value;
                     const Product = Parse.Object.extend(className);
                     const newProduct = new Product();
-                    newProduct.set('name_ar', result.value.nameAr);
-                    newProduct.set('name_en', result.value.nameEn);
-                    newProduct.set('name_es', result.value.nameEs);
-                    newProduct.set('price', result.value.price);
-                    newProduct.set('description_ar', result.value.descAr);
-                    newProduct.set('description_en', result.value.descEn);
-                    newProduct.set('description_es', result.value.descEs);
-                    newProduct.set('imageFile', result.value.imageFile);
-                    newProduct.set('photos', result.value.photoFiles);
+                    // Set all fields from the result.value object
+                    for (const key in result.value) {
+                        newProduct.set(key, result.value[key]);
+                    }
                     try {
                         await newProduct.save(null, { useMasterKey: true });
                         Swal.fire('نجاح!', 'تم إضافة المنتج بنجاح.', 'success');
