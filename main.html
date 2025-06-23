@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المتجر العالمي</title>
-
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -20,27 +20,27 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background: #212534; color: #fff; }
         .swal2-popup { font-family: 'Tajawal', sans-serif; }
-        .products-grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 3rem 1.5rem;
-            padding: 1rem;
-            justify-items: center;
+        .products-grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 3rem 1.5rem; 
+            padding: 1rem; 
+            justify-items: center; 
         }
-        .card {
-            width: 240px;
-            height: 440px;
-            border-radius: 25px;
-            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-            cursor: pointer;
+        .card { 
+            width: 240px; 
+            height: 440px; 
+            border-radius: 25px; 
+            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
+            transition: transform 0.3s ease; 
+            cursor: pointer; 
         }
         .card:hover { transform: scale(1.05); }
         .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body {
-            height: 220px;
-            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between;
+        .card-body { 
+            height: 220px; 
+            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; 
         }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -63,8 +63,8 @@
         }
         .lang-modal-btn:hover { background-color: #4a5568; }
         #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; margin-bottom: 1rem;}
-        .delivery-form-input {
-            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc;
+        .delivery-form-input { 
+            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc; 
             border-radius: 5px; padding: 8px; margin-top: 4px; box-sizing: border-box;
         }
         .status-badge { padding: 0.2em 0.6em; border-radius: 10px; font-size: 0.8em; color: white; font-weight: bold; }
@@ -150,7 +150,7 @@
                 detect_my_location: "Detect My Location", save_location: "Save Location", map_syria_lebanon_only: "Map delivery service is currently available for Syria and Lebanon.",
                 form_field_required: "This field is required",
                 tracking_modal_title: "My Orders", order_id: "Order ID", order_date: "Date", order_total: "Total", order_status: "Status",
-                status_processing: "Processing", status_shipped: "Shipped", status_delivered: "Delivered", no_orders_yet: "You have no orders yet.",
+                status_processing: "Processing", status_shipped: "Shipped", status_delivered: "Delivered", status_archived: "Archived", no_orders_yet: "You have no orders yet.",
                 cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card",
                 add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart.",
                 reviews: "Reviews", write_review: "Write a Review", your_rating: "Your Rating", your_comment: "Your Comment", submit_review: "Submit Review", already_rated: "You have already rated this product.", no_reviews: "No reviews yet.",
@@ -175,7 +175,8 @@
                 alert_processing_payment: "Processing payment...",
                 alert_insufficient_funds: "Your wallet balance is insufficient.",
                 alert_payment_success_title: "Payment Successful!", alert_payment_success_text: "{amount} has been deducted from your wallet.",
-                alert_payment_fail: "Payment process failed."
+                alert_payment_fail: "Payment process failed.",
+                confirm_receipt: "Confirm Receipt", confirm_receipt_title: "Confirm Order Receipt?", confirm_receipt_text: "This order will be moved to your archive. You will no longer see it in this list.", confirm_receipt_button: "Yes, I Received It", archive_success_title: "Archived!", archive_success_text: "The order has been successfully archived."
             },
             ar: {
                 store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", login: "تسجيل الدخول", language: "اللغة",
@@ -183,7 +184,7 @@
                 detect_my_location: "تحديد موقعي", save_location: "حفظ الموقع", map_syria_lebanon_only: "خدمة التوصيل عبر الخريطة متاحة حالياً لسوريا ولبنان.",
                 form_field_required: "هذا الحقل مطلوب",
                 tracking_modal_title: "طلباتي", order_id: "رقم الطلب", order_date: "التاريخ", order_total: "المجموع", order_status: "الحالة",
-                status_processing: "قيد المعالجة", status_shipped: "تم الشحن", status_delivered: "تم التسليم", no_orders_yet: "لا يوجد لديك طلبات بعد.",
+                status_processing: "قيد المعالجة", status_shipped: "تم الشحن", status_delivered: "تم التسليم", status_archived: "مؤرشف", no_orders_yet: "لا يوجد لديك طلبات بعد.",
                 cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة",
                 add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة.",
                 reviews: "التقييمات", write_review: "كتابة تقييم", your_rating: "تقييمك", your_comment: "تعليقك", submit_review: "إرسال التقييم", already_rated: "لقد قمت بتقييم هذا المنتج مسبقًا.", no_reviews: "لا توجد تقييمات بعد.",
@@ -208,7 +209,8 @@
                 alert_processing_payment: "جارِ معالجة الدفع...",
                 alert_insufficient_funds: "رصيدك في المحفظة غير كافٍ.",
                 alert_payment_success_title: "تم الدفع بنجاح!", alert_payment_success_text: "تم خصم {amount} من محفظتك.",
-                alert_payment_fail: "فشلت عملية الدفع."
+                alert_payment_fail: "فشلت عملية الدفع.",
+                confirm_receipt: "تأكيد الاستلام", confirm_receipt_title: "تأكيد استلام الطلب؟", confirm_receipt_text: "سيتم نقل هذا الطلب إلى أرشيفك. لن يظهر مجدداً في هذه القائمة.", confirm_receipt_button: "نعم، استلمته", archive_success_title: "تمت الأرشفة!", archive_success_text: "تمت أرشفة الطلب بنجاح."
             },
             es: {
                 store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Mis Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", login: "Iniciar Sesión", language: "Idioma",
@@ -216,7 +218,7 @@
                 detect_my_location: "Detectar mi Ubicación", save_location: "Guardar Ubicación", map_syria_lebanon_only: "El servicio de entrega por mapa está actualmente disponible para Siria y Líbano.",
                 form_field_required: "Este campo es obligatorio",
                 tracking_modal_title: "Mis Pedidos", order_id: "ID de Pedido", order_date: "Fecha", order_total: "Total", order_status: "Estado",
-                status_processing: "Procesando", status_shipped: "Enviado", status_delivered: "Entregado", no_orders_yet: "Aún no tienes pedidos.",
+                status_processing: "Procesando", status_shipped: "Enviado", status_delivered: "Entregado", status_archived: "Archivado", no_orders_yet: "Aún no tienes pedidos.",
                 cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta",
                 add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.",
                 reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas.",
@@ -241,7 +243,8 @@
                 alert_processing_payment: "Procesando pago...",
                 alert_insufficient_funds: "El saldo de su billetera es insuficiente.",
                 alert_payment_success_title: "¡Pago Exitoso!", alert_payment_success_text: "Se ha deducido {amount} de su billetera.",
-                alert_payment_fail: "El proceso de pago falló."
+                alert_payment_fail: "El proceso de pago falló.",
+                confirm_receipt: "Confirmar Recibo", confirm_receipt_title: "¿Confirmar la recepción del pedido?", confirm_receipt_text: "Este pedido se moverá a su archivo. Ya no lo verá en esta lista.", confirm_receipt_button: "Sí, lo recibí", archive_success_title: "¡Archivado!", archive_success_text: "El pedido se ha archivado con éxito."
             }
         };
         
@@ -585,8 +588,8 @@
             }
         }
         
-        // MODIFIED: This function now includes the final fixes for the map and country list
         function promptForDeliveryInfo(totalCost, cartItems, prefillData = {}) {
+            deliveryLocation = prefillData.deliveryLocation || null;
             const formHTML = `
                 <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
                     <label class="font-bold">${translations[currentLang].fullname}:</label>
@@ -638,7 +641,8 @@
                             country: document.getElementById('country').value,
                             city: document.getElementById('city').value,
                             address: document.getElementById('address').value,
-                            phone: document.getElementById('phone').value
+                            phone: document.getElementById('phone').value,
+                            deliveryLocation: deliveryLocation // Pass the current location
                         };
                         showMapModal(totalCost, cartItems, currentData);
                     });
@@ -664,8 +668,7 @@
             });
         }
         
-        // MODIFIED: This function now uses the stable single-modal approach
-        function showMapModal(currentData) {
+        function showMapModal(totalCost, cartItems, currentData) {
             const mapHTML = `<div class="text-center text-gray-800">
                     <p class="text-sm text-gray-500 mb-2">${translations[currentLang].map_syria_lebanon_only}</p>
                     <div id="map"></div>
@@ -675,90 +678,52 @@
                     </div>
                 </div>`;
             
-            // Update the content of the currently open Swal
-            const swalContainer = Swal.getHtmlContainer().parentNode;
-            swalContainer.querySelector('.swal2-title').textContent = translations[currentLang].select_on_map;
-            swalContainer.querySelector('.swal2-html-container').innerHTML = mapHTML;
-            Swal.getConfirmButton().style.display = 'none';
-            Swal.getCancelButton().style.display = 'none';
-            
-            let map = L.map('map').setView([33.5138, 36.2765], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-            let marker;
+            // Re-open the main swal but with map content. This preserves the modal instance.
+            Swal.fire({
+                title: translations[currentLang].select_on_map,
+                html: mapHTML,
+                width: '90%',
+                maxWidth: '700px',
+                showConfirmButton: false, // We use custom buttons in HTML
+                showCancelButton: false, // We control closing manually
+                didOpen: () => {
+                    let map = L.map('map').setView([33.5138, 36.2765], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                    let marker;
+                    
+                    if (currentData.deliveryLocation) {
+                        marker = L.marker([currentData.deliveryLocation.lat, currentData.deliveryLocation.lng]).addTo(map);
+                        map.setView([currentData.deliveryLocation.lat, currentData.deliveryLocation.lng], 15);
+                    }
 
-            if (deliveryLocation) {
-                marker = L.marker([deliveryLocation.lat, deliveryLocation.lng]).addTo(map);
-                map.setView([deliveryLocation.lat, deliveryLocation.lng], 15);
-            }
+                    function placeMarker(lat, lng) {
+                        if (marker) map.removeLayer(marker);
+                        marker = L.marker([lat, lng]).addTo(map);
+                        deliveryLocation = { lat, lng }; // Update global variable
+                        map.setView([lat, lng], 15);
+                    }
 
-            function placeMarker(lat, lng) {
-                if (marker) map.removeLayer(marker);
-                marker = L.marker([lat, lng]).addTo(map);
-                deliveryLocation = { lat, lng }; // Update global variable
-                map.setView([lat, lng], 15);
-            }
+                    map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
 
-            map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
+                    document.getElementById('save-location-btn').addEventListener('click', () => {
+                        // Close the current map modal and re-open the delivery form with all data preserved.
+                        Swal.close();
+                        setTimeout(() => {
+                           promptForDeliveryInfo(totalCost, cartItems, currentData);
+                        }, 100); // Timeout helps ensure smooth transition
+                    });
 
-            document.getElementById('save-location-btn').addEventListener('click', () => {
-                // When saving, switch content back to the form
-                const formHTML = `
-                <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
-                    <label class="font-bold">${translations[currentLang].fullname}:</label>
-                    <input type="text" id="fullname" class="delivery-form-input" required>
-                    <label class="font-bold mt-2 block">${translations[currentLang].country}:</label>
-                    <select id="country" class="delivery-form-input"></select>
-                    <label class="font-bold mt-2 block">${translations[currentLang].city}:</label>
-                    <input type="text" id="city" class="delivery-form-input" required>
-                    <label class="font-bold mt-2 block">${translations[currentLang].address_details}:</label>
-                    <input type="text" id="address" class="delivery-form-input" required>
-                    <label class="font-bold mt-2 block">${translations[currentLang].phone_number}:</label>
-                    <input type="tel" id="phone" class="delivery-form-input" required>
-                    <label class="font-bold mt-4 block">${translations[currentLang].map_location}: <span class="text-sm font-normal text-gray-500">${translations[currentLang].delivery_syria_lebanon}</span></label>
-                    <div class="flex items-center gap-4 mt-1">
-                        <button id="select-on-map-btn" type="button" class="bg-blue-500 text-white py-1 px-3 rounded">${translations[currentLang].select_on_map}</button>
-                        <span id="location-display" class="text-sm text-gray-600">${translations[currentLang].location_not_set}</span>
-                    </div>
-                </div>`;
-                
-                Swal.update({
-                    title: translations[currentLang].delivery_info_title,
-                    html: formHTML,
-                });
-
-                const countryDropdown = document.getElementById('country');
-                countryList.forEach(countryName => {
-                    const option = document.createElement('option');
-                    option.value = countryName;
-                    option.textContent = countryName;
-                    countryDropdown.appendChild(option);
-                });
-                
-                document.getElementById('fullname').value = currentData.fullname;
-                countryDropdown.value = currentData.country;
-                document.getElementById('city').value = currentData.city;
-                document.getElementById('address').value = currentData.address;
-                document.getElementById('phone').value = currentData.phone;
-                
-                if (deliveryLocation) {
-                    document.getElementById('location-display').textContent = `${deliveryLocation.lat.toFixed(4)}, ${deliveryLocation.lng.toFixed(4)}`;
+                    document.getElementById('detect-location-btn').addEventListener('click', () => {
+                        if (navigator.geolocation) {
+                            const options = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => placeMarker(position.coords.latitude, position.coords.longitude),
+                                () => { alert('Could not get your location.'); },
+                                options
+                            );
+                        } else { alert('Geolocation is not supported by this browser.'); }
+                    });
                 }
-
-                document.getElementById('select-on-map-btn').addEventListener('click', () => showMapModal(currentData));
-                
-                Swal.getConfirmButton().style.display = 'inline-block';
-                Swal.getCancelButton().style.display = 'inline-block';
-            });
-
-            document.getElementById('detect-location-btn').addEventListener('click', () => {
-                if (navigator.geolocation) {
-                    const options = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => placeMarker(position.coords.latitude, position.coords.longitude),
-                        () => alert('Could not get your location.'),
-                        options
-                    );
-                } else { alert('Geolocation is not supported by this browser.'); }
             });
         }
         
@@ -809,6 +774,7 @@
             const Order = Parse.Object.extend("Orders");
             const query = new Parse.Query(Order);
             query.equalTo("customer", currentUser);
+            query.notEqualTo("status", "Archived");
             query.descending("createdAt");
             try {
                 const orders = await query.find();
@@ -825,6 +791,15 @@
                         if (status === 'Processing') statusColor = 'bg-yellow-500';
                         if (status === 'Shipped') statusColor = 'bg-blue-500';
                         if (status === 'Delivered') statusColor = 'bg-green-500';
+                        let confirmButtonHTML = '';
+                        if (status === 'Delivered') {
+                            confirmButtonHTML = `<div class="mt-3 text-right">
+                                <button class="confirm-receipt-btn bg-indigo-600 text-white py-1 px-3 rounded-md text-sm hover:bg-indigo-700 transition" data-order-id="${order.id}">
+                                    <i class="fas fa-check-double mr-1"></i>
+                                    ${translations[currentLang].confirm_receipt}
+                                </button>
+                            </div>`;
+                        }
                         ordersHTML += `
                         <div class="border rounded-lg p-4 bg-white text-gray-800" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
                             <div class="flex justify-between items-center">
@@ -833,6 +808,7 @@
                             </div>
                             <p class="text-sm text-gray-600">${translations[currentLang].order_date}: ${new Date(order.get('createdAt')).toLocaleDateString()}</p>
                             <p class="text-sm text-gray-600">${translations[currentLang].order_total}: <span class="font-bold">$${order.get('totalAmount').toFixed(2)}</span></p>
+                            ${confirmButtonHTML}
                         </div>`;
                     });
                     ordersHTML += '</div>';
@@ -840,11 +816,51 @@
                 Swal.fire({
                     title: translations[currentLang].tracking_modal_title,
                     html: ordersHTML, width: '90%', maxWidth: '600px',
-                    showConfirmButton: false, showCloseButton: true, background: '#f9fafb'
+                    showConfirmButton: false, showCloseButton: true, background: '#f9fafb',
+                    didOpen: () => {
+                        document.querySelectorAll('.confirm-receipt-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                const orderId = e.currentTarget.dataset.orderId;
+                                confirmOrderReceiptAndArchive(orderId);
+                            });
+                        });
+                    }
                 });
             } catch (error) {
                 console.error("Error fetching orders:", error);
                 Swal.fire(translations[currentLang].alert_error_title, "Failed to fetch orders.", 'error');
+            }
+        }
+        
+        async function confirmOrderReceiptAndArchive(orderId) {
+            const result = await Swal.fire({
+                title: translations[currentLang].confirm_receipt_title,
+                text: translations[currentLang].confirm_receipt_text,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: translations[currentLang].confirm_receipt_button,
+                cancelButtonText: translations[currentLang].remove_item_cancel
+            });
+            if (result.isConfirmed) {
+                Swal.fire({ title: translations[currentLang].loading, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                const Order = Parse.Object.extend("Orders");
+                const query = new Parse.Query(Order);
+                try {
+                    const order = await query.get(orderId);
+                    order.set("status", "Archived"); 
+                    await order.save();
+                    await Swal.fire(
+                        translations[currentLang].archive_success_title,
+                        translations[currentLang].archive_success_text,
+                        'success'
+                    );
+                    showTrackingModal();
+                } catch (error) {
+                    console.error("Error archiving order:", error);
+                    Swal.fire(translations[currentLang].alert_error_title,"Failed to archive the order.",'error');
+                }
             }
         }
         
