@@ -642,7 +642,7 @@
                             city: document.getElementById('city').value,
                             address: document.getElementById('address').value,
                             phone: document.getElementById('phone').value,
-                            deliveryLocation: deliveryLocation // Pass the current location
+                            deliveryLocation: deliveryLocation
                         };
                         showMapModal(totalCost, cartItems, currentData);
                     });
@@ -669,23 +669,20 @@
         }
         
         function showMapModal(totalCost, cartItems, currentData) {
-            const mapHTML = `<div class="text-center text-gray-800">
+            Swal.fire({
+                title: translations[currentLang].select_on_map,
+                html: `<div class="text-center text-gray-800">
                     <p class="text-sm text-gray-500 mb-2">${translations[currentLang].map_syria_lebanon_only}</p>
                     <div id="map"></div>
                     <div class="mt-4 flex gap-4 justify-center">
                         <button id="detect-location-btn" class="bg-blue-500 text-white py-2 px-4 rounded"><i class="fas fa-location-arrow mr-2"></i>${translations[currentLang].detect_my_location}</button>
                         <button id="save-location-btn" class="bg-green-500 text-white py-2 px-4 rounded">${translations[currentLang].save_location}</button>
                     </div>
-                </div>`;
-            
-            // Re-open the main swal but with map content. This preserves the modal instance.
-            Swal.fire({
-                title: translations[currentLang].select_on_map,
-                html: mapHTML,
+                </div>`,
                 width: '90%',
                 maxWidth: '700px',
-                showConfirmButton: false, // We use custom buttons in HTML
-                showCancelButton: false, // We control closing manually
+                showConfirmButton: false,
+                showCancelButton: true, // Keep cancel button for manual closing
                 didOpen: () => {
                     let map = L.map('map').setView([33.5138, 36.2765], 13);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -699,18 +696,15 @@
                     function placeMarker(lat, lng) {
                         if (marker) map.removeLayer(marker);
                         marker = L.marker([lat, lng]).addTo(map);
-                        deliveryLocation = { lat, lng }; // Update global variable
+                        deliveryLocation = { lat, lng };
                         map.setView([lat, lng], 15);
                     }
 
                     map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
-
+                    
                     document.getElementById('save-location-btn').addEventListener('click', () => {
-                        // Close the current map modal and re-open the delivery form with all data preserved.
+                        // This closes the current (map) modal and the then() block below handles re-opening the form.
                         Swal.close();
-                        setTimeout(() => {
-                           promptForDeliveryInfo(totalCost, cartItems, currentData);
-                        }, 100); // Timeout helps ensure smooth transition
                     });
 
                     document.getElementById('detect-location-btn').addEventListener('click', () => {
@@ -724,6 +718,10 @@
                         } else { alert('Geolocation is not supported by this browser.'); }
                     });
                 }
+            }).then(() => {
+                // This 'then' block executes when the map modal is closed (by any means).
+                // We re-open the delivery form with all the data preserved.
+                promptForDeliveryInfo(totalCost, cartItems, currentData);
             });
         }
         
