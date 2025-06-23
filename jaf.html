@@ -108,16 +108,18 @@
         }
 
         try {
-            const query = new Parse.Query(Parse.Role);
-            query.equalTo("name", "Admin");
-            query.equalTo("users", currentUser);
-            const adminRole = await query.first({ useMasterKey: true });
+            // FIX: Call the secure cloud function to check if the user is an admin
+            const isUserAdmin = await Parse.Cloud.run('isAdmin');
 
-            if (!adminRole) { throw new Error("You are not an admin."); }
-            
-            authGate.style.display = 'none';
-            adminPanel.style.display = 'block';
-            loadProducts(); 
+            if (isUserAdmin) {
+                // If user is admin, show the panel
+                authGate.style.display = 'none';
+                adminPanel.style.display = 'block';
+                loadProducts(); 
+            } else {
+                // If not admin, throw an error
+                throw new Error("You are not an admin.");
+            }
 
         } catch (error) {
             console.error("Permission check failed:", error);
@@ -170,7 +172,7 @@
                         const Product = Parse.Object.extend(className);
                         const product = Product.createWithoutData(id);
                         try {
-                            await product.destroy();
+                            await product.destroy({ useMasterKey: true }); // Use master key for deletion
                             Swal.fire('تم الحذف!', 'تم حذف المنتج بنجاح.', 'success');
                             loadProducts();
                         } catch (e) { Swal.fire('خطأ!', 'فشل حذف المنتج.', 'error'); }
@@ -183,12 +185,12 @@
         async function loadOrders() {
             const tableBody = document.getElementById('orders-table-body');
             tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4">جارِ تحميل الطلبات...</td></tr>`;
-            const Order = Parse.Object.extend("Orders"); // Assuming you named the class "Orders"
+            const Order = Parse.Object.extend("Orders"); 
             const query = new Parse.Query(Order);
             query.include("customer");
             query.descending("createdAt");
             try {
-                const orders = await query.find();
+                const orders = await query.find({ useMasterKey: true });
                 tableBody.innerHTML = '';
                 orders.forEach(o => {
                     const customer = o.get('customer');
@@ -209,7 +211,7 @@
             tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4">جارِ تحميل المستخدمين...</td></tr>`;
             const query = new Parse.Query(Parse.User);
             try {
-                const users = await query.find();
+                const users = await query.find({ useMasterKey: true });
                 tableBody.innerHTML = '';
                 users.forEach(u => {
                     tableBody.innerHTML += `
