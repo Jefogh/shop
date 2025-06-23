@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- The lang and dir attributes will be set by JavaScript -->
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -45,6 +44,19 @@
         .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
         .product-rating { font-size: 13px; color: #facc15; }
         .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
+        /* Style for search and filter inputs */
+        .filter-input {
+            background-color: #2d3748; /* gray-800 */
+            border: 1px solid #4a5568; /* gray-600 */
+            color: white;
+            border-radius: 0.375rem; /* rounded-md */
+            padding: 0.5rem 1rem;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #4299e1; /* blue-400 */
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+        }
     </style>
 </head>
 <body class="bg-[#212534]">
@@ -95,10 +107,23 @@
     </nav>
 
     <main class="container mx-auto p-4 sm:p-8">
-        <h1 data-translate-key="products_title" class="text-3xl sm:text-4xl font-bold text-center text-white mb-12">منتجاتنا</h1>
+        <h1 data-translate-key="products_title" class="text-3xl sm:text-4xl font-bold text-center text-white mb-6">منتجاتنا</h1>
+
+        <div id="filter-container" class="mb-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <input type="text" id="search-input" class="filter-input w-full sm:w-1/2 lg:w-1/3" placeholder="ابحث عن منتج...">
+            <div class="flex items-center gap-2">
+                <label for="category-filter" data-translate-key="filter_by_category" class="text-gray-300">حسب النوع</label>
+                <select id="category-filter" class="filter-input">
+                    </select>
+            </div>
+        </div>
+
         <div id="products-grid" class="products-grid-container"></div>
         <div id="loading-indicator" class="text-center py-10">
             <p data-translate-key="loading" class="text-gray-400">جارِ تحميل المنتجات...</p>
+        </div>
+        <div id="no-results" class="text-center py-10 text-gray-400 hidden" data-translate-key="no_results">
+            لا توجد منتجات تطابق بحثك.
         </div>
     </main>
 
@@ -106,9 +131,9 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const translations = {
-            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart.", reviews: "Reviews", write_review: "Write a Review", your_rating: "Your Rating", your_comment: "Your Comment", submit_review: "Submit Review", already_rated: "You have already rated this product.", no_reviews: "No reviews yet." },
-            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة.", reviews: "التقييمات", write_review: "كتابة تقييم", your_rating: "تقييمك", your_comment: "تعليقك", submit_review: "إرسال التقييم", already_rated: "لقد قمت بتقييم هذا المنتج مسبقًا.", no_reviews: "لا توجد تقييمات بعد." },
-            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.", reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas." }
+            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart.", reviews: "Reviews", write_review: "Write a Review", your_rating: "Your Rating", your_comment: "Your Comment", submit_review: "Submit Review", already_rated: "You have already rated this product.", no_reviews: "No reviews yet.", search_placeholder: "Search for a product...", filter_by_category: "By Category", all_categories: "All Categories", no_results: "No products match your search." },
+            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة.", reviews: "التقييمات", write_review: "كتابة تقييم", your_rating: "تقييمك", your_comment: "تعليقك", submit_review: "إرسال التقييم", already_rated: "لقد قمت بتقييم هذا المنتج مسبقًا.", no_reviews: "لا توجد تقييمات بعد.", search_placeholder: "ابحث عن منتج...", filter_by_category: "حسب النوع", all_categories: "كل الأنواع", no_results: "لا توجد منتجات تطابق بحثك." },
+            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.", reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas.", search_placeholder: "Buscar un producto...", filter_by_category: "Por Categoría", all_categories: "Todas las Categorías", no_results: "No hay productos que coincidan con tu búsqueda." }
         };
         let currentLang = 'ar'; 
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
@@ -116,37 +141,37 @@
         const currentUser = Parse.User.current();
 
         let productsCache = [];
+        let uniqueCategories = [];
+
+        const searchInput = document.getElementById('search-input');
+        const categoryFilter = document.getElementById('category-filter');
+        const noResultsDiv = document.getElementById('no-results');
 
         function setLanguage(lang) {
             currentLang = lang;
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // Translate all elements with data-translate-key
             document.querySelectorAll('[data-translate-key]').forEach(el => {
                 const key = el.getAttribute('data-translate-key');
-                if (!translations[lang][key]) return;
-                if (key === 'my_wallet') {
-                    const balanceSpan = el.querySelector('#wallet-balance, #wallet-balance-mobile');
-                    el.textContent = translations[lang][key] + ' ';
-                    if (balanceSpan) el.appendChild(balanceSpan);
-                } else {
-                    el.textContent = translations[lang][key];
+                if (translations[lang] && translations[lang][key]) {
+                     if (key === 'my_wallet') {
+                        const balanceSpan = el.querySelector('#wallet-balance, #wallet-balance-mobile');
+                        el.textContent = translations[lang][key] + ' ';
+                        if (balanceSpan) el.appendChild(balanceSpan);
+                    } else {
+                        el.textContent = translations[lang][key];
+                    }
                 }
             });
-            renderProducts(productsCache, lang);
-        }
 
-        async function fetchUserWallet() {
-             try {
-                const user = await currentUser.fetch();
-                const balance = user.get('walletBalance') || 0;
-                const formattedBalance = `$${balance.toFixed(2)}`;
-                document.getElementById('wallet-balance').textContent = formattedBalance;
-                document.getElementById('wallet-balance-mobile').textContent = formattedBalance;
-            } catch (error) {
-                console.error("Error fetching wallet:", error);
-                document.getElementById('wallet-balance').textContent = '$0.00';
-                document.getElementById('wallet-balance-mobile').textContent = '$0.00';
-            }
+            // Translate search placeholder
+            searchInput.placeholder = translations[lang].search_placeholder;
+
+            // Repopulate category filter with translated categories
+            populateCategoryFilter(lang);
+            applyFiltersAndRender();
         }
 
         async function fetchProducts() {
@@ -161,7 +186,24 @@
             try {
                 const products = await query.find();
                 productsCache = products;
-                await renderProducts(products, currentLang);
+                
+                // Extract unique categories from the fetched products
+                const categoryMap = new Map();
+                productsCache.forEach(p => {
+                    const cat_en = p.get('category_en');
+                    if (cat_en && !categoryMap.has(cat_en)) {
+                        categoryMap.set(cat_en, {
+                            en: cat_en,
+                            ar: p.get('category_ar'),
+                            es: p.get('category_es')
+                        });
+                    }
+                });
+                uniqueCategories = Array.from(categoryMap.values());
+                
+                populateCategoryFilter(currentLang);
+                applyFiltersAndRender();
+
             } catch (error) {
                 console.error("Error fetching products: ", error);
                 Swal.fire({ title: 'خطأ', html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.<br><code class="text-xs">${error.message}</code>`, icon: 'error' });
@@ -169,13 +211,62 @@
                 loadingIndicator.style.display = 'none';
             }
         }
-        
-        async function renderProducts(products, lang) {
+
+        function populateCategoryFilter(lang) {
+            const selectedValue = categoryFilter.value;
+            categoryFilter.innerHTML = ''; // Clear existing options
+            
+            // Add "All Categories" option
+            const allOption = document.createElement('option');
+            allOption.value = 'all';
+            allOption.textContent = translations[lang].all_categories;
+            categoryFilter.appendChild(allOption);
+
+            // Add unique categories
+            uniqueCategories.forEach(cat => {
+                const option = document.createElement('option');
+                // Use English category as the value for consistency
+                option.value = cat.en; 
+                option.textContent = cat[lang] || cat.en; // Display translated category
+                categoryFilter.appendChild(option);
+            });
+            
+            // Restore previously selected value if it exists
+            categoryFilter.value = selectedValue || 'all';
+        }
+
+        function applyFiltersAndRender() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedCategory = categoryFilter.value;
+
+            let filteredProducts = productsCache;
+
+            // Apply search filter
+            if (searchTerm) {
+                filteredProducts = filteredProducts.filter(product => {
+                    const name = product.get(`name_${currentLang}`) || '';
+                    return name.toLowerCase().includes(searchTerm);
+                });
+            }
+
+            // Apply category filter
+            if (selectedCategory !== 'all') {
+                filteredProducts = filteredProducts.filter(product => {
+                    return product.get('category_en') === selectedCategory;
+                });
+            }
+
+            renderProducts(filteredProducts, currentLang);
+        }
+
+        function renderProducts(products, lang) {
             const productsGrid = document.getElementById('products-grid');
             productsGrid.innerHTML = '';
+            
             if (products.length === 0) {
-                 productsGrid.innerHTML = `<p class="text-center col-span-full text-gray-400">لا توجد منتجات لعرضها حاليًا.</p>`;
-                 return;
+                 noResultsDiv.style.display = 'block';
+            } else {
+                 noResultsDiv.style.display = 'none';
             }
 
             for (const product of products) {
@@ -221,6 +312,25 @@
             }
         }
         
+        // --- EVENT LISTENERS ---
+        searchInput.addEventListener('input', applyFiltersAndRender);
+        categoryFilter.addEventListener('change', applyFiltersAndRender);
+
+        // --- EXISTING CODE (UNCHANGED) ---
+        async function fetchUserWallet() {
+             try {
+                const user = await currentUser.fetch();
+                const balance = user.get('walletBalance') || 0;
+                const formattedBalance = `$${balance.toFixed(2)}`;
+                document.getElementById('wallet-balance').textContent = formattedBalance;
+                document.getElementById('wallet-balance-mobile').textContent = formattedBalance;
+            } catch (error) {
+                console.error("Error fetching wallet:", error);
+                document.getElementById('wallet-balance').textContent = '$0.00';
+                document.getElementById('wallet-balance-mobile').textContent = '$0.00';
+            }
+        }
+
         async function showProductDetails(product) {
             if (!product) return;
             const name = product.get(`name_${currentLang}`);
@@ -468,6 +578,7 @@
             updateCartCount();
         }
 
+        // Initial Load
         setLanguage('ar');
         fetchProducts();
     });
