@@ -672,38 +672,70 @@
                         <button id="save-location-btn" class="bg-green-500 text-white py-2 px-4 rounded">${translations[currentLang].save_location}</button>
                     </div>
                 </div>`;
+
             Swal.fire({
                 title: translations[currentLang].select_on_map,
-                html: mapHTML, width: '90%', maxWidth: '700px',
-                showConfirmButton: false, showCloseButton: true,
+                html: mapHTML, 
+                width: '90%', 
+                maxWidth: '700px',
+                showConfirmButton: false, 
+                // مهم جداً إبقاء زر الإغلاق متاحاً برمجياً
+                showCloseButton: true,
                 didOpen: () => {
                     let map = L.map('map').setView([33.5138, 36.2765], 13);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
                     let marker;
+                    
+                    // إذا كان هناك موقع محدد مسبقاً، اعرضه على الخريطة
+                    if (deliveryLocation) {
+                        marker = L.marker([deliveryLocation.lat, deliveryLocation.lng]).addTo(map);
+                        map.setView([deliveryLocation.lat, deliveryLocation.lng], 15);
+                    }
+
                     function placeMarker(lat, lng) {
-                        if (marker) map.removeLayer(marker);
+                        if (marker) {
+                            map.removeLayer(marker);
+                        }
                         marker = L.marker([lat, lng]).addTo(map);
-                        deliveryLocation = { lat, lng };
+                        deliveryLocation = { lat, lng }; // تحديث الإحداثيات
+                        // تحديث النص في نافذة معلومات الشحن التي لا تزال موجودة في الخلفية
+                        const locationDisplay = window.parent.document.getElementById('location-display');
+                        if(locationDisplay) {
+                           locationDisplay.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                        }
                         map.setView([lat, lng], 15);
                     }
+
                     map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
                     
+                    // --- الإصلاح لمشكلة إغلاق النافذة ---
+                    // عند الضغط على "حفظ"، نقوم بالنقر على زر الإغلاق الخاص بالنافذة الحالية فقط
                     document.getElementById('save-location-btn').addEventListener('click', () => {
-                        // MODIFIED: This now correctly closes only the top modal (the map)
-                        // by simulating a click on the SweetAlert2's built-in close button.
                         const closeButton = Swal.getCloseButton();
-                        if(closeButton) closeButton.click();
+                        if (closeButton) {
+                            closeButton.click();
+                        }
                     });
 
+                    // --- الإصلاح لمشكلة دقة الموقع ---
                     document.getElementById('detect-location-btn').addEventListener('click', () => {
                         if (navigator.geolocation) {
-                            // MODIFIED: Requesting high accuracy for better results on mobile.
+                            // طلب أعلى دقة ممكنة
+                            const options = {
+                                enableHighAccuracy: true,
+                                timeout: 5000,
+                                maximumAge: 0
+                            };
                             navigator.geolocation.getCurrentPosition(
                                 (position) => placeMarker(position.coords.latitude, position.coords.longitude),
-                                () => alert('Could not get your location. Please enable location services.'),
-                                { enableHighAccuracy: true }
+                                () => {
+                                    alert('Could not get your location. Please enable location services and try again.');
+                                },
+                                options // تطبيق الخيارات الجديدة
                             );
-                        } else { alert('Geolocation is not supported by this browser.'); }
+                        } else {
+                            alert('Geolocation is not supported by this browser.');
+                        }
                     });
                 }
             });
