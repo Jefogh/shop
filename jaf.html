@@ -12,16 +12,24 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; }
         .swal2-container { z-index: 9999; }
-        .tab-button { padding: 0.5rem 1rem; border-bottom: 2px solid transparent; font-weight: 500; color: #4b5563; transition: all 0.2s; }
-        .tab-button.active, .tab-button:hover { border-color: #3b82f6; color: #3b82f6; }
-        .swal2-input, .swal2-textarea, .swal2-file { margin-bottom: 1rem !important; }
-        td, th { vertical-align: middle; }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .tab-button.active, .tab-button:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .swal2-input, .swal2-textarea, .swal2-file { margin-bottom: 1rem; }
     </style>
 </head>
 <body class="bg-gray-100">
 
     <div id="auth-gate" class="flex items-center justify-center h-screen">
-        <p class="text-gray-600 text-lg">جارِ التحقق من الصلاحيات...</p>
+        <p>جارِ التحقق من الصلاحيات...</p>
     </div>
 
     <div id="admin-panel" class="hidden">
@@ -48,7 +56,7 @@
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
                     <h2 class="text-xl font-semibold text-gray-700">المنتجات</h2>
                     <div class="flex items-center gap-4">
-                         <select id="product-store-select" class="bg-white border border-gray-300 text-gray-700 rounded-md py-2 px-3">
+                         <select id="product-store-select" class="bg-white border border-gray-300 rounded-md py-2 px-3">
                             <option value="Things">المتجر العالمي</option>
                             <option value="Thingssy">متجر سوريا ولبنان</option>
                         </select>
@@ -91,193 +99,180 @@
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
 
+        const currentUser = Parse.User.current();
         const authGate = document.getElementById('auth-gate');
         const adminPanel = document.getElementById('admin-panel');
-        const productStoreSelect = document.getElementById('product-store-select');
-        const productsTableBody = document.getElementById('products-table-body');
-        const ordersTableBody = document.getElementById('orders-table-body');
-        const usersTableBody = document.getElementById('users-table-body');
+
+        if (!currentUser) {
+            Swal.fire({ title: 'غير مصرح به', text: 'يجب عليك تسجيل الدخول أولاً.', icon: 'error' }).then(() => { window.location.href = 'index.html'; });
+            return;
+        }
+
+        try {
+            const isUserAdmin = await Parse.Cloud.run('isAdmin');
+            if (isUserAdmin) {
+                authGate.style.display = 'none';
+                adminPanel.style.display = 'block';
+                loadProducts(); 
+            } else {
+                throw new Error("You are not an admin.");
+            }
+        } catch (error) {
+            console.error("Permission check failed:", error);
+            Swal.fire({ title: 'فشل الوصول', text: 'ليس لديك الصلاحيات اللازمة للوصول لهذه الصفحة.', icon: 'error' }).then(() => { window.location.href = 'main.html'; });
+        }
         
-        // --- AUTHENTICATION AND PERMISSION CHECK ---
-        async function checkPermissions() {
-            const currentUser = Parse.User.current();
-            if (!currentUser) {
-                Swal.fire({ title: 'غير مصرح به', text: 'يجب عليك تسجيل الدخول أولاً.', icon: 'error', allowOutsideClick: false }).then(() => { window.location.href = 'index.html'; });
-                return;
-            }
-            try {
-                const isUserAdmin = await Parse.Cloud.run('isAdmin');
-                if (isUserAdmin) {
-                    authGate.style.display = 'none';
-                    adminPanel.style.display = 'block';
-                    initializePanel();
-                } else {
-                    throw new Error("User is not an admin.");
-                }
-            } catch (error) {
-                console.error("Permission check failed:", error);
-                Swal.fire({ title: 'فشل الوصول', text: 'ليس لديك الصلاحيات اللازمة للوصول لهذه الصفحة.', icon: 'error', allowOutsideClick: false }).then(() => { window.location.href = 'main.html'; });
-            }
-        }
+        document.querySelectorAll('.tab-button').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                const tabName = e.currentTarget.dataset.tab;
+                document.getElementById(`${tabName}-tab`).classList.remove('hidden');
 
-        // --- INITIALIZATION ---
-        function initializePanel() {
-            setupTabs();
-            setupEventListeners();
-            loadProducts(); // Load initial tab
-        }
-
-        // --- TAB MANAGEMENT ---
-        function setupTabs() {
-            document.querySelectorAll('.tab-button').forEach(tab => {
-                tab.addEventListener('click', (e) => {
-                    const tabName = e.currentTarget.dataset.tab;
-                    document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
-                    e.currentTarget.classList.add('active');
-                    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-                    document.getElementById(`${tabName}-tab`).classList.remove('hidden');
-
-                    if (tabName === 'products') loadProducts();
-                    if (tabName === 'orders') loadOrders();
-                    if (tabName === 'users') loadUsers();
-                });
+                if(tabName === 'products') loadProducts();
+                if(tabName === 'orders') loadOrders();
+                if(tabName === 'users') loadUsers();
             });
-        }
+        });
         
-        // --- DATA LOADING FUNCTIONS ---
-        const renderLoading = (tbody, colspan) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">جارِ التحميل...</td></tr>`; };
-        const renderError = (tbody, colspan, error) => { console.error(error); tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4 text-red-500">فشل تحميل البيانات. تأكد من صلاحيات الوصول.</td></tr>`; };
-        const renderEmpty = (tbody, colspan, message) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">${message}</td></tr>`; };
+        const productStoreSelect = document.getElementById('product-store-select');
+        productStoreSelect.addEventListener('change', loadProducts);
 
         async function loadProducts() {
-            renderLoading(productsTableBody, 3);
+            const tableBody = document.getElementById('products-table-body');
             const className = productStoreSelect.value;
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-4">جارِ تحميل المنتجات...</td></tr>`;
             const Product = Parse.Object.extend(className);
             const query = new Parse.Query(Product);
             query.descending("createdAt");
             try {
-                const products = await query.find(); 
-                if (products.length === 0) return renderEmpty(productsTableBody, 3, "لا توجد منتجات في هذا المتجر.");
-                
-                const rowsHTML = products.map(p => `
-                    <tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${p.get('name_en') || 'N/A'}</td><td class="px-6 py-4">$${(p.get('price') || 0).toFixed(2)}</td><td class="px-6 py-4 space-x-2 space-x-reverse"><button class="text-blue-500 hover:underline edit-product-btn" data-id="${p.id}" data-class="${className}">تعديل</button><button class="text-red-500 hover:underline delete-product-btn" data-id="${p.id}" data-class="${className}">حذف</button></td></tr>`
-                ).join('');
-                productsTableBody.innerHTML = rowsHTML;
-            } catch(e) { renderError(productsTableBody, 3, e); }
+                const products = await query.find({ useMasterKey: true });
+                tableBody.innerHTML = '';
+                products.forEach(p => {
+                    tableBody.innerHTML += `<tr class="bg-white border-b"><td class="px-6 py-4">${p.get('name_en')}</td><td class="px-6 py-4">$${p.get('price')}</td><td class="px-6 py-4 space-x-2 space-x-reverse"><button class="text-blue-500 hover:underline edit-product-btn" data-id="${p.id}" data-class="${className}">تعديل</button><button class="text-red-500 hover:underline delete-product-btn" data-id="${p.id}" data-class="${className}">حذف</button></td></tr>`;
+                });
+                attachProductActionListeners();
+            } catch(e) { console.error("Failed to load products", e); tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-red-500">فشل تحميل المنتجات.</td></tr>`;}
         }
 
+        function attachProductActionListeners() {
+            document.querySelectorAll('.delete-product-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    const className = e.currentTarget.dataset.class;
+                    const result = await Swal.fire({ title: 'هل أنت متأكد؟', text: "لا يمكن التراجع عن هذا الإجراء!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'نعم، احذفه!', cancelButtonText: 'إلغاء' });
+                    if (result.isConfirmed) {
+                        const Product = Parse.Object.extend(className);
+                        const product = Product.createWithoutData(id);
+                        try {
+                            await product.destroy({ useMasterKey: true });
+                            Swal.fire('تم الحذف!', 'تم حذف المنتج بنجاح.', 'success');
+                            loadProducts();
+                        } catch (e) { Swal.fire('خطأ!', 'فشل حذف المنتج.', 'error'); }
+                    }
+                };
+            });
+             document.querySelectorAll('.edit-product-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                     Swal.fire('قيد التطوير', 'سيتم تفعيل ميزة تعديل المنتج قريباً.', 'info');
+                }
+            });
+        }
+        
         async function loadOrders() {
-            renderLoading(ordersTableBody, 5);
+            const tableBody = document.getElementById('orders-table-body');
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4">جارِ تحميل الطلبات...</td></tr>`;
             const Order = Parse.Object.extend("Orders"); 
             const query = new Parse.Query(Order);
             query.include("customer");
             query.descending("createdAt");
             try {
-                const orders = await query.find();
-                if (orders.length === 0) return renderEmpty(ordersTableBody, 5, "لا توجد طلبات لعرضها.");
-                
-                const rowsHTML = orders.map(o => {
+                const orders = await query.find({ useMasterKey: true });
+                tableBody.innerHTML = '';
+                orders.forEach(o => {
                     const customer = o.get('customer');
-                    return `
+                    tableBody.innerHTML += `
                         <tr class="bg-white border-b">
                             <td class="px-6 py-4">${customer ? customer.get('username') : 'مستخدم محذوف'}</td>
                             <td class="px-6 py-4">$${(o.get('totalAmount') || 0).toFixed(2)}</td>
-                            <td class="px-6 py-4 font-bold">${o.get('status')}</td>
+                            <td class="px-6 py-4">${o.get('status')}</td>
                             <td class="px-6 py-4">${new Date(o.get('createdAt')).toLocaleDateString()}</td>
-                            <td class="px-6 py-4"><button class="text-green-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
+                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
                         </tr>`;
-                }).join('');
-                ordersTableBody.innerHTML = rowsHTML;
-            } catch(e) { renderError(ordersTableBody, 5, e); }
+                });
+                attachOrderActionListeners();
+            } catch(e) { console.error("Failed to load orders", e); tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-red-500">فشل تحميل الطلبات.</td></tr>`;}
         }
         
-        async function loadUsers() {
-             renderLoading(usersTableBody, 4);
-            const query = new Parse.Query(Parse.User);
-            try {
-                const users = await query.find();
-                 if (users.length === 0) return renderEmpty(usersTableBody, 4, "لا يوجد مستخدمون.");
-                
-                const rowsHTML = users.map(u => `
-                        <tr class="bg-white border-b"><td class="px-6 py-4">${u.get('name') || u.get('username')}</td><td class="px-6 py-4">${u.get('email') || 'N/A'}</td><td class="px-6 py-4 font-bold">$${(u.get('walletBalance') || 0).toFixed(2)}</td><td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td></tr>`
-                ).join('');
-                usersTableBody.innerHTML = rowsHTML;
-            } catch(e) { renderError(usersTableBody, 4, e); }
-        }
-
-        // --- EVENT HANDLING (using Event Delegation) ---
-        function setupEventListeners() {
-            productStoreSelect.addEventListener('change', loadProducts);
-            productsTableBody.addEventListener('click', handleProductActions);
-            ordersTableBody.addEventListener('click', handleOrderActions);
-            usersTableBody.addEventListener('click', handleUserActions);
-            document.getElementById('add-product-btn').addEventListener('click', handleAddProduct);
-            document.getElementById('logout-button').addEventListener('click', async () => {
-                await Parse.User.logOut();
-                window.location.href = 'index.html';
+        function attachOrderActionListeners() {
+            document.querySelectorAll('.update-status-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const orderId = e.currentTarget.dataset.id;
+                    const { value: status } = await Swal.fire({
+                        title: 'تحديث حالة الطلب',
+                        input: 'select',
+                        inputOptions: { 'Processing': 'قيد المعالجة', 'Shipped': 'تم الشحن', 'Delivered': 'تم التسليم', 'Archived': 'مؤرشف'},
+                        inputPlaceholder: 'اختر الحالة الجديدة',
+                        showCancelButton: true,
+                        confirmButtonText: 'تحديث'
+                    });
+                    if (status) {
+                        const Order = Parse.Object.extend("Orders");
+                        const order = Order.createWithoutData(orderId);
+                        order.set("status", status);
+                        try {
+                            await order.save(null, { useMasterKey: true });
+                            Swal.fire('نجاح', 'تم تحديث حالة الطلب.', 'success');
+                            loadOrders();
+                        } catch (err) { Swal.fire('خطأ', 'فشل تحديث الحالة.', 'error'); }
+                    }
+                }
             });
         }
 
-        async function handleProductActions(e) {
-            const target = e.target;
-            const id = target.dataset.id;
-            const className = target.dataset.class;
-
-            if (target.matches('.delete-product-btn')) {
-                const result = await Swal.fire({ title: 'هل أنت متأكد؟', text: "لا يمكن التراجع عن هذا الإجراء!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'نعم، احذفه!', cancelButtonText: 'إلغاء' });
-                if (result.isConfirmed) {
-                    const Product = Parse.Object.extend(className);
-                    const product = Product.createWithoutData(id);
-                    try {
-                        await product.destroy();
-                        Swal.fire('تم الحذف!', 'تم حذف المنتج بنجاح.', 'success');
-                        loadProducts();
-                    } catch (err) { Swal.fire('خطأ!', `فشل حذف المنتج: ${err.message}`, 'error'); }
-                }
-            } else if (target.matches('.edit-product-btn')) {
-                 Swal.fire('قيد التطوير', 'سيتم تفعيل ميزة تعديل المنتج قريباً.', 'info');
-            }
+        async function loadUsers() {
+             const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4">جارِ تحميل المستخدمين...</td></tr>`;
+            const query = new Parse.Query(Parse.User);
+            try {
+                const users = await query.find({ useMasterKey: true });
+                tableBody.innerHTML = '';
+                users.forEach(u => {
+                    tableBody.innerHTML += `<tr class="bg-white border-b"><td class="px-6 py-4">${u.get('name') || u.get('username')}</td><td class="px-6 py-4">${u.get('email')}</td><td class="px-6 py-4">$${(u.get('walletBalance') || 0).toFixed(2)}</td><td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td></tr>`;
+                });
+                attachUserActionListeners();
+            } catch(e) { console.error("Failed to load users", e); tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-500">فشل تحميل المستخدمين.</td></tr>`;}
         }
 
-        async function handleOrderActions(e) {
-            if (e.target.matches('.update-status-btn')) {
-                const orderId = e.target.dataset.id;
-                const { value: status } = await Swal.fire({
-                    title: 'تحديث حالة الطلب', input: 'select',
-                    inputOptions: { 'Processing': 'قيد المعالجة', 'Shipped': 'تم الشحن', 'Delivered': 'تم التسليم', 'Archived': 'مؤرشف'},
-                    inputPlaceholder: 'اختر الحالة الجديدة', showCancelButton: true, confirmButtonText: 'تحديث'
-                });
-                if (status) {
-                    const Order = Parse.Object.extend("Orders");
-                    const order = Order.createWithoutData(orderId);
-                    order.set("status", status);
-                    try {
-                        await order.save();
-                        Swal.fire('نجاح', 'تم تحديث حالة الطلب.', 'success');
-                        loadOrders();
-                    } catch (err) { Swal.fire('خطأ', `فشل تحديث الحالة: ${err.message}`, 'error'); }
+        function attachUserActionListeners() {
+            document.querySelectorAll('.edit-user-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const userId = e.currentTarget.dataset.id;
+                    const { value: amount } = await Swal.fire({
+                        title: 'تعديل رصيد المحفظة',
+                        input: 'number',
+                        inputLabel: 'أدخل المبلغ لإضافته (يمكن استخدام رقم سالب للخصم)',
+                        inputPlaceholder: '0.00',
+                        showCancelButton: true,
+                        confirmButtonText: 'إضافة الرصيد',
+                    });
+                    if (amount) {
+                        const query = new Parse.Query(Parse.User);
+                        try {
+                            const user = await query.get(userId, { useMasterKey: true });
+                            user.increment("walletBalance", parseFloat(amount));
+                            await user.save(null, { useMasterKey: true });
+                            Swal.fire('نجاح', 'تم تحديث رصيد المستخدم.', 'success');
+                            loadUsers();
+                        } catch (err) { Swal.fire('خطأ', 'فشل تحديث الرصيد.', 'error'); }
+                    }
                 }
-            }
-        }
-
-        async function handleUserActions(e) {
-            if (e.target.matches('.edit-user-btn')) {
-                const userId = e.target.dataset.id;
-                const { value: amount } = await Swal.fire({
-                    title: 'تعديل رصيد المحفظة', input: 'number', inputLabel: 'أدخل المبلغ لإضافته (يمكن استخدام رقم سالب للخصم)',
-                    inputPlaceholder: '0.00', showCancelButton: true, confirmButtonText: 'تحديث الرصيد',
-                });
-                if (amount && !isNaN(parseFloat(amount))) {
-                     try {
-                        await Parse.Cloud.run('updateUserBalance', { userId: userId, amount: parseFloat(amount) });
-                        Swal.fire('نجاح', 'تم تحديث رصيد المستخدم.', 'success');
-                        loadUsers();
-                    } catch (err) { Swal.fire('خطأ', `فشل تحديث الرصيد: ${err.message}`, 'error'); }
-                }
-            }
+            });
         }
         
-        function handleAddProduct() {
+        document.getElementById('add-product-btn').addEventListener('click', () => {
              Swal.fire({
                 title: 'إضافة منتج جديد',
                 html: `
@@ -306,23 +301,30 @@
                     const photosInput = document.getElementById('photos');
                     if (imageInput.files.length === 0) { Swal.showValidationMessage(`الرجاء اختيار صورة رئيسية`); return false; }
 
-                    const filesToUpload = [];
+                    // Create Parse.File objects
                     const imageFile = new Parse.File(imageInput.files[0].name, imageInput.files[0]);
-                    filesToUpload.push(imageFile);
-                    
                     const photoFiles = Array.from(photosInput.files).map(file => new Parse.File(file.name, file));
-                    filesToUpload.push(...photoFiles);
-
-                    Swal.showLoading();
-                    await Parse.File.saveAll(filesToUpload);
+                    
+                    // FIX: Save each file individually instead of using saveAll
+                    await imageFile.save();
+                    for (const file of photoFiles) {
+                        await file.save();
+                    }
                     
                     return {
-                        name_ar: document.getElementById('name_ar').value, name_en: document.getElementById('name_en').value, name_es: document.getElementById('name_es').value,
-                        category_ar: document.getElementById('category_ar').value, category_en: document.getElementById('category_en').value, category_es: document.getElementById('category_es').value,
-                        price: parseFloat(document.getElementById('price').value) || 0,
+                        name_ar: document.getElementById('name_ar').value,
+                        name_en: document.getElementById('name_en').value,
+                        name_es: document.getElementById('name_es').value,
+                        category_ar: document.getElementById('category_ar').value,
+                        category_en: document.getElementById('category_en').value,
+                        category_es: document.getElementById('category_es').value,
+                        price: parseFloat(document.getElementById('price').value),
                         shippingTime: document.getElementById('shippingTime').value,
-                        description_ar: document.getElementById('desc_ar').value, description_en: document.getElementById('desc_en').value, description_es: document.getElementById('desc_es').value,
-                        imageFile: imageFile, photos: photoFiles
+                        description_ar: document.getElementById('desc_ar').value,
+                        description_en: document.getElementById('desc_en').value,
+                        description_es: document.getElementById('desc_es').value,
+                        imageFile: imageFile,
+                        photos: photoFiles
                     };
                 }
             }).then(async (result) => {
@@ -330,11 +332,12 @@
                     const className = productStoreSelect.value;
                     const Product = Parse.Object.extend(className);
                     const newProduct = new Product();
+                    // Set all fields from the result.value object
                     for (const key in result.value) {
-                        if(result.value[key]) { newProduct.set(key, result.value[key]); }
+                        newProduct.set(key, result.value[key]);
                     }
                     try {
-                        await newProduct.save();
+                        await newProduct.save(null, { useMasterKey: true });
                         Swal.fire('نجاح!', 'تم إضافة المنتج بنجاح.', 'success');
                         loadProducts();
                     } catch (e) {
@@ -342,10 +345,12 @@
                     }
                 }
             });
-        }
-        
-        // --- STARTUP ---
-        checkPermissions();
+        });
+
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            await Parse.User.logOut();
+            window.location.href = 'index.html';
+        });
     });
     </script>
 </body>
