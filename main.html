@@ -701,6 +701,23 @@
         
         const loginButtons = [document.getElementById('login-button'), document.getElementById('login-button-mobile')];
         const logoutButtons = [document.getElementById('logout-button'), document.getElementById('logout-button-mobile')];
+logoutButtons.forEach(btn => {
+    // نتأكد أولاً أن الزر موجود قبل إضافة المستمع لتجنب الأخطاء
+    if (btn) { 
+        btn.addEventListener('click', async () => {
+            console.log("Logout button clicked!"); // رسالة تأكيد أن الزر يعمل
+            try {
+                await Parse.User.logOut();
+                console.log("User logged out successfully from Parse."); // رسالة تأكيد نجاح تسجيل الخروج
+                window.location.reload();
+            } catch (error) {
+                // في حال فشلت عملية تسجيل الخروج، سيظهر الخطأ هنا
+                console.error("Logout failed:", error);
+                alert(`Logout failed! See console for details. Error: ${error.message}`);
+            }
+        });
+    }
+});
         const walletLinks = [document.querySelector('a[href="bank.html"]'), document.querySelector('#mobile-menu a[href="bank.html"]')];
 
         if (!currentUser) {
