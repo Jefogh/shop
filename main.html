@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المتجر العالمي</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
@@ -20,27 +20,27 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background: #212534; color: #fff; }
         .swal2-popup { font-family: 'Tajawal', sans-serif; }
-        .products-grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: 3rem 1.5rem; 
-            padding: 1rem; 
-            justify-items: center; 
+        .products-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 3rem 1.5rem;
+            padding: 1rem;
+            justify-items: center;
         }
-        .card { 
-            width: 240px; 
-            height: 440px; 
-            border-radius: 25px; 
-            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
-            transition: transform 0.3s ease; 
-            cursor: pointer; 
+        .card {
+            width: 240px;
+            height: 440px;
+            border-radius: 25px;
+            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
         }
         .card:hover { transform: scale(1.05); }
         .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body { 
-            height: 220px; 
-            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; 
+        .card-body {
+            height: 220px;
+            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between;
         }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -63,8 +63,8 @@
         }
         .lang-modal-btn:hover { background-color: #4a5568; }
         #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; margin-bottom: 1rem;}
-        .delivery-form-input { 
-            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc; 
+        .delivery-form-input {
+            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc;
             border-radius: 5px; padding: 8px; margin-top: 4px; box-sizing: border-box;
         }
         .status-badge { padding: 0.2em 0.6em; border-radius: 10px; font-size: 0.8em; color: white; font-weight: bold; }
@@ -585,6 +585,7 @@
             }
         }
         
+        // MODIFIED: This function now includes the final fixes for the map and country list
         function promptForDeliveryInfo(totalCost, cartItems, prefillData = {}) {
             const formHTML = `
                 <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
@@ -662,82 +663,102 @@
                 }
             });
         }
-
-        function showMapModal(totalCost, cartItems, currentData) {
-            const mapHTML = `<div class="text-center">
-                    <p class="text-sm text-gray-600 mb-2">${translations[currentLang].map_syria_lebanon_only}</p>
+        
+        // MODIFIED: This function now uses the stable single-modal approach
+        function showMapModal(currentData) {
+            const mapHTML = `<div class="text-center text-gray-800">
+                    <p class="text-sm text-gray-500 mb-2">${translations[currentLang].map_syria_lebanon_only}</p>
                     <div id="map"></div>
                     <div class="mt-4 flex gap-4 justify-center">
                         <button id="detect-location-btn" class="bg-blue-500 text-white py-2 px-4 rounded"><i class="fas fa-location-arrow mr-2"></i>${translations[currentLang].detect_my_location}</button>
                         <button id="save-location-btn" class="bg-green-500 text-white py-2 px-4 rounded">${translations[currentLang].save_location}</button>
                     </div>
                 </div>`;
+            
+            // Update the content of the currently open Swal
+            const swalContainer = Swal.getHtmlContainer().parentNode;
+            swalContainer.querySelector('.swal2-title').textContent = translations[currentLang].select_on_map;
+            swalContainer.querySelector('.swal2-html-container').innerHTML = mapHTML;
+            Swal.getConfirmButton().style.display = 'none';
+            Swal.getCancelButton().style.display = 'none';
+            
+            let map = L.map('map').setView([33.5138, 36.2765], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            let marker;
 
-            Swal.fire({
-                title: translations[currentLang].select_on_map,
-                html: mapHTML, 
-                width: '90%', 
-                maxWidth: '700px',
-                showConfirmButton: false, 
-                // مهم جداً إبقاء زر الإغلاق متاحاً برمجياً
-                showCloseButton: true,
-                didOpen: () => {
-                    let map = L.map('map').setView([33.5138, 36.2765], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                    let marker;
-                    
-                    // إذا كان هناك موقع محدد مسبقاً، اعرضه على الخريطة
-                    if (deliveryLocation) {
-                        marker = L.marker([deliveryLocation.lat, deliveryLocation.lng]).addTo(map);
-                        map.setView([deliveryLocation.lat, deliveryLocation.lng], 15);
-                    }
+            if (deliveryLocation) {
+                marker = L.marker([deliveryLocation.lat, deliveryLocation.lng]).addTo(map);
+                map.setView([deliveryLocation.lat, deliveryLocation.lng], 15);
+            }
 
-                    function placeMarker(lat, lng) {
-                        if (marker) {
-                            map.removeLayer(marker);
-                        }
-                        marker = L.marker([lat, lng]).addTo(map);
-                        deliveryLocation = { lat, lng }; // تحديث الإحداثيات
-                        // تحديث النص في نافذة معلومات الشحن التي لا تزال موجودة في الخلفية
-                        const locationDisplay = window.parent.document.getElementById('location-display');
-                        if(locationDisplay) {
-                           locationDisplay.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                        }
-                        map.setView([lat, lng], 15);
-                    }
+            function placeMarker(lat, lng) {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker([lat, lng]).addTo(map);
+                deliveryLocation = { lat, lng }; // Update global variable
+                map.setView([lat, lng], 15);
+            }
 
-                    map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
-                    
-                    // --- الإصلاح لمشكلة إغلاق النافذة ---
-                    // عند الضغط على "حفظ"، نقوم بالنقر على زر الإغلاق الخاص بالنافذة الحالية فقط
-                    document.getElementById('save-location-btn').addEventListener('click', () => {
-                        const closeButton = Swal.getCloseButton();
-                        if (closeButton) {
-                            closeButton.click();
-                        }
-                    });
+            map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
 
-                    // --- الإصلاح لمشكلة دقة الموقع ---
-                    document.getElementById('detect-location-btn').addEventListener('click', () => {
-                        if (navigator.geolocation) {
-                            // طلب أعلى دقة ممكنة
-                            const options = {
-                                enableHighAccuracy: true,
-                                timeout: 5000,
-                                maximumAge: 0
-                            };
-                            navigator.geolocation.getCurrentPosition(
-                                (position) => placeMarker(position.coords.latitude, position.coords.longitude),
-                                () => {
-                                    alert('Could not get your location. Please enable location services and try again.');
-                                },
-                                options // تطبيق الخيارات الجديدة
-                            );
-                        } else {
-                            alert('Geolocation is not supported by this browser.');
-                        }
-                    });
+            document.getElementById('save-location-btn').addEventListener('click', () => {
+                // When saving, switch content back to the form
+                const formHTML = `
+                <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
+                    <label class="font-bold">${translations[currentLang].fullname}:</label>
+                    <input type="text" id="fullname" class="delivery-form-input" required>
+                    <label class="font-bold mt-2 block">${translations[currentLang].country}:</label>
+                    <select id="country" class="delivery-form-input"></select>
+                    <label class="font-bold mt-2 block">${translations[currentLang].city}:</label>
+                    <input type="text" id="city" class="delivery-form-input" required>
+                    <label class="font-bold mt-2 block">${translations[currentLang].address_details}:</label>
+                    <input type="text" id="address" class="delivery-form-input" required>
+                    <label class="font-bold mt-2 block">${translations[currentLang].phone_number}:</label>
+                    <input type="tel" id="phone" class="delivery-form-input" required>
+                    <label class="font-bold mt-4 block">${translations[currentLang].map_location}: <span class="text-sm font-normal text-gray-500">${translations[currentLang].delivery_syria_lebanon}</span></label>
+                    <div class="flex items-center gap-4 mt-1">
+                        <button id="select-on-map-btn" type="button" class="bg-blue-500 text-white py-1 px-3 rounded">${translations[currentLang].select_on_map}</button>
+                        <span id="location-display" class="text-sm text-gray-600">${translations[currentLang].location_not_set}</span>
+                    </div>
+                </div>`;
+                
+                Swal.update({
+                    title: translations[currentLang].delivery_info_title,
+                    html: formHTML,
+                });
+
+                const countryDropdown = document.getElementById('country');
+                countryList.forEach(countryName => {
+                    const option = document.createElement('option');
+                    option.value = countryName;
+                    option.textContent = countryName;
+                    countryDropdown.appendChild(option);
+                });
+                
+                document.getElementById('fullname').value = currentData.fullname;
+                countryDropdown.value = currentData.country;
+                document.getElementById('city').value = currentData.city;
+                document.getElementById('address').value = currentData.address;
+                document.getElementById('phone').value = currentData.phone;
+                
+                if (deliveryLocation) {
+                    document.getElementById('location-display').textContent = `${deliveryLocation.lat.toFixed(4)}, ${deliveryLocation.lng.toFixed(4)}`;
                 }
+
+                document.getElementById('select-on-map-btn').addEventListener('click', () => showMapModal(currentData));
+                
+                Swal.getConfirmButton().style.display = 'inline-block';
+                Swal.getCancelButton().style.display = 'inline-block';
+            });
+
+            document.getElementById('detect-location-btn').addEventListener('click', () => {
+                if (navigator.geolocation) {
+                    const options = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => placeMarker(position.coords.latitude, position.coords.longitude),
+                        () => alert('Could not get your location.'),
+                        options
+                    );
+                } else { alert('Geolocation is not supported by this browser.'); }
             });
         }
         
