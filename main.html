@@ -176,7 +176,7 @@
                 alert_insufficient_funds: "Your wallet balance is insufficient.",
                 alert_payment_success_title: "Payment Successful!", alert_payment_success_text: "{amount} has been deducted from your wallet.",
                 alert_payment_fail: "Payment process failed.",
-                confirm_receipt: "Confirm Receipt", confirm_receipt_title: "Confirm Order Receipt?", confirm_receipt_text: "This order will be moved to your archive. You will no longer see it in this list.", confirm_receipt_button: "Yes, I Received It", archive_success_title: "Archived!", archive_success_text: "The order has been successfully archived."
+                confirm_receipt: "Confirm Receipt", confirm_receipt_title: "Confirm Order Receipt?", confirm_receipt_text: "This will confirm you have received the order. It will be hidden from this list.", confirm_receipt_button: "Yes, I Received It", archive_success_title: "Confirmed!", archive_success_text: "Receipt confirmed successfully."
             },
             ar: {
                 store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", login: "تسجيل الدخول", language: "اللغة",
@@ -210,7 +210,7 @@
                 alert_insufficient_funds: "رصيدك في المحفظة غير كافٍ.",
                 alert_payment_success_title: "تم الدفع بنجاح!", alert_payment_success_text: "تم خصم {amount} من محفظتك.",
                 alert_payment_fail: "فشلت عملية الدفع.",
-                confirm_receipt: "تأكيد الاستلام", confirm_receipt_title: "تأكيد استلام الطلب؟", confirm_receipt_text: "سيتم نقل هذا الطلب إلى أرشيفك. لن يظهر مجدداً في هذه القائمة.", confirm_receipt_button: "نعم، استلمته", archive_success_title: "تمت الأرشفة!", archive_success_text: "تمت أرشفة الطلب بنجاح."
+                confirm_receipt: "تأكيد الاستلام", confirm_receipt_title: "تأكيد استلام الطلب؟", confirm_receipt_text: "هذا سيؤكد استلامك للطلب. سيتم إخفاؤه من هذه القائمة.", confirm_receipt_button: "نعم، استلمته", archive_success_title: "تم التأكيد!", archive_success_text: "تم تأكيد الاستلام بنجاح."
             },
             es: {
                 store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Mis Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", login: "Iniciar Sesión", language: "Idioma",
@@ -244,7 +244,7 @@
                 alert_insufficient_funds: "El saldo de su billetera es insuficiente.",
                 alert_payment_success_title: "¡Pago Exitoso!", alert_payment_success_text: "Se ha deducido {amount} de su billetera.",
                 alert_payment_fail: "El proceso de pago falló.",
-                confirm_receipt: "Confirmar Recibo", confirm_receipt_title: "¿Confirmar la recepción del pedido?", confirm_receipt_text: "Este pedido se moverá a su archivo. Ya no lo verá en esta lista.", confirm_receipt_button: "Sí, lo recibí", archive_success_title: "¡Archivado!", archive_success_text: "El pedido se ha archivado con éxito."
+                confirm_receipt: "Confirmar Recibo", confirm_receipt_title: "¿Confirmar la recepción del pedido?", confirm_receipt_text: "Esto confirmará que ha recibido el pedido. Se ocultará de esta lista.", confirm_receipt_button: "Sí, lo recibí", archive_success_title: "¡Confirmado!", archive_success_text: "Recepción confirmada con éxito."
             }
         };
         
@@ -589,29 +589,30 @@
         }
         
         function promptForDeliveryInfo(totalCost, cartItems, prefillData = {}) {
-            deliveryLocation = prefillData.deliveryLocation || null;
-            const formHTML = `
+            deliveryLocation = prefillData.deliveryLocation || deliveryLocation;
+            
+            const getDeliveryFormHTML = (data) => `
                 <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
                     <label class="font-bold">${translations[currentLang].fullname}:</label>
-                    <input type="text" id="fullname" class="delivery-form-input" required>
+                    <input type="text" id="fullname" class="delivery-form-input" value="${data.fullname || ''}" required>
                     <label class="font-bold mt-2 block">${translations[currentLang].country}:</label>
                     <select id="country" class="delivery-form-input"></select>
                     <label class="font-bold mt-2 block">${translations[currentLang].city}:</label>
-                    <input type="text" id="city" class="delivery-form-input" required>
+                    <input type="text" id="city" class="delivery-form-input" value="${data.city || ''}" required>
                     <label class="font-bold mt-2 block">${translations[currentLang].address_details}:</label>
-                    <input type="text" id="address" class="delivery-form-input" required>
+                    <input type="text" id="address" class="delivery-form-input" value="${data.address || ''}" required>
                     <label class="font-bold mt-2 block">${translations[currentLang].phone_number}:</label>
-                    <input type="tel" id="phone" class="delivery-form-input" required>
+                    <input type="tel" id="phone" class="delivery-form-input" value="${data.phone || ''}" required>
                     <label class="font-bold mt-4 block">${translations[currentLang].map_location}: <span class="text-sm font-normal text-gray-500">${translations[currentLang].delivery_syria_lebanon}</span></label>
                     <div class="flex items-center gap-4 mt-1">
                         <button id="select-on-map-btn" type="button" class="bg-blue-500 text-white py-1 px-3 rounded">${translations[currentLang].select_on_map}</button>
-                        <span id="location-display" class="text-sm text-gray-600">${translations[currentLang].location_not_set}</span>
+                        <span id="location-display" class="text-sm text-gray-600">${deliveryLocation ? `${deliveryLocation.lat.toFixed(4)}, ${deliveryLocation.lng.toFixed(4)}` : translations[currentLang].location_not_set}</span>
                     </div>
                 </div>`;
 
             Swal.fire({
                 title: translations[currentLang].delivery_info_title,
-                html: formHTML,
+                html: getDeliveryFormHTML(prefillData),
                 confirmButtonText: translations[currentLang].confirm_and_pay,
                 showCancelButton: true,
                 cancelButtonText: translations[currentLang].remove_item_cancel,
@@ -624,16 +625,7 @@
                         option.textContent = countryName;
                         countryDropdown.appendChild(option);
                     });
-                    
-                    document.getElementById('fullname').value = prefillData.fullname || '';
                     countryDropdown.value = prefillData.country || 'Syria';
-                    document.getElementById('city').value = prefillData.city || '';
-                    document.getElementById('address').value = prefillData.address || '';
-                    document.getElementById('phone').value = prefillData.phone || '';
-                    
-                    if (deliveryLocation) {
-                        document.getElementById('location-display').textContent = `${deliveryLocation.lat.toFixed(4)}, ${deliveryLocation.lng.toFixed(4)}`;
-                    }
 
                     document.getElementById('select-on-map-btn').addEventListener('click', () => {
                         const currentData = {
@@ -644,7 +636,9 @@
                             phone: document.getElementById('phone').value,
                             deliveryLocation: deliveryLocation
                         };
-                        showMapModal(totalCost, cartItems, currentData);
+                        showMapModal(currentData, (newData) => {
+                             promptForDeliveryInfo(totalCost, cartItems, newData);
+                        });
                     });
                 },
                 preConfirm: () => {
@@ -668,7 +662,7 @@
             });
         }
         
-        function showMapModal(totalCost, cartItems, currentData) {
+        function showMapModal(currentData, callbackOnSave) {
             Swal.fire({
                 title: translations[currentLang].select_on_map,
                 html: `<div class="text-center text-gray-800">
@@ -682,15 +676,19 @@
                 width: '90%',
                 maxWidth: '700px',
                 showConfirmButton: false,
-                showCancelButton: true, // Keep cancel button for manual closing
+                showCloseButton: true,
+                willClose: () => {
+                    callbackOnSave(currentData);
+                },
                 didOpen: () => {
                     let map = L.map('map').setView([33.5138, 36.2765], 13);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
                     let marker;
                     
                     if (currentData.deliveryLocation) {
-                        marker = L.marker([currentData.deliveryLocation.lat, currentData.deliveryLocation.lng]).addTo(map);
-                        map.setView([currentData.deliveryLocation.lat, currentData.deliveryLocation.lng], 15);
+                        const { lat, lng } = currentData.deliveryLocation;
+                        marker = L.marker([lat, lng]).addTo(map);
+                        map.setView([lat, lng], 15);
                     }
 
                     function placeMarker(lat, lng) {
@@ -703,8 +701,8 @@
                     map.on('click', e => placeMarker(e.latlng.lat, e.latlng.lng));
                     
                     document.getElementById('save-location-btn').addEventListener('click', () => {
-                        // This closes the current (map) modal and the then() block below handles re-opening the form.
-                        Swal.close();
+                         currentData.deliveryLocation = deliveryLocation;
+                         Swal.close();
                     });
 
                     document.getElementById('detect-location-btn').addEventListener('click', () => {
@@ -718,10 +716,6 @@
                         } else { alert('Geolocation is not supported by this browser.'); }
                     });
                 }
-            }).then(() => {
-                // This 'then' block executes when the map modal is closed (by any means).
-                // We re-open the delivery form with all the data preserved.
-                promptForDeliveryInfo(totalCost, cartItems, currentData);
             });
         }
         
@@ -772,7 +766,7 @@
             const Order = Parse.Object.extend("Orders");
             const query = new Parse.Query(Order);
             query.equalTo("customer", currentUser);
-            query.notEqualTo("status", "Archived");
+            query.notEqualTo("Useraccept", true); // MODIFIED: Hide orders where Useraccept is true
             query.descending("createdAt");
             try {
                 const orders = await query.find();
@@ -819,7 +813,7 @@
                         document.querySelectorAll('.confirm-receipt-btn').forEach(btn => {
                             btn.addEventListener('click', (e) => {
                                 const orderId = e.currentTarget.dataset.orderId;
-                                confirmOrderReceiptAndArchive(orderId);
+                                confirmAndSetUserAccept(orderId); // MODIFIED: Call the new function
                             });
                         });
                     }
@@ -830,7 +824,7 @@
             }
         }
         
-        async function confirmOrderReceiptAndArchive(orderId) {
+        async function confirmAndSetUserAccept(orderId) {
             const result = await Swal.fire({
                 title: translations[currentLang].confirm_receipt_title,
                 text: translations[currentLang].confirm_receipt_text,
@@ -847,7 +841,7 @@
                 const query = new Parse.Query(Order);
                 try {
                     const order = await query.get(orderId);
-                    order.set("status", "Archived"); 
+                    order.set("Useraccept", true); // MODIFIED: Set the new field to true
                     await order.save();
                     await Swal.fire(
                         translations[currentLang].archive_success_title,
@@ -856,8 +850,8 @@
                     );
                     showTrackingModal();
                 } catch (error) {
-                    console.error("Error archiving order:", error);
-                    Swal.fire(translations[currentLang].alert_error_title,"Failed to archive the order.",'error');
+                    console.error("Error confirming order:", error);
+                    Swal.fire(translations[currentLang].alert_error_title,"Failed to confirm receipt.",'error');
                 }
             }
         }
