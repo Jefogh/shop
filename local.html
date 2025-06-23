@@ -583,20 +583,28 @@
             if (quantity) { addToCart(product, parseInt(quantity)); }
         }
 
-        async function addToCart(product, quantityToAdd) {
+async function addToCart(product, quantityToAdd) {
             Swal.fire({ title: translations[currentLang].alert_adding_to_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
+
+            // --- التعديل الأول هنا ---
+            // يبحث الآن عن المنتج في العمود الصحيح 'productsy'
             query.equalTo("productsy", product); 
+            
             try {
                 let cartItem = await query.first();
-                if (cartItem) { 
-                    cartItem.increment("quantity", quantityToAdd); 
+                if (cartItem) {
+                    cartItem.increment("quantity", quantityToAdd);
                 } else { 
                     cartItem = new Net(); 
                     cartItem.set("guest", currentUser); 
+
+                    // --- التعديل الثاني هنا ---
+                    // يقوم بحفظ مؤشر المنتج في العمود الصحيح 'productsy'
                     cartItem.set("productsy", product); 
+
                     cartItem.set("quantity", quantityToAdd); 
                 }
                 await cartItem.save();
