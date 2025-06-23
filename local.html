@@ -71,7 +71,7 @@
         #poll-fab {
             position: fixed;
             bottom: 2rem;
-            left: 2rem; /* Changed from right to left for RTL */
+            left: 2rem;
             width: 60px;
             height: 60px;
             background-color: #db2777; /* pink-600 */
@@ -90,8 +90,50 @@
             transform: scale(1.1);
             background-color: #c21e66;
         }
-        .poll-option { margin-bottom: 10px; }
-        .poll-option label { margin-left: 10px; margin-right: 10px; }
+        .poll-options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .poll-image-option {
+            cursor: pointer;
+            border: 3px solid #e5e7eb; /* gray-200 */
+            border-radius: 10px;
+            padding: 8px;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+            text-align: center;
+            background-color: #f9fafb; /* gray-50 */
+        }
+        .poll-image-option.selected, .poll-image-option:hover {
+            border-color: #3b82f6; /* blue-500 */
+            transform: translateY(-5px);
+        }
+        .poll-image-option img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+            pointer-events: none; /* Make image unclickable directly */
+        }
+        .poll-image-option .vote-btn {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .poll-result-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .poll-result-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .poll-result-details { flex-grow: 1; }
         .poll-result-bar {
             width: 100%; background-color: #e0e0e0; border-radius: 5px;
             overflow: hidden; margin-top: 5px;
@@ -215,7 +257,7 @@
                 alert_payment_success_title: "Payment Successful!", alert_payment_success_text: "{amount} has been deducted from your wallet.",
                 alert_payment_fail: "Payment process failed.",
                 confirm_receipt: "Confirm Receipt", confirm_receipt_title: "Confirm Order Receipt?", confirm_receipt_text: "This will confirm you have received the order. It will be hidden from this list.", confirm_receipt_button: "Yes, I Received It", archive_success_title: "Confirmed!", archive_success_text: "Receipt confirmed successfully.",
-                poll_title: "Community Poll", poll_no_active: "There are no active polls at the moment.", poll_submit_vote: "Submit Vote", poll_already_voted: "You have already voted in this poll.", poll_results: "Poll Results", poll_thank_you: "Thank you for voting!", poll_total_votes: "Total Votes", poll_login_required: "You must be logged in to vote."
+                poll_title: "Vote for the Next Design!", poll_no_active: "There are no active polls at the moment.", poll_submit_vote: "Submit Vote", poll_already_voted: "You have already voted in this poll.", poll_results: "Live Poll Results", poll_thank_you: "Thank you for voting!", poll_total_votes: "Votes", poll_login_required: "You must be logged in to vote.", poll_select_design: "Choose this Design"
             },
             ar: {
                 store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", login: "تسجيل الدخول", language: "اللغة",
@@ -250,7 +292,7 @@
                 alert_payment_success_title: "تم الدفع بنجاح!", alert_payment_success_text: "تم خصم {amount} من محفظتك.",
                 alert_payment_fail: "فشلت عملية الدفع.",
                 confirm_receipt: "تأكيد الاستلام", confirm_receipt_title: "تأكيد استلام الطلب؟", confirm_receipt_text: "هذا سيؤكد استلامك للطلب. سيتم إخفاؤه من هذه القائمة.", confirm_receipt_button: "نعم، استلمته", archive_success_title: "تم التأكيد!", archive_success_text: "تم تأكيد الاستلام بنجاح.",
-                poll_title: "استطلاع رأي", poll_no_active: "لا يوجد استطلاعات رأي نشطة حالياً.", poll_submit_vote: "إرسال التصويت", poll_already_voted: "لقد قمت بالتصويت في هذا الاستطلاع مسبقاً.", poll_results: "نتائج الاستطلاع", poll_thank_you: "شكراً لتصويتك!", poll_total_votes: "مجموع الأصوات", poll_login_required: "يجب تسجيل الدخول للتصويت."
+                poll_title: "صوّت للتصميم القادم!", poll_no_active: "لا يوجد استطلاعات رأي نشطة حالياً.", poll_submit_vote: "إرسال التصويت", poll_already_voted: "لقد قمت بالتصويت في هذا الاستطلاع مسبقاً.", poll_results: "نتائج التصويت الحية", poll_thank_you: "شكراً لتصويتك!", poll_total_votes: "أصوات", poll_login_required: "يجب تسجيل الدخول للتصويت.", poll_select_design: "اختر هذا التصميم"
             },
             es: {
                 store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Mis Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", login: "Iniciar Sesión", language: "Idioma",
@@ -285,7 +327,7 @@
                 alert_payment_success_title: "¡Pago Exitoso!", alert_payment_success_text: "Se ha deducido {amount} de su billetera.",
                 alert_payment_fail: "El proceso de pago falló.",
                 confirm_receipt: "Confirmar Recibo", confirm_receipt_title: "¿Confirmar la recepción del pedido?", confirm_receipt_text: "Esto confirmará que ha recibido el pedido. Se ocultará de esta lista.", confirm_receipt_button: "Sí, lo recibí", archive_success_title: "¡Confirmado!", archive_success_text: "Recepción confirmada con éxito.",
-                poll_title: "Encuesta de la Comunidad", poll_no_active: "No hay encuestas activas en este momento.", poll_submit_vote: "Enviar Voto", poll_already_voted: "Ya has votado en esta encuesta.", poll_results: "Resultados de la Encuesta", poll_thank_you: "¡Gracias por votar!", poll_total_votes: "Votos Totales", poll_login_required: "Debes iniciar sesión para votar."
+                poll_title: "Encuesta de la Comunidad", poll_no_active: "No hay encuestas activas en este momento.", poll_submit_vote: "Enviar Voto", poll_already_voted: "Ya has votado en esta encuesta.", poll_results: "Resultados de la Encuesta", poll_thank_you: "¡Gracias por votar!", poll_total_votes: "Votos Totales", poll_login_required: "Debes iniciar sesión para votar.", poll_select_design: "Elige este Diseño"
             }
         };
         
@@ -332,7 +374,7 @@
             const productsGrid = document.getElementById('products-grid');
             loadingIndicator.style.display = 'block';
             productsGrid.innerHTML = '';
-            const Product = Parse.Object.extend("Thingssy"); // MODIFIED FOR THIS PAGE
+            const Product = Parse.Object.extend("Thingssy");
             const query = new Parse.Query(Product);
             query.select("name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", "category_ar", "category_en", "category_es", "price", "imageFile", "photos", "shippingTime", "averageRating", "ratingCount");
             try {
@@ -447,7 +489,7 @@
             }
         }
 
-async function showProductDetails(product) {
+        async function showProductDetails(product) {
             if (!product) return;
             const name = product.get(`name_${currentLang}`);
             const description = product.get(`description_${currentLang}`);
@@ -459,18 +501,12 @@ async function showProductDetails(product) {
             let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
             let thumbnailsHTML = '';
             allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
-            
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
-            
-            // --- MODIFIED HERE ---
-            // Now it looks for the pointer in the 'productsy' column instead of 'product'
-            query.equalTo("productsy", product); 
-            
+            query.equalTo("productsy", product);
             query.include("guest");
             query.descending("createdAt");
             let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
-            
             try {
                 const reviews = await query.find();
                 if (reviews.length === 0) {
@@ -490,20 +526,16 @@ async function showProductDetails(product) {
                 reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
             }
             reviewsHTML += `</div></div>`;
-            
             const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p><button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600">${translations[currentLang].write_review}</button></div></div>` + reviewsHTML;
             Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product)); }});
         }
-        
-async function promptForReview(product) {
+
+        async function promptForReview(product) {
             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_rate, 'warning'); return; }
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
-            
-            // --- MODIFIED HERE ---
-            query.equalTo("productsy", product); // Check for existing rating using the new column
+            query.equalTo("productsy", product);
             query.equalTo("guest", currentUser);
-
             const existingRating = await query.first();
             if (existingRating) { Swal.fire(translations[currentLang].alert_info_title, translations[currentLang].already_rated, 'info'); return; }
             const { value: formValues } = await Swal.fire({
@@ -528,18 +560,15 @@ async function promptForReview(product) {
                 const newRating = new Rating();
                 newRating.set("stars", parseInt(formValues.stars));
                 newRating.set("comment", formValues.comment);
-                
-                // --- MODIFIED HERE ---
-                newRating.set("productsy", product); // Save the new rating using the new column
+                newRating.set("productsy", product);
                 newRating.set("guest", currentUser);
-                
                 try {
                     await newRating.save();
                     Swal.fire(translations[currentLang].alert_rating_submit_success_title, translations[currentLang].alert_rating_submit_success_text, 'success').then(() => fetchProducts());
                 } catch(error) { Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_rating_submit_fail, 'error'); }
             }
         }
-        
+
         async function promptForQuantity(product) {
             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_add, 'warning'); return; }
             const { value: quantity } = await Swal.fire({
@@ -738,8 +767,6 @@ async function promptForReview(product) {
                 showConfirmButton: false,
                 showCancelButton: true,
                 willClose: () => {
-                    // This logic ensures that when the map modal closes (for any reason),
-                    // the delivery form is re-opened with the latest data.
                     promptForDeliveryInfo(totalCost, cartItems, currentData);
                 },
                 didOpen: () => {
@@ -989,42 +1016,64 @@ async function promptForReview(product) {
 
         function displayPollOptions(poll) {
             const question = poll.get(`question_${currentLang}`) || poll.get('question_en');
-            const options = poll.get('options') || [];
-            let optionsHTML = '<div class="text-left">';
-            options.forEach(option => {
-                const optionText = option[`text_${currentLang}`] || option.text_en;
-                optionsHTML += `<div class="poll-option"><input type="radio" id="poll-opt-${option.id}" name="poll_option" value="${option.id}" class="mr-2"><label for="poll-opt-${option.id}">${optionText}</label></div>`;
-            });
+            let selectedOptionId = null;
+
+            let optionsHTML = '<div class="poll-options-container text-gray-800">';
+            for (let i = 1; i <= 3; i++) {
+                const imageFile = poll.get(`image${i}`);
+                const optionText = poll.get(`text${i}_${currentLang}`) || poll.get(`text${i}_en`);
+                if (imageFile && optionText) {
+                    const imageUrl = imageFile.url();
+                    optionsHTML += `
+                    <div class="poll-image-option" data-option-id="${i}">
+                        <img src="${imageUrl}" alt="${optionText}">
+                        <p class="mt-2 font-semibold">${optionText}</p>
+                        <button class="vote-btn mt-2 bg-blue-600 text-white py-1 px-4 rounded-md text-sm">${translations[currentLang].poll_select_design}</button>
+                    </div>`;
+                }
+            }
             optionsHTML += '</div>';
+
             Swal.fire({
                 title: question,
                 html: optionsHTML,
+                showConfirmButton: true,
                 confirmButtonText: translations[currentLang].poll_submit_vote,
                 showCancelButton: true,
                 cancelButtonText: translations[currentLang].remove_item_cancel,
+                customClass: { popup: 'w-full max-w-4xl' },
+                didOpen: () => {
+                    const optionDivs = document.querySelectorAll('.poll-image-option');
+                    optionDivs.forEach(div => {
+                        div.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            optionDivs.forEach(d => d.classList.remove('selected'));
+                            div.classList.add('selected');
+                            selectedOptionId = parseInt(div.dataset.optionId);
+                        });
+                    });
+                },
                 preConfirm: () => {
-                    const selectedOption = document.querySelector('input[name="poll_option"]:checked');
-                    if (!selectedOption) {
-                        Swal.showValidationMessage("الرجاء اختيار أحد الخيارات");
+                    if (!selectedOptionId) {
+                        Swal.showValidationMessage(translations[currentLang].poll_select_design);
                         return false;
                     }
-                    return selectedOption.value;
+                    return selectedOptionId;
                 }
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    const selectedOptionId = parseInt(result.value);
                     const PollVote = Parse.Object.extend("PollVotes");
                     const newVote = new PollVote();
                     newVote.set("poll", poll);
                     newVote.set("user", currentUser);
-                    newVote.set("optionId", selectedOptionId);
+                    newVote.set("optionId", result.value);
                     try {
                         await newVote.save();
                         await Swal.fire(translations[currentLang].poll_thank_you, '', 'success');
                         displayPollResults(poll);
                     } catch (error) {
                         console.error("Error saving vote:", error);
-                        Swal.fire(translations[currentLang].alert_error_title, "فشل حفظ التصويت", 'error');
+                        Swal.fire(translations[currentLang].alert_error_title, "Failed to save vote", 'error');
                     }
                 }
             });
@@ -1033,13 +1082,11 @@ async function promptForReview(product) {
         async function displayPollResults(poll) {
             Swal.fire({ title: translations[currentLang].loading, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             const question = poll.get(`question_${currentLang}`) || poll.get('question_en');
-            const options = poll.get('options') || [];
             const PollVote = Parse.Object.extend("PollVotes");
             const query = new Parse.Query(PollVote);
             query.equalTo("poll", poll);
             const allVotes = await query.find();
-            const results = {};
-            options.forEach(opt => results[opt.id] = 0);
+            const results = { 1: 0, 2: 0, 3: 0 };
             allVotes.forEach(vote => {
                 const optId = vote.get("optionId");
                 if (results[optId] !== undefined) {
@@ -1047,32 +1094,40 @@ async function promptForReview(product) {
                 }
             });
             const totalVotes = allVotes.length;
-            let resultsHTML = `<div class="text-left w-full text-gray-800">`;
-            options.forEach(option => {
-                const voteCount = results[option.id] || 0;
-                const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100) : 0;
-                const optionText = option[`text_${currentLang}`] || option.text_en;
-                resultsHTML += `
-                <div class="mb-4">
-                    <div class="flex justify-between items-center mb-1">
-                        <span>${optionText}</span>
-                        <span class="font-bold">${percentage.toFixed(1)}%</span>
-                    </div>
-                    <div class="poll-result-bar">
-                        <div class="poll-result-progress" style="width: ${percentage}%;">${voteCount}</div>
-                    </div>
-                </div>`;
-            });
-            resultsHTML += `<p class="text-center mt-4 text-gray-500">${translations[currentLang].poll_total_votes}: ${totalVotes}</p></div>`;
+            let resultsHTML = `<div class="w-full text-gray-800">`;
+            for (let i = 1; i <= 3; i++) {
+                const imageFile = poll.get(`image${i}`);
+                const optionText = poll.get(`text${i}_${currentLang}`) || poll.get(`text${i}_en`);
+                if (imageFile && optionText) {
+                    const imageUrl = imageFile.url();
+                    const voteCount = results[i] || 0;
+                    const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100) : 0;
+                    resultsHTML += `
+                    <div class="poll-result-item">
+                        <img src="${imageUrl}" alt="${optionText}">
+                        <div class="poll-result-details">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold">${optionText}</span>
+                                <span class="text-gray-600">${voteCount} ${translations[currentLang].poll_total_votes} (${percentage.toFixed(1)}%)</span>
+                            </div>
+                            <div class="poll-result-bar">
+                                <div class="poll-result-progress" style="width: ${percentage}%;"></div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+            }
+            resultsHTML += `</div>`;
             Swal.fire({
                 title: question,
                 html: resultsHTML,
+                customClass: { popup: 'w-full max-w-2xl' },
                 showConfirmButton: false,
                 showCloseButton: true,
                 background: '#f9fafb'
             });
         }
-
+        
         // --- FINAL SETUP AND EVENT LISTENERS ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const langGlobeButton = document.getElementById('lang-globe-button');
