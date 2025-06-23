@@ -447,7 +447,7 @@
             }
         }
 
-        async function showProductDetails(product) {
+async function showProductDetails(product) {
             if (!product) return;
             const name = product.get(`name_${currentLang}`);
             const description = product.get(`description_${currentLang}`);
@@ -459,12 +459,18 @@
             let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
             let thumbnailsHTML = '';
             allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
+            
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
-            query.equalTo("product", product);
+            
+            // --- MODIFIED HERE ---
+            // Now it looks for the pointer in the 'productsy' column instead of 'product'
+            query.equalTo("productsy", product); 
+            
             query.include("guest");
             query.descending("createdAt");
             let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
+            
             try {
                 const reviews = await query.find();
                 if (reviews.length === 0) {
@@ -484,16 +490,20 @@
                 reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
             }
             reviewsHTML += `</div></div>`;
+            
             const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p><button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600">${translations[currentLang].write_review}</button></div></div>` + reviewsHTML;
             Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product)); }});
         }
-
-        async function promptForReview(product) {
+        
+async function promptForReview(product) {
             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_rate, 'warning'); return; }
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
-            query.equalTo("product", product);
+            
+            // --- MODIFIED HERE ---
+            query.equalTo("productsy", product); // Check for existing rating using the new column
             query.equalTo("guest", currentUser);
+
             const existingRating = await query.first();
             if (existingRating) { Swal.fire(translations[currentLang].alert_info_title, translations[currentLang].already_rated, 'info'); return; }
             const { value: formValues } = await Swal.fire({
@@ -518,15 +528,18 @@
                 const newRating = new Rating();
                 newRating.set("stars", parseInt(formValues.stars));
                 newRating.set("comment", formValues.comment);
-                newRating.set("product", product);
+                
+                // --- MODIFIED HERE ---
+                newRating.set("productsy", product); // Save the new rating using the new column
                 newRating.set("guest", currentUser);
+                
                 try {
                     await newRating.save();
                     Swal.fire(translations[currentLang].alert_rating_submit_success_title, translations[currentLang].alert_rating_submit_success_text, 'success').then(() => fetchProducts());
                 } catch(error) { Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_rating_submit_fail, 'error'); }
             }
         }
-
+        
         async function promptForQuantity(product) {
             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_add, 'warning'); return; }
             const { value: quantity } = await Swal.fire({
