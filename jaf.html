@@ -12,17 +12,8 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; }
         .swal2-container { z-index: 9999; }
-        .tab-button {
-            padding: 0.5rem 1rem;
-            border-bottom: 2px solid transparent;
-            font-weight: 500;
-            color: #4b5563;
-            transition: all 0.2s;
-        }
-        .tab-button.active, .tab-button:hover {
-            border-color: #3b82f6;
-            color: #3b82f6;
-        }
+        .tab-button { padding: 0.5rem 1rem; border-bottom: 2px solid transparent; font-weight: 500; color: #4b5563; transition: all 0.2s; }
+        .tab-button.active, .tab-button:hover { border-color: #3b82f6; color: #3b82f6; }
         .swal2-input, .swal2-textarea, .swal2-file { margin-bottom: 1rem !important; }
         td, th { vertical-align: middle; }
     </style>
@@ -50,7 +41,6 @@
                     <button class="tab-button active" data-tab="products">إدارة المنتجات</button>
                     <button class="tab-button" data-tab="orders">إدارة الطلبات</button>
                     <button class="tab-button" data-tab="users">إدارة المستخدمين</button>
-                    <button class="tab-button" data-tab="polls">إدارة الاستطلاعات</button>
                 </nav>
             </div>
 
@@ -77,7 +67,7 @@
                  <h2 class="text-xl font-semibold text-gray-700 mb-4">الطلبات</h2>
                  <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500">
-                         <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">المستخدم</th><th class="px-6 py-3">الإجمالي</th><th class="px-6 py-3">الحالة</th><th class="px-6 py-3">تاريخ الطلب</th><th class="px-6 py-3">الإجراءات</th></tr></thead>
+                         <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">المستخدم</th><th class="px-6 py-3">الإجمالي</th><th class="px-6 py-3">الحالة</th><th class="px-6 py-3">تاريخ الطلب</th><th class="px-6 py-3">تحديث الحالة</th></tr></thead>
                         <tbody id="orders-table-body"></tbody>
                     </table>
                 </div>
@@ -92,38 +82,21 @@
                     </table>
                 </div>
             </div>
-
-            <div id="polls-tab" class="tab-content hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-semibold text-gray-700">الاستطلاعات</h2>
-                    <button id="add-poll-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"><i class="fas fa-plus mr-2"></i>إضافة استطلاع جديد</button>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">السؤال (EN)</th><th class="px-6 py-3">الحالة</th><th class="px-6 py-3">إجراءات</th></tr></thead>
-                        <tbody id="polls-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
         </main>
     </div>
 
     <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        // --- PARSE INITIALIZATION ---
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
 
-        // --- DOM ELEMENTS ---
         const authGate = document.getElementById('auth-gate');
         const adminPanel = document.getElementById('admin-panel');
         const productStoreSelect = document.getElementById('product-store-select');
         const productsTableBody = document.getElementById('products-table-body');
         const ordersTableBody = document.getElementById('orders-table-body');
         const usersTableBody = document.getElementById('users-table-body');
-        const pollsTableBody = document.getElementById('polls-table-body');
         
         // --- AUTHENTICATION AND PERMISSION CHECK ---
         async function checkPermissions() {
@@ -147,8 +120,15 @@
             }
         }
 
-        // --- INITIALIZATION AND EVENT LISTENERS ---
+        // --- INITIALIZATION ---
         function initializePanel() {
+            setupTabs();
+            setupEventListeners();
+            loadProducts(); // Load initial tab
+        }
+
+        // --- TAB MANAGEMENT ---
+        function setupTabs() {
             document.querySelectorAll('.tab-button').forEach(tab => {
                 tab.addEventListener('click', (e) => {
                     const tabName = e.currentTarget.dataset.tab;
@@ -160,30 +140,13 @@
                     if (tabName === 'products') loadProducts();
                     if (tabName === 'orders') loadOrders();
                     if (tabName === 'users') loadUsers();
-                    if (tabName === 'polls') loadPolls();
                 });
             });
-
-            productStoreSelect.addEventListener('change', loadProducts);
-            document.getElementById('add-product-btn').addEventListener('click', handleAddProduct);
-            document.getElementById('add-poll-btn').addEventListener('click', handleAddPoll);
-            document.getElementById('logout-button').addEventListener('click', async () => {
-                await Parse.User.logOut();
-                window.location.href = 'index.html';
-            });
-
-            // Event Delegation for action buttons
-            productsTableBody.addEventListener('click', handleProductActions);
-            ordersTableBody.addEventListener('click', handleOrderActions);
-            usersTableBody.addEventListener('click', handleUserActions);
-            pollsTableBody.addEventListener('click', handlePollActions);
-
-            loadProducts(); // Load initial tab
         }
-
+        
         // --- DATA LOADING FUNCTIONS ---
         const renderLoading = (tbody, colspan) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">جارِ التحميل...</td></tr>`; };
-        const renderError = (tbody, colspan, error) => { console.error(error); tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4 text-red-500">فشل تحميل البيانات.</td></tr>`; };
+        const renderError = (tbody, colspan, error) => { console.error(error); tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4 text-red-500">فشل تحميل البيانات. تأكد من صلاحيات الوصول.</td></tr>`; };
         const renderEmpty = (tbody, colspan, message) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">${message}</td></tr>`; };
 
         async function loadProducts() {
@@ -193,8 +156,8 @@
             const query = new Parse.Query(Product);
             query.descending("createdAt");
             try {
-                const products = await query.find({ useMasterKey: true });
-                if (products.length === 0) return renderEmpty(productsTableBody, 3, "لا توجد منتجات.");
+                const products = await query.find(); 
+                if (products.length === 0) return renderEmpty(productsTableBody, 3, "لا توجد منتجات في هذا المتجر.");
                 
                 const rowsHTML = products.map(p => `
                     <tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${p.get('name_en') || 'N/A'}</td><td class="px-6 py-4">$${(p.get('price') || 0).toFixed(2)}</td><td class="px-6 py-4 space-x-2 space-x-reverse"><button class="text-blue-500 hover:underline edit-product-btn" data-id="${p.id}" data-class="${className}">تعديل</button><button class="text-red-500 hover:underline delete-product-btn" data-id="${p.id}" data-class="${className}">حذف</button></td></tr>`
@@ -210,8 +173,8 @@
             query.include("customer");
             query.descending("createdAt");
             try {
-                const orders = await query.find({ useMasterKey: true });
-                if (orders.length === 0) return renderEmpty(ordersTableBody, 5, "لا توجد طلبات.");
+                const orders = await query.find();
+                if (orders.length === 0) return renderEmpty(ordersTableBody, 5, "لا توجد طلبات لعرضها.");
                 
                 const rowsHTML = orders.map(o => {
                     const customer = o.get('customer');
@@ -221,7 +184,7 @@
                             <td class="px-6 py-4">$${(o.get('totalAmount') || 0).toFixed(2)}</td>
                             <td class="px-6 py-4 font-bold">${o.get('status')}</td>
                             <td class="px-6 py-4">${new Date(o.get('createdAt')).toLocaleDateString()}</td>
-                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline view-order-btn" data-id="${o.id}">عرض</button> <button class="text-green-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
+                            <td class="px-6 py-4"><button class="text-green-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
                         </tr>`;
                 }).join('');
                 ordersTableBody.innerHTML = rowsHTML;
@@ -229,71 +192,158 @@
         }
         
         async function loadUsers() {
-            renderLoading(usersTableBody, 4);
+             renderLoading(usersTableBody, 4);
             const query = new Parse.Query(Parse.User);
             try {
-                const users = await query.find({ useMasterKey: true });
-                if (users.length === 0) return renderEmpty(usersTableBody, 4, "لا يوجد مستخدمون.");
+                const users = await query.find();
+                 if (users.length === 0) return renderEmpty(usersTableBody, 4, "لا يوجد مستخدمون.");
                 
                 const rowsHTML = users.map(u => `
-                    <tr class="bg-white border-b"><td class="px-6 py-4">${u.get('name') || u.get('username')}</td><td class="px-6 py-4">${u.get('email') || 'N/A'}</td><td class="px-6 py-4 font-bold">$${(u.get('walletBalance') || 0).toFixed(2)}</td><td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td></tr>`
+                        <tr class="bg-white border-b"><td class="px-6 py-4">${u.get('name') || u.get('username')}</td><td class="px-6 py-4">${u.get('email') || 'N/A'}</td><td class="px-6 py-4 font-bold">$${(u.get('walletBalance') || 0).toFixed(2)}</td><td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td></tr>`
                 ).join('');
                 usersTableBody.innerHTML = rowsHTML;
             } catch(e) { renderError(usersTableBody, 4, e); }
         }
 
-        async function loadPolls() {
-            renderLoading(pollsTableBody, 3);
-            const Poll = Parse.Object.extend("Polls");
-            const query = new Parse.Query(Poll);
-            query.descending("createdAt");
-            try {
-                const polls = await query.find({ useMasterKey: true });
-                if (polls.length === 0) return renderEmpty(pollsTableBody, 3, "لا توجد استطلاعات.");
-
-                const rowsHTML = polls.map(p => `
-                    <tr class="bg-white border-b">
-                        <td class="px-6 py-4 font-medium text-gray-900">${p.get('question_en') || 'N/A'}</td>
-                        <td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${p.get('isActive') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${p.get('isActive') ? 'نشط' : 'غير نشط'}</span></td>
-                        <td class="px-6 py-4 space-x-2 space-x-reverse">
-                            <button class="text-green-500 hover:underline activate-poll-btn" data-id="${p.id}" ${p.get('isActive') ? 'disabled' : ''}>تفعيل</button>
-                            <button class="text-blue-500 hover:underline view-poll-results-btn" data-id="${p.id}">النتائج</button>
-                            <button class="text-red-500 hover:underline delete-poll-btn" data-id="${p.id}">حذف</button>
-                        </td>
-                    </tr>`
-                ).join('');
-                pollsTableBody.innerHTML = rowsHTML;
-            } catch(e) { renderError(pollsTableBody, 3, e); }
+        // --- EVENT HANDLING (using Event Delegation) ---
+        function setupEventListeners() {
+            productStoreSelect.addEventListener('change', loadProducts);
+            productsTableBody.addEventListener('click', handleProductActions);
+            ordersTableBody.addEventListener('click', handleOrderActions);
+            usersTableBody.addEventListener('click', handleUserActions);
+            document.getElementById('add-product-btn').addEventListener('click', handleAddProduct);
+            document.getElementById('logout-button').addEventListener('click', async () => {
+                await Parse.User.logOut();
+                window.location.href = 'index.html';
+            });
         }
-        
-        // --- ACTION HANDLERS (using Event Delegation) ---
-        async function handleProductActions(e) { /* ... Same as previous ... */ }
-        async function handleOrderActions(e) { /* ... Same as previous ... */ }
-        async function handleUserActions(e) { /* ... Same as previous ... */ }
 
-        async function handlePollActions(e) {
+        async function handleProductActions(e) {
             const target = e.target;
-            const pollId = target.dataset.id;
-            if (!pollId) return;
+            const id = target.dataset.id;
+            const className = target.dataset.class;
 
-            if (target.matches('.activate-poll-btn')) {
-                Swal.fire({ title: 'جارِ التفعيل...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                try {
-                    await Parse.Cloud.run('activatePoll', { pollId });
-                    Swal.fire('نجاح', 'تم تفعيل الاستطلاع بنجاح.', 'success');
-                    loadPolls();
-                } catch(err) { Swal.fire('خطأ', `فشل تفعيل الاستطلاع: ${err.message}`, 'error'); }
-            } else if (target.matches('.delete-poll-btn')) {
-                // Delete logic similar to deleteProduct
-            } else if (target.matches('.view-poll-results-btn')) {
-                // Logic to view poll results, similar to client-side displayPollResults
+            if (target.matches('.delete-product-btn')) {
+                const result = await Swal.fire({ title: 'هل أنت متأكد؟', text: "لا يمكن التراجع عن هذا الإجراء!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'نعم، احذفه!', cancelButtonText: 'إلغاء' });
+                if (result.isConfirmed) {
+                    const Product = Parse.Object.extend(className);
+                    const product = Product.createWithoutData(id);
+                    try {
+                        await product.destroy();
+                        Swal.fire('تم الحذف!', 'تم حذف المنتج بنجاح.', 'success');
+                        loadProducts();
+                    } catch (err) { Swal.fire('خطأ!', `فشل حذف المنتج: ${err.message}`, 'error'); }
+                }
+            } else if (target.matches('.edit-product-btn')) {
+                 Swal.fire('قيد التطوير', 'سيتم تفعيل ميزة تعديل المنتج قريباً.', 'info');
+            }
+        }
+
+        async function handleOrderActions(e) {
+            if (e.target.matches('.update-status-btn')) {
+                const orderId = e.target.dataset.id;
+                const { value: status } = await Swal.fire({
+                    title: 'تحديث حالة الطلب', input: 'select',
+                    inputOptions: { 'Processing': 'قيد المعالجة', 'Shipped': 'تم الشحن', 'Delivered': 'تم التسليم', 'Archived': 'مؤرشف'},
+                    inputPlaceholder: 'اختر الحالة الجديدة', showCancelButton: true, confirmButtonText: 'تحديث'
+                });
+                if (status) {
+                    const Order = Parse.Object.extend("Orders");
+                    const order = Order.createWithoutData(orderId);
+                    order.set("status", status);
+                    try {
+                        await order.save();
+                        Swal.fire('نجاح', 'تم تحديث حالة الطلب.', 'success');
+                        loadOrders();
+                    } catch (err) { Swal.fire('خطأ', `فشل تحديث الحالة: ${err.message}`, 'error'); }
+                }
+            }
+        }
+
+        async function handleUserActions(e) {
+            if (e.target.matches('.edit-user-btn')) {
+                const userId = e.target.dataset.id;
+                const { value: amount } = await Swal.fire({
+                    title: 'تعديل رصيد المحفظة', input: 'number', inputLabel: 'أدخل المبلغ لإضافته (يمكن استخدام رقم سالب للخصم)',
+                    inputPlaceholder: '0.00', showCancelButton: true, confirmButtonText: 'تحديث الرصيد',
+                });
+                if (amount && !isNaN(parseFloat(amount))) {
+                     try {
+                        await Parse.Cloud.run('updateUserBalance', { userId: userId, amount: parseFloat(amount) });
+                        Swal.fire('نجاح', 'تم تحديث رصيد المستخدم.', 'success');
+                        loadUsers();
+                    } catch (err) { Swal.fire('خطأ', `فشل تحديث الرصيد: ${err.message}`, 'error'); }
+                }
             }
         }
         
-        // --- ADD/EDIT MODAL FUNCTIONS ---
-        function handleAddProduct() { /* ... Same as previous ... */ }
-        function handleAddPoll() { /* ... Logic for adding a new poll ... */ }
+        function handleAddProduct() {
+             Swal.fire({
+                title: 'إضافة منتج جديد',
+                html: `
+                    <div class="text-right space-y-2">
+                        <input id="name_ar" class="swal2-input" placeholder="الاسم (عربي)">
+                        <input id="name_en" class="swal2-input" placeholder="Name (English)">
+                        <input id="name_es" class="swal2-input" placeholder="Nombre (Español)">
+                        <input id="category_ar" class="swal2-input" placeholder="الصنف (عربي)">
+                        <input id="category_en" class="swal2-input" placeholder="Category (English)">
+                        <input id="category_es" class="swal2-input" placeholder="Categoría (Español)">
+                        <input id="price" type="number" class="swal2-input" placeholder="السعر">
+                        <input id="shippingTime" class="swal2-input" placeholder="وقت الشحن (مثال: 5-10 أيام)">
+                        <textarea id="desc_ar" class="swal2-textarea" placeholder="الوصف (عربي)"></textarea>
+                        <textarea id="desc_en" class="swal2-textarea" placeholder="Description (English)"></textarea>
+                        <textarea id="desc_es" class="swal2-textarea" placeholder="Descripción (Español)"></textarea>
+                        <p class="text-sm">الصورة الرئيسية:</p>
+                        <input id="imageFile" type="file" class="swal2-file">
+                        <p class="text-sm mt-2">صور إضافية:</p>
+                        <input id="photos" type="file" class="swal2-file" multiple>
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'إضافة',
+                cancelButtonText: 'إلغاء',
+                preConfirm: async () => {
+                    const imageInput = document.getElementById('imageFile');
+                    const photosInput = document.getElementById('photos');
+                    if (imageInput.files.length === 0) { Swal.showValidationMessage(`الرجاء اختيار صورة رئيسية`); return false; }
 
+                    const filesToUpload = [];
+                    const imageFile = new Parse.File(imageInput.files[0].name, imageInput.files[0]);
+                    filesToUpload.push(imageFile);
+                    
+                    const photoFiles = Array.from(photosInput.files).map(file => new Parse.File(file.name, file));
+                    filesToUpload.push(...photoFiles);
+
+                    Swal.showLoading();
+                    await Parse.File.saveAll(filesToUpload);
+                    
+                    return {
+                        name_ar: document.getElementById('name_ar').value, name_en: document.getElementById('name_en').value, name_es: document.getElementById('name_es').value,
+                        category_ar: document.getElementById('category_ar').value, category_en: document.getElementById('category_en').value, category_es: document.getElementById('category_es').value,
+                        price: parseFloat(document.getElementById('price').value) || 0,
+                        shippingTime: document.getElementById('shippingTime').value,
+                        description_ar: document.getElementById('desc_ar').value, description_en: document.getElementById('desc_en').value, description_es: document.getElementById('desc_es').value,
+                        imageFile: imageFile, photos: photoFiles
+                    };
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    const className = productStoreSelect.value;
+                    const Product = Parse.Object.extend(className);
+                    const newProduct = new Product();
+                    for (const key in result.value) {
+                        if(result.value[key]) { newProduct.set(key, result.value[key]); }
+                    }
+                    try {
+                        await newProduct.save();
+                        Swal.fire('نجاح!', 'تم إضافة المنتج بنجاح.', 'success');
+                        loadProducts();
+                    } catch (e) {
+                        Swal.fire('خطأ!', `فشلت إضافة المنتج: ${e.message}`, 'error');
+                    }
+                }
+            });
+        }
+        
         // --- STARTUP ---
         checkPermissions();
     });
