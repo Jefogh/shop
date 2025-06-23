@@ -19,14 +19,16 @@
         .swal2-popup { font-family: 'Tajawal', sans-serif; }
         .products-grid-container { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            /* MODIFIED: Changed minmax from 260px to 240px to fit more items */
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
             gap: 3rem 1.5rem; 
             padding: 1rem; 
             justify-items: center; 
         }
         .card { 
-            width: 260px; 
-            height: 480px; 
+            /* MODIFIED: Adjusted card size for better grid layout */
+            width: 240px; 
+            height: 440px; 
             border-radius: 25px; 
             box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
             transition: transform 0.3s ease; 
@@ -35,7 +37,11 @@
         .card:hover { transform: scale(1.05); }
         .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body { height: 260px; background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-body { 
+            /* MODIFIED: Adjusted body height to match new card height */
+            height: 220px; 
+            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; 
+        }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-caption { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-top: 4px; }
@@ -57,6 +63,22 @@
             border-color: #4299e1; /* blue-400 */
             box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
         }
+        /* Style for language switcher buttons in modal */
+        .lang-modal-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+            background-color: #2d3748;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .lang-modal-btn:hover {
+            background-color: #4a5568;
+        }
     </style>
 </head>
 <body class="bg-[#212534]">
@@ -66,7 +88,7 @@
             <div class="flex justify-between items-center">
                 <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
                 <div class="hidden md:flex items-center space-x-4 space-x-reverse">
-                    <a href="dashboard.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
+                    <a href="main.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
                     <a href="local.html" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                     <a href="bank.html" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
                     <a href="track.html" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
@@ -75,13 +97,15 @@
                 </div>
                 <div class="flex items-center">
                      <button id="cart-button" class="text-white text-2xl relative mx-2"> <i class="fas fa-shopping-cart"></i> <span id="cart-count" class="cart-badge hidden">0</span> </button>
+                     <button id="lang-globe-button" class="md:hidden text-white text-xl relative mx-2"> <i class="fas fa-globe"></i> </button>
                     <div class="md:hidden"> <button id="mobile-menu-button" class="text-white p-2"> <i class="fas fa-bars"></i> </button> </div>
                     <div class="hidden md:flex items-center space-x-2 space-x-reverse ml-4">
                         <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
                         <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
                         <button data-lang="es" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">Español</button>
                     </div>
-                     <button id="logout-button" class="hidden md:block bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
+                     <a href="index.html" id="login-button" class="hidden bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition" data-translate-key="login">تسجيل الدخول</a>
+                     <button id="logout-button" class="hidden bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
                 </div>
             </div>
             <div id="mobile-menu" class="hidden md:hidden mt-4">
@@ -93,7 +117,7 @@
                 <a href="connect.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="contact_info">معلومات الاتصال</a>
                 <hr class="my-2 border-gray-700">
                 <div class="px-4 py-2">
-                    <p class="text-gray-400 text-xs mb-2">اللغة</p>
+                    <p class="text-gray-400 text-xs mb-2" data-translate-key="language">اللغة</p>
                     <div class="flex justify-around">
                         <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
                         <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
@@ -101,7 +125,8 @@
                     </div>
                 </div>
                  <hr class="my-2 border-gray-700">
-                <button id="logout-button-mobile" class="w-full text-left py-2 px-4 text-sm text-red-400 hover:bg-gray-700 rounded-md" data-translate-key="logout">تسجيل الخروج</button>
+                 <a href="index.html" id="login-button-mobile" class="hidden w-full text-left py-2 px-4 text-sm text-blue-400 hover:bg-gray-700 rounded-md" data-translate-key="login">تسجيل الدخول</a>
+                 <button id="logout-button-mobile" class="hidden w-full text-left py-2 px-4 text-sm text-red-400 hover:bg-gray-700 rounded-md" data-translate-key="logout">تسجيل الخروج</button>
             </div>
         </div>
     </nav>
@@ -131,9 +156,90 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const translations = {
-            en: { store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card", add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart.", reviews: "Reviews", write_review: "Write a Review", your_rating: "Your Rating", your_comment: "Your Comment", submit_review: "Submit Review", already_rated: "You have already rated this product.", no_reviews: "No reviews yet.", search_placeholder: "Search for a product...", filter_by_category: "By Category", all_categories: "All Categories", no_results: "No products match your search." },
-            ar: { store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة", add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة.", reviews: "التقييمات", write_review: "كتابة تقييم", your_rating: "تقييمك", your_comment: "تعليقك", submit_review: "إرسال التقييم", already_rated: "لقد قمت بتقييم هذا المنتج مسبقًا.", no_reviews: "لا توجد تقييمات بعد.", search_placeholder: "ابحث عن منتج...", filter_by_category: "حسب النوع", all_categories: "كل الأنواع", no_results: "لا توجد منتجات تطابق بحثك." },
-            es: { store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta", add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.", reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas.", search_placeholder: "Buscar un producto...", filter_by_category: "Por Categoría", all_categories: "Todas las Categorías", no_results: "No hay productos que coincidan con tu búsqueda." }
+            en: {
+                store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", login: "Login", language: "Language",
+                cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card",
+                add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart.",
+                reviews: "Reviews", write_review: "Write a Review", your_rating: "Your Rating", your_comment: "Your Comment", submit_review: "Submit Review", already_rated: "You have already rated this product.", no_reviews: "No reviews yet.",
+                search_placeholder: "Search for a product...", filter_by_category: "By Category", all_categories: "All Categories", no_results: "No products match your search.",
+                alert_error_title: "Error", alert_warning_title: "Warning", alert_success_title: "Success", alert_info_title: "Info",
+                alert_products_load_fail: "Failed to load products. Check API keys and table permissions.",
+                alert_reviews_load_fail: "Failed to load reviews.",
+                alert_must_login_to_rate: "You must be logged in to rate products.",
+                alert_rating_submit_success_title: "Thank you!", alert_rating_submit_success_text: "Your review has been submitted successfully.",
+                alert_rating_submit_fail: "Failed to submit review.",
+                alert_must_login_to_add: "Please log in first to add products to the cart.",
+                alert_invalid_quantity: "Please enter a valid quantity!",
+                alert_adding_to_cart: "Adding to cart...",
+                alert_added_to_cart_title: "Added", alert_added_to_cart_text: "The product has been added to your cart successfully!",
+                alert_add_to_cart_fail: "Failed to add product to cart.",
+                alert_permission_error: "<strong>Permission Error!</strong><br>Please check the security settings for the 'Net' class.",
+                alert_must_login_to_view_cart: "Please log in first to view the cart.",
+                alert_loading_cart: "Loading cart...",
+                alert_cart_display_fail: "Failed to display cart.",
+                alert_deleting: "Deleting...",
+                alert_delete_fail: "Failed to delete product.",
+                alert_processing_payment: "Processing payment...",
+                alert_insufficient_funds: "Your wallet balance is insufficient.",
+                alert_payment_success_title: "Payment Successful!", alert_payment_success_text: "{amount} has been deducted from your wallet.",
+                alert_payment_fail: "Payment process failed."
+            },
+            ar: {
+                store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", login: "تسجيل الدخول", language: "اللغة",
+                cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة",
+                add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة.",
+                reviews: "التقييمات", write_review: "كتابة تقييم", your_rating: "تقييمك", your_comment: "تعليقك", submit_review: "إرسال التقييم", already_rated: "لقد قمت بتقييم هذا المنتج مسبقًا.", no_reviews: "لا توجد تقييمات بعد.",
+                search_placeholder: "ابحث عن منتج...", filter_by_category: "حسب النوع", all_categories: "كل الأنواع", no_results: "لا توجد منتجات تطابق بحثك.",
+                alert_error_title: "خطأ", alert_warning_title: "تنبيه", alert_success_title: "نجاح", alert_info_title: "معلومة",
+                alert_products_load_fail: "فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.",
+                alert_reviews_load_fail: "فشل تحميل التقييمات.",
+                alert_must_login_to_rate: "يجب تسجيل الدخول لتقييم المنتجات.",
+                alert_rating_submit_success_title: "شكراً لك!", alert_rating_submit_success_text: "تم إرسال تقييمك بنجاح.",
+                alert_rating_submit_fail: "فشل إرسال التقييم.",
+                alert_must_login_to_add: "الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.",
+                alert_invalid_quantity: "الرجاء إدخال كمية صالحة!",
+                alert_adding_to_cart: "جارِ الإضافة للسلة...",
+                alert_added_to_cart_title: "تمت الإضافة", alert_added_to_cart_text: "تمت إضافة المنتج إلى سلتك بنجاح!",
+                alert_add_to_cart_fail: "فشلت إضافة المنتج للسلة.",
+                alert_permission_error: "<strong>خطأ في الأذونات!</strong><br>الرجاء التأكد من إعدادات الأمان لجدول 'Net' بشكل صحيح.",
+                alert_must_login_to_view_cart: "الرجاء تسجيل الدخول أولاً لعرض السلة.",
+                alert_loading_cart: "جارِ تحميل السلة...",
+                alert_cart_display_fail: "فشل عرض السلة.",
+                alert_deleting: "جارِ الحذف...",
+                alert_delete_fail: "فشل حذف المنتج.",
+                alert_processing_payment: "جارِ معالجة الدفع...",
+                alert_insufficient_funds: "رصيدك في المحفظة غير كافٍ.",
+                alert_payment_success_title: "تم الدفع بنجاح!", alert_payment_success_text: "تم خصم {amount} من محفظتك.",
+                alert_payment_fail: "فشلت عملية الدفع."
+            },
+            es: {
+                store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", login: "Iniciar Sesión", language: "Idioma",
+                cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta",
+                add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.",
+                reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas.",
+                search_placeholder: "Buscar un producto...", filter_by_category: "Por Categoría", all_categories: "Todas las Categorías", no_results: "No hay productos que coincidan con tu búsqueda.",
+                alert_error_title: "Error", alert_warning_title: "Advertencia", alert_success_title: "Éxito", alert_info_title: "Información",
+                alert_products_load_fail: "No se pudieron cargar los productos. Verifique las claves de API y los permisos de la tabla.",
+                alert_reviews_load_fail: "No se pudieron cargar las reseñas.",
+                alert_must_login_to_rate: "Debes iniciar sesión para valorar productos.",
+                alert_rating_submit_success_title: "¡Gracias!", alert_rating_submit_success_text: "Tu reseña ha sido enviada con éxito.",
+                alert_rating_submit_fail: "Error al enviar la reseña.",
+                alert_must_login_to_add: "Por favor, inicie sesión primero para añadir productos a la cesta.",
+                alert_invalid_quantity: "¡Por favor, introduzca una cantidad válida!",
+                alert_adding_to_cart: "Añadiendo a la cesta...",
+                alert_added_to_cart_title: "Añadido", alert_added_to_cart_text: "¡El producto ha sido añadido a tu cesta con éxito!",
+                alert_add_to_cart_fail: "Error al añadir el producto a la cesta.",
+                alert_permission_error: "<strong>¡Error de Permiso!</strong><br>Por favor, compruebe la configuración de seguridad para la clase 'Net'.",
+                alert_must_login_to_view_cart: "Por favor, inicie sesión primero para ver la cesta.",
+                alert_loading_cart: "Cargando cesta...",
+                alert_cart_display_fail: "Error al mostrar la cesta.",
+                alert_deleting: "Eliminando...",
+                alert_delete_fail: "Error al eliminar el producto.",
+                alert_processing_payment: "Procesando pago...",
+                alert_insufficient_funds: "El saldo de su billetera es insuficiente.",
+                alert_payment_success_title: "¡Pago Exitoso!", alert_payment_success_text: "Se ha deducido {amount} de su billetera.",
+                alert_payment_fail: "El proceso de pago falló."
+            }
         };
         let currentLang = 'ar'; 
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
@@ -152,7 +258,6 @@
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
-            // Translate all elements with data-translate-key
             document.querySelectorAll('[data-translate-key]').forEach(el => {
                 const key = el.getAttribute('data-translate-key');
                 if (translations[lang] && translations[lang][key]) {
@@ -166,10 +271,7 @@
                 }
             });
 
-            // Translate search placeholder
             searchInput.placeholder = translations[lang].search_placeholder;
-
-            // Repopulate category filter with translated categories
             populateCategoryFilter(lang);
             applyFiltersAndRender();
         }
@@ -187,7 +289,6 @@
                 const products = await query.find();
                 productsCache = products;
                 
-                // Extract unique categories from the fetched products
                 const categoryMap = new Map();
                 productsCache.forEach(p => {
                     const cat_en = p.get('category_en');
@@ -206,7 +307,11 @@
 
             } catch (error) {
                 console.error("Error fetching products: ", error);
-                Swal.fire({ title: 'خطأ', html: `فشل تحميل المنتجات. تأكد من صحة مفاتيح الربط وأذونات الجدول.<br><code class="text-xs">${error.message}</code>`, icon: 'error' });
+                Swal.fire({ 
+                    title: translations[currentLang].alert_error_title, 
+                    html: `${translations[currentLang].alert_products_load_fail}<br><code class="text-xs">${error.message}</code>`, 
+                    icon: 'error' 
+                });
             } finally {
                 loadingIndicator.style.display = 'none';
             }
@@ -214,24 +319,20 @@
 
         function populateCategoryFilter(lang) {
             const selectedValue = categoryFilter.value;
-            categoryFilter.innerHTML = ''; // Clear existing options
+            categoryFilter.innerHTML = '';
             
-            // Add "All Categories" option
             const allOption = document.createElement('option');
             allOption.value = 'all';
             allOption.textContent = translations[lang].all_categories;
             categoryFilter.appendChild(allOption);
 
-            // Add unique categories
             uniqueCategories.forEach(cat => {
                 const option = document.createElement('option');
-                // Use English category as the value for consistency
                 option.value = cat.en; 
-                option.textContent = cat[lang] || cat.en; // Display translated category
+                option.textContent = cat[lang] || cat.en;
                 categoryFilter.appendChild(option);
             });
             
-            // Restore previously selected value if it exists
             categoryFilter.value = selectedValue || 'all';
         }
 
@@ -241,7 +342,6 @@
 
             let filteredProducts = productsCache;
 
-            // Apply search filter
             if (searchTerm) {
                 filteredProducts = filteredProducts.filter(product => {
                     const name = product.get(`name_${currentLang}`) || '';
@@ -249,7 +349,6 @@
                 });
             }
 
-            // Apply category filter
             if (selectedCategory !== 'all') {
                 filteredProducts = filteredProducts.filter(product => {
                     return product.get('category_en') === selectedCategory;
@@ -312,11 +411,6 @@
             }
         }
         
-        // --- EVENT LISTENERS ---
-        searchInput.addEventListener('input', applyFiltersAndRender);
-        categoryFilter.addEventListener('change', applyFiltersAndRender);
-
-        // --- EXISTING CODE (UNCHANGED) ---
         async function fetchUserWallet() {
              try {
                 const user = await currentUser.fetch();
@@ -367,7 +461,7 @@
                     });
                 }
             } catch(e) {
-                reviewsHTML += `<p class="text-red-500">فشل تحميل التقييمات.</p>`;
+                reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
             }
             reviewsHTML += `</div></div>`;
             
@@ -376,13 +470,13 @@
         }
         
         async function promptForReview(product) {
-            if(!currentUser) { Swal.fire('تنبيه', 'يجب تسجيل الدخول لتقييم المنتجات.', 'warning'); return; }
+            if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_rate, 'warning'); return; }
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
             query.equalTo("product", product);
             query.equalTo("guest", currentUser);
             const existingRating = await query.first();
-            if (existingRating) { Swal.fire('', translations[currentLang].already_rated, 'info'); return; }
+            if (existingRating) { Swal.fire(translations[currentLang].alert_info_title, translations[currentLang].already_rated, 'info'); return; }
             const { value: formValues } = await Swal.fire({
                 title: translations[currentLang].write_review,
                 html: `<div class="rating-stars text-3xl mb-4"><i class="fa fa-star text-gray-400" data-value="1"></i><i class="fa fa-star text-gray-400" data-value="2"></i><i class="fa fa-star text-gray-400" data-value="3"></i><i class="fa fa-star text-gray-400" data-value="4"></i><i class="fa fa-star text-gray-400" data-value="5"></i></div><textarea id="swal-comment" class="swal2-textarea" placeholder="${translations[currentLang].your_comment}"></textarea>`,
@@ -409,19 +503,29 @@
                 newRating.set("guest", currentUser);
                 try {
                     await newRating.save();
-                    Swal.fire('شكراً لك!', 'تم إرسال تقييمك بنجاح.', 'success').then(() => fetchProducts());
-                } catch(error) { Swal.fire('خطأ', 'فشل إرسال التقييم.', 'error'); }
+                    Swal.fire(translations[currentLang].alert_rating_submit_success_title, translations[currentLang].alert_rating_submit_success_text, 'success').then(() => fetchProducts());
+                } catch(error) { Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_rating_submit_fail, 'error'); }
             }
         }
         
         async function promptForQuantity(product) {
-             if(!currentUser) { Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لإضافة منتجات للسلة.', 'warning'); return; }
-            const { value: quantity } = await Swal.fire({ title: translations[currentLang].add_item_title, input: 'number', inputLabel: translations[currentLang].add_item_label, inputValue: 1, inputAttributes: { min: 1, step: 1 }, showCancelButton: true, inputValidator: (value) => { if (!value || value < 1) { return 'الرجاء إدخال كمية صالحة!' } } });
+             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_add, 'warning'); return; }
+            const { value: quantity } = await Swal.fire({ 
+                title: translations[currentLang].add_item_title, 
+                input: 'number', 
+                inputLabel: translations[currentLang].add_item_label, 
+                inputValue: 1, 
+                inputAttributes: { min: 1, step: 1 }, 
+                showCancelButton: true, 
+                confirmButtonText: translations[currentLang].add_to_cart,
+                cancelButtonText: translations[currentLang].remove_item_cancel,
+                inputValidator: (value) => { if (!value || value < 1) { return translations[currentLang].alert_invalid_quantity } } 
+            });
             if (quantity) { addToCart(product, parseInt(quantity)); }
         }
         
         async function addToCart(product, quantityToAdd) {
-            Swal.fire({ title: 'جارِ الإضافة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            Swal.fire({ title: translations[currentLang].alert_adding_to_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
@@ -432,12 +536,12 @@
                 else { cartItem = new Net(); cartItem.set("guest", currentUser); cartItem.set("product", product); cartItem.set("quantity", quantityToAdd); }
                 await cartItem.save();
                 updateCartCount();
-                Swal.fire('تمت الإضافة', 'تمت إضافة المنتج إلى سلتك بنجاح!', 'success');
+                Swal.fire(translations[currentLang].alert_added_to_cart_title, translations[currentLang].alert_added_to_cart_text, 'success');
             } catch (error) {
                  console.error("Error adding to cart:", error);
-                 let errorMessage = 'فشلت إضافة المنتج للسلة.';
-                 if (error.code === 119) { errorMessage = `<strong>خطأ في الأذونات!</strong><br>الرجاء التأكد من إعدادات الأمان لجدول "Net" بشكل صحيح.`; }
-                 Swal.fire({ title: 'خطأ', html: errorMessage + `<br><br><code class="text-xs text-left block" dir="ltr">${error.message}</code>`, icon: 'error' });
+                 let errorMessage = translations[currentLang].alert_add_to_cart_fail;
+                 if (error.code === 119) { errorMessage = translations[currentLang].alert_permission_error; }
+                 Swal.fire({ title: translations[currentLang].alert_error_title, html: errorMessage + `<br><br><code class="text-xs text-left block" dir="ltr">${error.message}</code>`, icon: 'error' });
             }
         }
         
@@ -459,7 +563,7 @@
         }
         
         document.getElementById('cart-button').addEventListener('click', async () => {
-             if(!currentUser) { Swal.fire('تنبيه', 'الرجاء تسجيل الدخول أولاً لعرض السلة.', 'warning'); return; }
+             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_view_cart, 'warning'); return; }
             showCartModal();
         });
 
@@ -468,7 +572,7 @@
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
             query.include("product"); 
-            Swal.fire({ title: 'جارِ تحميل السلة...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            Swal.fire({ title: translations[currentLang].alert_loading_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             try {
                 const cartItems = await query.find();
                 let subtotal = 0;
@@ -502,7 +606,7 @@
                 }});
             } catch(error) {
                 console.error("Error showing cart:", error);
-                Swal.fire('خطأ', 'فشل عرض السلة.', 'error');
+                Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_cart_display_fail, 'error');
             }
         }
         
@@ -523,7 +627,7 @@
         }
 
         async function removeFromCart(cartItemId) {
-            Swal.fire({ title: 'جارِ الحذف...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            Swal.fire({ title: translations[currentLang].alert_deleting, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             const Net = Parse.Object.extend("Net");
             const cartItem = Net.createWithoutData(cartItemId);
             try {
@@ -533,50 +637,87 @@
                 Swal.close();
             } catch (error) {
                 console.error("Error removing from cart:", error);
-                Swal.fire('خطأ', 'فشل حذف المنتج.', 'error');
+                Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_delete_fail, 'error');
             }
         }
         
         async function handleWalletPayment(totalCost, cartItems) {
-            Swal.fire({ title: 'جارِ معالجة الدفع...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            Swal.fire({ title: translations[currentLang].alert_processing_payment, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             try {
                 const user = await currentUser.fetch();
                 const balance = user.get('walletBalance') || 0;
-                if (balance < totalCost) { Swal.fire('خطأ', 'رصيدك في المحفظة غير كافٍ.', 'error'); return; }
+                if (balance < totalCost) { Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_insufficient_funds, 'error'); return; }
                 const newBalance = balance - totalCost;
                 currentUser.set('walletBalance', newBalance);
                 await currentUser.save();
                 await Parse.Object.destroyAll(cartItems);
                 fetchUserWallet();
                 updateCartCount();
-                Swal.fire('تم الدفع بنجاح!', `تم خصم $${totalCost.toFixed(2)} من محفظتك.`, 'success');
+                const amount = `$${totalCost.toFixed(2)}`;
+                const successText = translations[currentLang].alert_payment_success_text.replace('{amount}', amount);
+                Swal.fire(translations[currentLang].alert_payment_success_title, successText, 'success');
             } catch (error) {
                  console.error("Error during wallet payment:", error);
-                 Swal.fire('خطأ', 'فشلت عملية الدفع.', 'error');
+                 Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_payment_fail, 'error');
             }
+        }
+
+        function showLanguageSwitcherModal() {
+            Swal.fire({
+                title: translations[currentLang].language,
+                html: `
+                    <button class="lang-modal-btn" data-lang="ar">العربية</button>
+                    <button class="lang-modal-btn" data-lang="en">English</button>
+                    <button class="lang-modal-btn" data-lang="es">Español</button>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                background: '#212534',
+                customClass: {
+                    title: 'text-white',
+                },
+                didOpen: (modal) => {
+                    modal.querySelectorAll('.lang-modal-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            setLanguage(e.target.dataset.lang);
+                            Swal.close();
+                        });
+                    });
+                }
+            });
         }
 
         // --- AUTH & PAGE SETUP ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const langGlobeButton = document.getElementById('lang-globe-button');
         const mobileMenu = document.getElementById('mobile-menu');
         if(mobileMenuButton) { mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden')); }
+        if(langGlobeButton) { langGlobeButton.addEventListener('click', showLanguageSwitcherModal); }
         
         document.querySelectorAll('.lang-switcher').forEach(s => s.addEventListener('click', e => {
             setLanguage(e.target.dataset.lang);
             if(mobileMenu) mobileMenu.classList.add('hidden');
         }));
         
+        const loginButtons = [document.getElementById('login-button'), document.getElementById('login-button-mobile')];
         const logoutButtons = [document.getElementById('logout-button'), document.getElementById('logout-button-mobile')];
-        logoutButtons.forEach(btn => btn.addEventListener('click', async () => { await Parse.User.logOut(); window.location.reload(); }));
-        
+        const walletLinks = [document.querySelector('a[href="bank.html"]'), document.querySelector('#mobile-menu a[href="bank.html"]')];
+
         if (!currentUser) {
             logoutButtons.forEach(btn => btn.style.display = 'none');
-            document.querySelector('[data-translate-key="my_wallet"]').style.display = 'none';
-            document.querySelector('#mobile-menu [data-translate-key="my_wallet"]').style.display = 'none';
+            loginButtons.forEach(btn => btn.classList.remove('hidden'));
+            walletLinks.forEach(link => link.style.display = 'none');
         } else {
+            loginButtons.forEach(btn => btn.style.display = 'none');
+            logoutButtons.forEach(btn => btn.classList.remove('hidden'));
+            walletLinks.forEach(link => link.style.display = 'block'); // or flex/inline-block as needed
             fetchUserWallet();
             updateCartCount();
         }
+
+        // --- EVENT LISTENERS ---
+        searchInput.addEventListener('input', applyFiltersAndRender);
+        categoryFilter.addEventListener('change', applyFiltersAndRender);
 
         // Initial Load
         setLanguage('ar');
