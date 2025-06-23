@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; }
+        .swal2-container { z-index: 9999; }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .tab-button.active, .tab-button:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="auth-gate">
+        <div class="flex items-center justify-center h-screen">
+            <p>جارِ التحقق من الصلاحيات...</p>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="hidden">
+        <header class="bg-white shadow">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">لوحة التحكم</h1>
+                <div>
+                    <a href="main.html" class="text-sm text-blue-600 hover:underline">العودة للمتجر</a>
+                    <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 ml-4">تسجيل الخروج</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-6">
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex space-x-4 space-x-reverse" aria-label="Tabs">
+                    <button class="tab-button active" data-tab="products">إدارة المنتجات</button>
+                    <button class="tab-button" data-tab="orders">إدارة الطلبات</button>
+                    <button class="tab-button" data-tab="users">إدارة المستخدمين</button>
+                </nav>
+            </div>
+
+            <div id="products-tab" class="tab-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">المنتجات</h2>
+                    <button id="add-product-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"><i class="fas fa-plus mr-2"></i>إضافة منتج جديد</button>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">المنتج (EN)</th><th class="px-6 py-3">السعر</th><th class="px-6 py-3">إجراءات</th></tr></thead>
+                        <tbody id="products-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="orders-tab" class="tab-content hidden">
+                 <h2 class="text-xl font-semibold text-gray-700 mb-4">الطلبات</h2>
+                 <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">المستخدم</th><th class="px-6 py-3">الإجمالي</th><th class="px-6 py-3">الحالة</th><th class="px-6 py-3">تاريخ الطلب</th><th class="px-6 py-3">تحديث الحالة</th></tr></thead>
+                        <tbody id="orders-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="users-tab" class="tab-content hidden">
+                 <h2 class="text-xl font-semibold text-gray-700 mb-4">المستخدمون</h2>
+                 <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">الاسم</th><th class="px-6 py-3">البريد الإلكتروني</th><th class="px-6 py-3">رصيد المحفظة</th><th class="px-6 py-3">تعديل الرصيد</th></tr></thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "YOUR_JAVASCRIPT_KEY");
+        Parse.serverURL = "https://parseapi.back4app.com/";
+
+        const currentUser = Parse.User.current();
+        const authGate = document.getElementById('auth-gate');
+        const adminPanel = document.getElementById('admin-panel');
+
+        // --- SECURITY CHECK ---
+        if (!currentUser) {
+            Swal.fire({ title: 'غير مصرح به', text: 'يجب عليك تسجيل الدخول أولاً.', icon: 'error' }).then(() => {
+                window.location.href = 'index.html';
+            });
+            return;
+        }
+
+        try {
+            const query = new Parse.Query(Parse.Role);
+            query.equalTo("name", "Admin");
+            query.equalTo("users", currentUser);
+            const adminRole = await query.first();
+
+            if (!adminRole) {
+                throw new Error("You are not an admin.");
+            }
+            
+            // If user is admin, show the panel
+            authGate.style.display = 'none';
+            adminPanel.style.display = 'block';
+            loadProducts(); // Load initial tab
+
+        } catch (error) {
+            console.error("Permission check failed:", error);
+            Swal.fire({ title: 'فشل الوصول', text: 'ليس لديك الصلاحيات اللازمة للوصول لهذه الصفحة.', icon: 'error' }).then(() => {
+                window.location.href = 'main.html';
+            });
+            return;
+        }
+        
+        // Tab switching logic
+        const tabs = document.querySelectorAll('.tab-button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                tabs.forEach(t => t.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                const tabName = e.currentTarget.dataset.tab;
+                document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+
+                if(tabName === 'products') loadProducts();
+                if(tabName === 'orders') loadOrders();
+                if(tabName === 'users') loadUsers();
+            });
+        });
+        
+        // --- Product Management ---
+        async function loadProducts() {
+            const tableBody = document.getElementById('products-table-body');
+            tableBody.innerHTML = `<tr><td colspan="3" class="text-center p-4">جارِ تحميل المنتجات...</td></tr>`;
+            const Product = Parse.Object.extend("Things");
+            const query = new Parse.Query(Product);
+            query.descending("createdAt");
+            try {
+                const products = await query.find();
+                tableBody.innerHTML = '';
+                products.forEach(p => {
+                    tableBody.innerHTML += `
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">${p.get('name_en')}</td>
+                            <td class="px-6 py-4">$${p.get('price')}</td>
+                            <td class="px-6 py-4 space-x-2 space-x-reverse">
+                                <button class="text-blue-500 hover:underline edit-product-btn" data-id="${p.id}">تعديل</button>
+                                <button class="text-red-500 hover:underline delete-product-btn" data-id="${p.id}">حذف</button>
+                            </td>
+                        </tr>`;
+                });
+            } catch(e) { /* error handling */ }
+        }
+
+        // --- Order Management ---
+        async function loadOrders() {
+            const tableBody = document.getElementById('orders-table-body');
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-4">جارِ تحميل الطلبات...</td></tr>`;
+            const Order = Parse.Object.extend("Orders");
+            const query = new Parse.Query(Order);
+            query.include("customer");
+            query.descending("createdAt");
+            try {
+                const orders = await query.find();
+                tableBody.innerHTML = '';
+                orders.forEach(o => {
+                    const customer = o.get('customer');
+                    tableBody.innerHTML += `
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">${customer ? customer.get('username') : 'مستخدم محذوف'}</td>
+                            <td class="px-6 py-4">$${o.get('totalAmount').toFixed(2)}</td>
+                            <td class="px-6 py-4">${o.get('status')}</td>
+                            <td class="px-6 py-4">${new Date(o.get('createdAt')).toLocaleDateString()}</td>
+                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
+                        </tr>`;
+                });
+            } catch(e) { /* error handling */ }
+        }
+
+        // --- User Management ---
+        async function loadUsers() {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = `<tr><td colspan="4" class="text-center p-4">جارِ تحميل المستخدمين...</td></tr>`;
+            const query = new Parse.Query(Parse.User);
+            try {
+                const users = await query.find();
+                tableBody.innerHTML = '';
+                users.forEach(u => {
+                    tableBody.innerHTML += `
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">${u.get('name') || u.get('username')}</td>
+                            <td class="px-6 py-4">${u.get('email')}</td>
+                            <td class="px-6 py-4">$${(u.get('walletBalance') || 0).toFixed(2)}</td>
+                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل</button></td>
+                        </tr>`;
+                });
+            } catch(e) { /* error handling */ }
+        }
+
+        // --- Event Listeners for Actions ---
+        // (Add, Edit, Delete logic for each section will go here, using Swal.fire for modals)
+
+        document.getElementById('logout-button').addEventListener('click', async () => {
+            await Parse.User.logOut();
+            window.location.href = 'index.html';
+        });
+    });
+    </script>
+</body>
+</html>
