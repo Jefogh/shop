@@ -3,437 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المتجر العالمي</title>
-    
+    <title>لوحة التحكم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
     <style>
-        body { font-family: 'Tajawal', sans-serif; background: #212534; color: #fff; }
-        .swal2-popup { font-family: 'Tajawal', sans-serif; }
-        .products-grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: 3rem 1.5rem; 
-            padding: 1rem; 
-            justify-items: center; 
+        body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; }
+        .swal2-container { z-index: 9999; }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: #4b5563;
+            transition: all 0.2s;
         }
-        .card { 
-            width: 240px; 
-            height: 440px; 
-            border-radius: 25px; 
-            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
-            transition: transform 0.3s ease; 
-            cursor: pointer; 
-        }
-        .card:hover { transform: scale(1.05); }
-        .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
-        .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body { 
-            height: 220px; 
-            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; 
-        }
-        .product-desc { padding: 5px 0; }
-        .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .product-caption { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-top: 4px; }
-        .product-properties { display: flex; justify-content: space-between; align-items: center; }
-        .product-price { font-size: 24px; font-weight: 700; color: #3B82F6; }
-        .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
-        .product-rating { font-size: 13px; color: #facc15; }
-        .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
-        .filter-input {
-            background-color: #2d3748; border: 1px solid #4a5568; color: white;
-            border-radius: 0.375rem; padding: 0.5rem 1rem;
-        }
-        .filter-input:focus {
-            outline: none; border-color: #4299e1; box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
-        }
-        .lang-modal-btn {
-            width: 100%; padding: 12px; margin: 5px 0; border-radius: 8px; border: 1px solid #4a5568;
-            background-color: #2d3748; color: white; font-size: 16px; cursor: pointer; transition: background-color 0.2s;
-        }
-        .lang-modal-btn:hover { background-color: #4a5568; }
-        #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; margin-bottom: 1rem;}
-        .delivery-form-input { 
-            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc; 
-            border-radius: 5px; padding: 8px; margin-top: 4px; box-sizing: border-box;
-        }
-        .status-badge { padding: 0.2em 0.6em; border-radius: 10px; font-size: 0.8em; color: white; font-weight: bold; }
-        #poll-fab {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            width: 60px;
-            height: 60px;
-            background-color: #db2777;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 50;
-            transition: transform 0.2s ease-in-out, opacity 0.3s;
-        }
-        #poll-fab:hover {
-            transform: scale(1.1);
-            background-color: #c21e66;
-        }
-        .poll-options-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-        .poll-image-option {
-            cursor: pointer;
-            border: 3px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 8px;
-            transition: border-color 0.2s ease, transform 0.2s ease;
-            text-align: center;
-            background-color: #f9fafb;
-        }
-         .poll-image-option.selected, .poll-image-option:hover {
+        .tab-button.active, .tab-button:hover {
             border-color: #3b82f6;
-            transform: translateY(-5px);
+            color: #3b82f6;
         }
-        .poll-image-option img {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 5px;
-            pointer-events: none;
-        }
-        .poll-image-option .vote-btn {
-            margin-top: 10px;
-            width: 100%;
-        }
-        .poll-result-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        .poll-result-item img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-        .poll-result-details { flex-grow: 1; }
-        .poll-result-bar {
-            width: 100%; background-color: #e0e0e0; border-radius: 5px;
-            overflow: hidden; margin-top: 5px;
-        }
-        .poll-result-progress {
-            height: 20px; background-color: #2563eb; color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px;
-            transition: width 0.5s ease-in-out;
-        }
-        .store-switcher {
-            background-color: transparent;
-            border: 2px solid #4a5568;
-            color: #d1d5db;
-            padding: 0.5rem 1.5rem;
-            border-radius: 9999px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .store-switcher.active, .store-switcher:hover {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
+        .swal2-input, .swal2-textarea, .swal2-file { margin-bottom: 1rem !important; }
+        td, th { vertical-align: middle; }
     </style>
 </head>
-<body class="bg-[#212534]">
+<body class="bg-gray-100">
 
-    <nav class="bg-gray-900 bg-opacity-80 shadow-lg backdrop-blur-md sticky top-0 z-40">
-        <div class="container mx-auto px-4 sm:px-6 py-4">
-            <div class="flex justify-between items-center">
-                <div data-translate-key="store_name" class="font-bold text-xl sm:text-2xl text-white">المتجر العالمي</div>
-                <div class="hidden md:flex items-center space-x-4 space-x-reverse">
-                    </div>
-                <div class="flex items-center">
-                     <button id="cart-button" class="text-white text-2xl relative mx-2"> <i class="fas fa-shopping-cart"></i> <span id="cart-count" class="cart-badge hidden">0</span> </button>
-                     <button id="track-orders-btn" class="text-white text-2xl relative mx-2"><i class="fas fa-box"></i></button>
-                     <button id="lang-globe-button" class="md:hidden text-white text-xl relative mx-2"> <i class="fas fa-globe"></i> </button>
-                    <div class="md:hidden"> <button id="mobile-menu-button" class="text-white p-2"> <i class="fas fa-bars"></i> </button> </div>
-                    <div class="hidden md:flex items-center space-x-2 space-x-reverse ml-4">
-                        <button data-lang="ar" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">العربية</button>
-                        <button data-lang="en" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">English</button>
-                        <button data-lang="es" class="lang-switcher px-3 py-1 text-white hover:bg-gray-700 rounded-md">Español</button>
-                    </div>
-                     <a href="index.html" id="login-button" class="hidden bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition" data-translate-key="login">تسجيل الدخول</a>
-                     <button id="logout-button" class="hidden bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition" data-translate-key="logout">تسجيل الخروج</button>
+    <div id="auth-gate" class="flex items-center justify-center h-screen">
+        <p class="text-gray-600 text-lg">جارِ التحقق من الصلاحيات...</p>
+    </div>
+
+    <div id="admin-panel" class="hidden">
+        <header class="bg-white shadow">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">لوحة التحكم</h1>
+                <div>
+                    <a href="main.html" class="text-sm text-blue-600 hover:underline">العودة للمتجر</a>
+                    <button id="logout-button" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 ml-4">تسجيل الخروج</button>
                 </div>
             </div>
-            <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <a href="wallet.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
-                <button id="track-orders-btn-mobile" class="block w-full text-left py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</button>
-                <hr class="my-2 border-gray-700">
-                <a href="index.html" id="login-button-mobile" class="hidden w-full text-left py-2 px-4 text-sm text-blue-400 hover:bg-gray-700 rounded-md" data-translate-key="login">تسجيل الدخول</a>
-                <button id="logout-button-mobile" class="hidden w-full text-left py-2 px-4 text-sm text-red-400 hover:bg-gray-700 rounded-md" data-translate-key="logout">تسجيل الخروج</button>
+        </header>
+
+        <main class="container mx-auto p-6">
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex space-x-4 space-x-reverse" aria-label="Tabs">
+                    <button class="tab-button active" data-tab="products">إدارة المنتجات</button>
+                    <button class="tab-button" data-tab="orders">إدارة الطلبات</button>
+                    <button class="tab-button" data-tab="users">إدارة المستخدمين</button>
+                    <button class="tab-button" data-tab="polls">إدارة الاستطلاعات</button>
+                </nav>
             </div>
-        </div>
-    </nav>
 
-    <main class="container mx-auto p-4 sm:p-8">
-        <h1 data-translate-key="products_title" class="text-3xl sm:text-4xl font-bold text-center text-white mb-6">منتجاتنا</h1>
-        
-        <div class="flex justify-center gap-4 mb-8">
-            <button class="store-switcher active" data-store="Things" data-translate-key="global_store">المتجر العالمي</button>
-            <button class="store-switcher" data-store="Thingssy" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</button>
-        </div>
-
-        <div id="filter-container" class="mb-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <input type="text" id="search-input" class="filter-input w-full sm:w-1/2 lg:w-1/3" placeholder="ابحث عن منتج...">
-            <div class="flex items-center gap-2">
-                <label for="category-filter" data-translate-key="filter_by_category" class="text-gray-300">حسب النوع</label>
-                <select id="category-filter" class="filter-input"></select>
+            <div id="products-tab" class="tab-content">
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                    <h2 class="text-xl font-semibold text-gray-700">المنتجات</h2>
+                    <div class="flex items-center gap-4">
+                         <select id="product-store-select" class="bg-white border border-gray-300 text-gray-700 rounded-md py-2 px-3">
+                            <option value="Things">المتجر العالمي</option>
+                            <option value="Thingssy">متجر سوريا ولبنان</option>
+                        </select>
+                        <button id="add-product-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"><i class="fas fa-plus mr-2"></i>إضافة منتج جديد</button>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">المنتج (EN)</th><th class="px-6 py-3">السعر</th><th class="px-6 py-3">إجراءات</th></tr></thead>
+                        <tbody id="products-table-body"></tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <div id="products-grid" class="products-grid-container"></div>
-        <div id="loading-indicator" class="text-center py-10">
-            <p data-translate-key="loading" class="text-gray-400">جارِ تحميل المنتجات...</p>
-        </div>
-        <div id="no-results" class="text-center py-10 text-gray-400 hidden" data-translate-key="no_results">
-            لا توجد منتجات تطابق بحثك.
-        </div>
-    </main>
-    
-    <div id="poll-fab" title="Vote Now!" style="display: none;">
-        <i class="fas fa-poll"></i>
+            <div id="orders-tab" class="tab-content hidden">
+                 <h2 class="text-xl font-semibold text-gray-700 mb-4">الطلبات</h2>
+                 <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">المستخدم</th><th class="px-6 py-3">الإجمالي</th><th class="px-6 py-3">الحالة</th><th class="px-6 py-3">تاريخ الطلب</th><th class="px-6 py-3">الإجراءات</th></tr></thead>
+                        <tbody id="orders-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="users-tab" class="tab-content hidden">
+                 <h2 class="text-xl font-semibold text-gray-700 mb-4">المستخدمون</h2>
+                 <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                         <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">الاسم</th><th class="px-6 py-3">البريد الإلكتروني</th><th class="px-6 py-3">رصيد المحفظة</th><th class="px-6 py-3">تعديل الرصيد</th></tr></thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="polls-tab" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">الاستطلاعات</h2>
+                    <button id="add-poll-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"><i class="fas fa-plus mr-2"></i>إضافة استطلاع جديد</button>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">السؤال (EN)</th><th class="px-6 py-3">الحالة</th><th class="px-6 py-3">إجراءات</th></tr></thead>
+                        <tbody id="polls-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
     </div>
 
     <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // ... (Complete, combined translations object goes here) ...
-        const translations = {
-            en: {
-                store_name: "Global Store", global_store: "Global Store", products_title: "Our Products", loading: "Loading products...", /* ... all EN keys ... */
-                poll_title: "Vote for the Next Design!", poll_select_design: "Choose this Design"
-            },
-            ar: {
-                store_name: "المتجر العالمي", global_store: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", /* ... all AR keys ... */
-                poll_title: "صوّت للتصميم القادم!", poll_select_design: "اختر هذا التصميم"
-            },
-            es: {
-                store_name: "Tienda Global", global_store: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", /* ... all ES keys ... */
-                poll_title: "¡Vota por el Próximo Diseño!", poll_select_design: "Elige este Diseño"
-            }
-        };
-
-        const countryList = [ /* Full country list as provided before */ ];
-
-        let currentLang = 'ar';
-        let currentStore = 'Things'; // Default store
+    document.addEventListener('DOMContentLoaded', async () => {
+        // --- PARSE INITIALIZATION ---
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
-        const currentUser = Parse.User.current();
 
-        let productsCache = [];
-        let uniqueCategories = [];
-        let deliveryLocation = null;
-
-        const searchInput = document.getElementById('search-input');
-        const categoryFilter = document.getElementById('category-filter');
-        const noResultsDiv = document.getElementById('no-results');
+        // --- DOM ELEMENTS ---
+        const authGate = document.getElementById('auth-gate');
+        const adminPanel = document.getElementById('admin-panel');
+        const productStoreSelect = document.getElementById('product-store-select');
+        const productsTableBody = document.getElementById('products-table-body');
+        const ordersTableBody = document.getElementById('orders-table-body');
+        const usersTableBody = document.getElementById('users-table-body');
+        const pollsTableBody = document.getElementById('polls-table-body');
         
-        // --- START OF ALL FUNCTIONS (Full and Complete) ---
-
-        function setLanguage(lang) {
-            // Function code is complete
+        // --- AUTHENTICATION AND PERMISSION CHECK ---
+        async function checkPermissions() {
+            const currentUser = Parse.User.current();
+            if (!currentUser) {
+                Swal.fire({ title: 'غير مصرح به', text: 'يجب عليك تسجيل الدخول أولاً.', icon: 'error', allowOutsideClick: false }).then(() => { window.location.href = 'index.html'; });
+                return;
+            }
+            try {
+                const isUserAdmin = await Parse.Cloud.run('isAdmin');
+                if (isUserAdmin) {
+                    authGate.style.display = 'none';
+                    adminPanel.style.display = 'block';
+                    initializePanel();
+                } else {
+                    throw new Error("User is not an admin.");
+                }
+            } catch (error) {
+                console.error("Permission check failed:", error);
+                Swal.fire({ title: 'فشل الوصول', text: 'ليس لديك الصلاحيات اللازمة للوصول لهذه الصفحة.', icon: 'error', allowOutsideClick: false }).then(() => { window.location.href = 'main.html'; });
+            }
         }
 
-        async function fetchProducts(storeClassName) {
-            const loadingIndicator = document.getElementById('loading-indicator');
-            const productsGrid = document.getElementById('products-grid');
-            loadingIndicator.style.display = 'block';
-            productsGrid.innerHTML = '';
-            const Product = Parse.Object.extend(storeClassName);
+        // --- INITIALIZATION AND EVENT LISTENERS ---
+        function initializePanel() {
+            document.querySelectorAll('.tab-button').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const tabName = e.currentTarget.dataset.tab;
+                    document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+                    document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+
+                    if (tabName === 'products') loadProducts();
+                    if (tabName === 'orders') loadOrders();
+                    if (tabName === 'users') loadUsers();
+                    if (tabName === 'polls') loadPolls();
+                });
+            });
+
+            productStoreSelect.addEventListener('change', loadProducts);
+            document.getElementById('add-product-btn').addEventListener('click', handleAddProduct);
+            document.getElementById('add-poll-btn').addEventListener('click', handleAddPoll);
+            document.getElementById('logout-button').addEventListener('click', async () => {
+                await Parse.User.logOut();
+                window.location.href = 'index.html';
+            });
+
+            // Event Delegation for action buttons
+            productsTableBody.addEventListener('click', handleProductActions);
+            ordersTableBody.addEventListener('click', handleOrderActions);
+            usersTableBody.addEventListener('click', handleUserActions);
+            pollsTableBody.addEventListener('click', handlePollActions);
+
+            loadProducts(); // Load initial tab
+        }
+
+        // --- DATA LOADING FUNCTIONS ---
+        const renderLoading = (tbody, colspan) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">جارِ التحميل...</td></tr>`; };
+        const renderError = (tbody, colspan, error) => { console.error(error); tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4 text-red-500">فشل تحميل البيانات.</td></tr>`; };
+        const renderEmpty = (tbody, colspan, message) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">${message}</td></tr>`; };
+
+        async function loadProducts() {
+            renderLoading(productsTableBody, 3);
+            const className = productStoreSelect.value;
+            const Product = Parse.Object.extend(className);
             const query = new Parse.Query(Product);
-            query.select("name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", "category_ar", "category_en", "category_es", "price", "imageFile", "photos", "shippingTime", "averageRating", "ratingCount");
+            query.descending("createdAt");
             try {
-                const products = await query.find();
-                productsCache = products;
-                const categoryMap = new Map();
-                productsCache.forEach(p => {
-                    const cat_en = p.get('category_en');
-                    if (cat_en && !categoryMap.has(cat_en)) {
-                        categoryMap.set(cat_en, {
-                            en: cat_en, ar: p.get('category_ar'), es: p.get('category_es')
-                        });
-                    }
-                });
-                uniqueCategories = Array.from(categoryMap.values());
-                populateCategoryFilter(currentLang);
-                applyFiltersAndRender();
-            } catch (error) {
-                Swal.fire({
-                    title: translations[currentLang].alert_error_title,
-                    html: `${translations[currentLang].alert_products_load_fail}<br><code class="text-xs">${error.message}</code>`,
-                    icon: 'error'
-                });
-            } finally {
-                loadingIndicator.style.display = 'none';
-            }
+                const products = await query.find({ useMasterKey: true });
+                if (products.length === 0) return renderEmpty(productsTableBody, 3, "لا توجد منتجات.");
+                
+                const rowsHTML = products.map(p => `
+                    <tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${p.get('name_en') || 'N/A'}</td><td class="px-6 py-4">$${(p.get('price') || 0).toFixed(2)}</td><td class="px-6 py-4 space-x-2 space-x-reverse"><button class="text-blue-500 hover:underline edit-product-btn" data-id="${p.id}" data-class="${className}">تعديل</button><button class="text-red-500 hover:underline delete-product-btn" data-id="${p.id}" data-class="${className}">حذف</button></td></tr>`
+                ).join('');
+                productsTableBody.innerHTML = rowsHTML;
+            } catch(e) { renderError(productsTableBody, 3, e); }
         }
 
-        function populateCategoryFilter(lang) { /* ... function code ... */ }
-        function applyFiltersAndRender() { /* ... function code ... */ }
-        function renderProducts(products, lang) { /* ... function code ... */ }
-        async function fetchUserWallet() { /* ... function code ... */ }
-
-        async function showProductDetails(product) {
-            // ...
-            const Ratings = Parse.Object.extend("Ratings");
-            const query = new Parse.Query(Ratings);
-            if (currentStore === "Things") {
-                query.equalTo("product", product);
-            } else {
-                query.equalTo("productsy", product);
-            }
-            query.include("guest");
-            // ... rest of the function
-        }
-
-        async function promptForReview(product) {
-            // ...
-            const Ratings = Parse.Object.extend("Ratings");
-            const query = new Parse.Query(Ratings);
-            if (currentStore === "Things") {
-                query.equalTo("product", product);
-            } else {
-                query.equalTo("productsy", product);
-            }
-            query.equalTo("guest", currentUser);
-            // ...
-            if (formValues && formValues.stars > 0) {
-                // ...
-                if (currentStore === "Things") {
-                    newRating.set("product", product);
-                } else {
-                    newRating.set("productsy", product);
-                }
-                newRating.set("guest", currentUser);
-                // ...
-            }
-        }
-        
-        async function promptForQuantity(product) { /* ... function code ... */ }
-        
-        async function addToCart(product, quantityToAdd) {
-            Swal.fire({ title: translations[currentLang].alert_adding_to_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-            const Net = Parse.Object.extend("Net");
-            const query = new Parse.Query(Net);
-            query.equalTo("guest", currentUser);
-            if (currentStore === "Things") {
-                query.equalTo("product", product);
-            } else {
-                query.equalTo("productsy", product);
-            }
+        async function loadOrders() {
+            renderLoading(ordersTableBody, 5);
+            const Order = Parse.Object.extend("Orders"); 
+            const query = new Parse.Query(Order);
+            query.include("customer");
+            query.descending("createdAt");
             try {
-                let cartItem = await query.first();
-                if (cartItem) {
-                    cartItem.increment("quantity", quantityToAdd);
-                } else {
-                    cartItem = new Net();
-                    cartItem.set("guest", currentUser);
-                    cartItem.set("quantity", quantityToAdd);
-                    if (currentStore === "Things") {
-                        cartItem.set("product", product);
-                    } else {
-                        cartItem.set("productsy", product);
-                    }
-                }
-                await cartItem.save();
-                updateCartCount();
-                Swal.fire(translations[currentLang].alert_added_to_cart_title, translations[currentLang].alert_added_to_cart_text, 'success');
-            } catch (error) {
-                Swal.fire({ title: translations[currentLang].alert_error_title, html: `...`, icon: 'error' });
+                const orders = await query.find({ useMasterKey: true });
+                if (orders.length === 0) return renderEmpty(ordersTableBody, 5, "لا توجد طلبات.");
+                
+                const rowsHTML = orders.map(o => {
+                    const customer = o.get('customer');
+                    return `
+                        <tr class="bg-white border-b">
+                            <td class="px-6 py-4">${customer ? customer.get('username') : 'مستخدم محذوف'}</td>
+                            <td class="px-6 py-4">$${(o.get('totalAmount') || 0).toFixed(2)}</td>
+                            <td class="px-6 py-4 font-bold">${o.get('status')}</td>
+                            <td class="px-6 py-4">${new Date(o.get('createdAt')).toLocaleDateString()}</td>
+                            <td class="px-6 py-4"><button class="text-blue-500 hover:underline view-order-btn" data-id="${o.id}">عرض</button> <button class="text-green-500 hover:underline update-status-btn" data-id="${o.id}">تحديث</button></td>
+                        </tr>`;
+                }).join('');
+                ordersTableBody.innerHTML = rowsHTML;
+            } catch(e) { renderError(ordersTableBody, 5, e); }
+        }
+        
+        async function loadUsers() {
+            renderLoading(usersTableBody, 4);
+            const query = new Parse.Query(Parse.User);
+            try {
+                const users = await query.find({ useMasterKey: true });
+                if (users.length === 0) return renderEmpty(usersTableBody, 4, "لا يوجد مستخدمون.");
+                
+                const rowsHTML = users.map(u => `
+                    <tr class="bg-white border-b"><td class="px-6 py-4">${u.get('name') || u.get('username')}</td><td class="px-6 py-4">${u.get('email') || 'N/A'}</td><td class="px-6 py-4 font-bold">$${(u.get('walletBalance') || 0).toFixed(2)}</td><td class="px-6 py-4"><button class="text-blue-500 hover:underline edit-user-btn" data-id="${u.id}">تعديل الرصيد</button></td></tr>`
+                ).join('');
+                usersTableBody.innerHTML = rowsHTML;
+            } catch(e) { renderError(usersTableBody, 4, e); }
+        }
+
+        async function loadPolls() {
+            renderLoading(pollsTableBody, 3);
+            const Poll = Parse.Object.extend("Polls");
+            const query = new Parse.Query(Poll);
+            query.descending("createdAt");
+            try {
+                const polls = await query.find({ useMasterKey: true });
+                if (polls.length === 0) return renderEmpty(pollsTableBody, 3, "لا توجد استطلاعات.");
+
+                const rowsHTML = polls.map(p => `
+                    <tr class="bg-white border-b">
+                        <td class="px-6 py-4 font-medium text-gray-900">${p.get('question_en') || 'N/A'}</td>
+                        <td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${p.get('isActive') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${p.get('isActive') ? 'نشط' : 'غير نشط'}</span></td>
+                        <td class="px-6 py-4 space-x-2 space-x-reverse">
+                            <button class="text-green-500 hover:underline activate-poll-btn" data-id="${p.id}" ${p.get('isActive') ? 'disabled' : ''}>تفعيل</button>
+                            <button class="text-blue-500 hover:underline view-poll-results-btn" data-id="${p.id}">النتائج</button>
+                            <button class="text-red-500 hover:underline delete-poll-btn" data-id="${p.id}">حذف</button>
+                        </td>
+                    </tr>`
+                ).join('');
+                pollsTableBody.innerHTML = rowsHTML;
+            } catch(e) { renderError(pollsTableBody, 3, e); }
+        }
+        
+        // --- ACTION HANDLERS (using Event Delegation) ---
+        async function handleProductActions(e) { /* ... Same as previous ... */ }
+        async function handleOrderActions(e) { /* ... Same as previous ... */ }
+        async function handleUserActions(e) { /* ... Same as previous ... */ }
+
+        async function handlePollActions(e) {
+            const target = e.target;
+            const pollId = target.dataset.id;
+            if (!pollId) return;
+
+            if (target.matches('.activate-poll-btn')) {
+                Swal.fire({ title: 'جارِ التفعيل...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                try {
+                    await Parse.Cloud.run('activatePoll', { pollId });
+                    Swal.fire('نجاح', 'تم تفعيل الاستطلاع بنجاح.', 'success');
+                    loadPolls();
+                } catch(err) { Swal.fire('خطأ', `فشل تفعيل الاستطلاع: ${err.message}`, 'error'); }
+            } else if (target.matches('.delete-poll-btn')) {
+                // Delete logic similar to deleteProduct
+            } else if (target.matches('.view-poll-results-btn')) {
+                // Logic to view poll results, similar to client-side displayPollResults
             }
         }
-
-        async function updateCartCount() { /* ... function code ... */ }
-
-        async function showCartModal() {
-            const Net = Parse.Object.extend("Net");
-            const query = new Parse.Query(Net);
-            query.equalTo("guest", currentUser);
-            query.include("product");
-            query.include("productsy");
-            // ...
-            cartItems.forEach(item => {
-                const productObject = item.get("product") || item.get("productsy");
-                // ...
-            });
-            // ...
-        }
-
-        async function processOrder(totalCost, cartItems, shippingDetails, location) {
-            // ...
-            const itemsSnapshot = cartItems.map(item => {
-                const productObject = item.get("product") || item.get("productsy");
-                if (!productObject) return null;
-                return {
-                    objectId: productObject.id,
-                    name: productObject.get(`name_en`),
-                    quantity: item.get("quantity"),
-                    price: productObject.get("price")
-                };
-            }).filter(item => item !== null);
-            // ...
-        }
-
-        function promptForDeliveryInfo(totalCost, cartItems, prefillData = {}) { /* ... function code from previous step ... */ }
-        function showMapModal(totalCost, cartItems, currentData) { /* ... function code from previous step ... */ }
-        async function showTrackingModal() { /* ... function code from previous step ... */ }
-        async function confirmAndSetUserAccept(orderId) { /* ... function code from previous step ... */ }
-        async function confirmRemoveFromCart(cartItemId) { /* ... function code ... */ }
-        async function removeFromCart(cartItemId) { /* ... function code ... */ }
-        function showLanguageSwitcherModal() { /* ... function code ... */ }
-        async function showPollModal() { /* ... function code ... */ }
-        function displayPollOptions(poll) { /* ... function code ... */ }
-        async function displayPollResults(poll) { /* ... function code ... */ }
         
-        // --- FINAL SETUP AND EVENT LISTENERS ---
-        document.querySelectorAll('.store-switcher').forEach(button => {
-            button.addEventListener('click', (e) => {
-                document.querySelectorAll('.store-switcher').forEach(btn => btn.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                currentStore = e.currentTarget.dataset.store;
-                const pollFab = document.getElementById('poll-fab');
-                if (currentStore === 'Thingssy') {
-                    pollFab.style.display = 'flex';
-                } else {
-                    pollFab.style.display = 'none';
-                }
-                fetchProducts(currentStore);
-            });
-        });
+        // --- ADD/EDIT MODAL FUNCTIONS ---
+        function handleAddProduct() { /* ... Same as previous ... */ }
+        function handleAddPoll() { /* ... Logic for adding a new poll ... */ }
 
-        // ... (all other event listeners)
-        
-        // Initial Load
-        setLanguage('ar');
-        fetchProducts(currentStore);
+        // --- STARTUP ---
+        checkPermissions();
     });
     </script>
 </body>
