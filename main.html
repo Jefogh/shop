@@ -4,43 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المتجر العالمي</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <style>
         body { font-family: 'Tajawal', sans-serif; background: #212534; color: #fff; }
         .swal2-popup { font-family: 'Tajawal', sans-serif; }
-        .products-grid-container { 
-            display: grid; 
-            /* MODIFIED: Changed minmax from 260px to 240px to fit more items */
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: 3rem 1.5rem; 
-            padding: 1rem; 
-            justify-items: center; 
+        .products-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 3rem 1.5rem;
+            padding: 1rem;
+            justify-items: center;
         }
-        .card { 
-            /* MODIFIED: Adjusted card size for better grid layout */
-            width: 240px; 
-            height: 440px; 
-            border-radius: 25px; 
-            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2); 
-            transition: transform 0.3s ease; 
-            cursor: pointer; 
+        .card {
+            width: 240px;
+            height: 440px;
+            border-radius: 25px;
+            box-shadow: -10px 10px 1px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
         }
         .card:hover { transform: scale(1.05); }
         .card-head { position: relative; height: 220px; background: linear-gradient(135deg, #fa782e 8%, #c82930 83%); border-radius: 25px 25px 0 0; display: flex; align-items: flex-start; padding: 15px; }
         .product-img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-25deg); width: 100%; max-width: 220px; filter: drop-shadow(0 25px 15px rgba(0,0,0,0.2)); }
-        .card-body { 
-            /* MODIFIED: Adjusted body height to match new card height */
-            height: 220px; 
-            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; 
+        .card-body {
+            height: 220px;
+            background: #fff; color: #333; border-radius: 0 0 25px 25px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between;
         }
         .product-desc { padding: 5px 0; }
         .product-title { display: block; font-size: 16px; font-weight: 700; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -50,35 +50,24 @@
         .cart-badge { background-color: #EF4444; color: white; border-radius: 50%; padding: 0.1em 0.5em; font-size: 0.75rem; position: absolute; top: -5px; right: -10px;}
         .product-rating { font-size: 13px; color: #facc15; }
         .rating-stars .fa-star { cursor: pointer; transition: color 0.2s; }
-        /* Style for search and filter inputs */
         .filter-input {
-            background-color: #2d3748; /* gray-800 */
-            border: 1px solid #4a5568; /* gray-600 */
-            color: white;
-            border-radius: 0.375rem; /* rounded-md */
-            padding: 0.5rem 1rem;
+            background-color: #2d3748; border: 1px solid #4a5568; color: white;
+            border-radius: 0.375rem; padding: 0.5rem 1rem;
         }
         .filter-input:focus {
-            outline: none;
-            border-color: #4299e1; /* blue-400 */
-            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+            outline: none; border-color: #4299e1; box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
         }
-        /* Style for language switcher buttons in modal */
         .lang-modal-btn {
-            width: 100%;
-            padding: 12px;
-            margin: 5px 0;
-            border-radius: 8px;
-            border: 1px solid #4a5568;
-            background-color: #2d3748;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            width: 100%; padding: 12px; margin: 5px 0; border-radius: 8px; border: 1px solid #4a5568;
+            background-color: #2d3748; color: white; font-size: 16px; cursor: pointer; transition: background-color 0.2s;
         }
-        .lang-modal-btn:hover {
-            background-color: #4a5568;
+        .lang-modal-btn:hover { background-color: #4a5568; }
+        #map { height: 300px; width: 100%; border-radius: 8px; z-index: 1; }
+        .delivery-form-input {
+            width: 100%; background-color: #f0f2f5; color: #333; border: 1px solid #ccc;
+            border-radius: 5px; padding: 8px; margin-top: 4px; box-sizing: border-box;
         }
+        .status-badge { padding: 0.2em 0.6em; border-radius: 10px; font-size: 0.8em; color: white; font-weight: bold; }
     </style>
 </head>
 <body class="bg-[#212534]">
@@ -91,7 +80,7 @@
                     <a href="main.html" class="text-gray-300 hover:text-white" data-translate-key="home">الرئيسية</a>
                     <a href="local.html" class="text-gray-300 hover:text-white" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                     <a href="wallet.html" class="text-gray-300 hover:text-white" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance" class="font-bold">...</span></a>
-                    <a href="track.html" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</a>
+                    <button id="track-orders-btn" class="text-gray-300 hover:text-white" data-translate-key="track_orders">تتبع طلباتي</button>
                     <a href="us.html" class="text-gray-300 hover:text-white" data-translate-key="about_us">من نحن</a>
                     <a href="contact.html" class="text-gray-300 hover:text-white" data-translate-key="contact_info">معلومات الاتصال</a>
                 </div>
@@ -112,7 +101,7 @@
                 <a href="main.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="home">الرئيسية</a>
                 <a href="local.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="syria_lebanon_store">متجر سوريا ولبنان</a>
                 <a href="bank.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="my_wallet">محفظتي: <span id="wallet-balance-mobile" class="font-bold">...</span></a>
-                <a href="track.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</a>
+                <button id="track-orders-btn-mobile" class="block w-full text-left py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="track_orders">تتبع طلباتي</button>
                 <a href="us.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="about_us">من نحن</a>
                 <a href="connect.html" class="block py-2 px-4 text-sm text-gray-300 hover:bg-gray-700 rounded-md" data-translate-key="contact_info">معلومات الاتصال</a>
                 <hr class="my-2 border-gray-700">
@@ -138,8 +127,7 @@
             <input type="text" id="search-input" class="filter-input w-full sm:w-1/2 lg:w-1/3" placeholder="ابحث عن منتج...">
             <div class="flex items-center gap-2">
                 <label for="category-filter" data-translate-key="filter_by_category" class="text-gray-300">حسب النوع</label>
-                <select id="category-filter" class="filter-input">
-                    </select>
+                <select id="category-filter" class="filter-input"></select>
             </div>
         </div>
 
@@ -157,7 +145,11 @@
     document.addEventListener('DOMContentLoaded', () => {
         const translations = {
             en: {
-                store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", login: "Login", language: "Language",
+                store_name: "Global Store", products_title: "Our Products", loading: "Loading products...", shipping_time: "Shipping Time", add_to_cart: "Add to Cart", home: "Home", syria_lebanon_store: "Syria & Lebanon Store", my_wallet: "My Wallet:", track_orders: "Track My Orders", about_us: "About Us", contact_info: "Contact Info", logout: "Logout", login: "Login", language: "Language",
+                delivery_info_title: "Delivery Information", delivery_syria_lebanon: "(Optional, for Syria & Lebanon only)", fullname: "Full Name", country: "Country", city: "City", address_details: "Address Details (Street, Building...)", phone_number: "Phone Number", map_location: "Location on Map", select_on_map: "Select on Map", location_not_set: "Not Set", confirm_and_pay: "Confirm & Pay",
+                form_field_required: "This field is required",
+                tracking_modal_title: "My Orders", order_id: "Order ID", order_date: "Date", order_total: "Total", order_status: "Status",
+                status_processing: "Processing", status_shipped: "Shipped", status_delivered: "Delivered", no_orders_yet: "You have no orders yet.",
                 cart_title: "My Cart", empty_cart: "Your cart is empty.", product: "Product", price: "Price", quantity: "Quantity", total: "Total", subtotal: "Subtotal", checkout: "Checkout", pay_wallet: "Pay with Wallet", pay_paypal: "Pay with PayPal", pay_card: "Pay with Card",
                 add_item_title: "Add to Cart", add_item_label: "Enter quantity", remove_item_title: "Are you sure?", remove_item_text: "This product will be removed from your cart!", remove_item_confirm: "Yes, delete it!", remove_item_cancel: "Cancel", item_removed_title: "Deleted!", item_removed_text: "The product has been removed from your cart.",
                 reviews: "Reviews", write_review: "Write a Review", your_rating: "Your Rating", your_comment: "Your Comment", submit_review: "Submit Review", already_rated: "You have already rated this product.", no_reviews: "No reviews yet.",
@@ -186,6 +178,10 @@
             },
             ar: {
                 store_name: "المتجر العالمي", products_title: "منتجاتنا", loading: "جارِ تحميل المنتجات...", shipping_time: "وقت الشحن", add_to_cart: "أضف إلى السلة", home: "الرئيسية", syria_lebanon_store: "متجر سوريا ولبنان", my_wallet: "محفظتي:", track_orders: "تتبع طلباتي", about_us: "من نحن", contact_info: "معلومات الاتصال", logout: "تسجيل الخروج", login: "تسجيل الدخول", language: "اللغة",
+                delivery_info_title: "معلومات التسليم", delivery_syria_lebanon: "(اختياري، لسوريا ولبنان فقط)", fullname: "الاسم الكامل", country: "البلد", city: "المدينة", address_details: "تفاصيل العنوان (شارع، بناء...)", phone_number: "رقم الهاتف", map_location: "الموقع على الخريطة", select_on_map: "تحديد على الخريطة", location_not_set: "لم يتم التحديد", confirm_and_pay: "تأكيد والدفع",
+                form_field_required: "هذا الحقل مطلوب",
+                tracking_modal_title: "طلباتي", order_id: "رقم الطلب", order_date: "التاريخ", order_total: "المجموع", order_status: "الحالة",
+                status_processing: "قيد المعالجة", status_shipped: "تم الشحن", status_delivered: "تم التسليم", no_orders_yet: "لا يوجد لديك طلبات بعد.",
                 cart_title: "سلتي", empty_cart: "سلتك فارغة.", product: "المنتج", price: "السعر", quantity: "الكمية", total: "المجموع", subtotal: "المجموع الفرعي", checkout: "الدفع", pay_wallet: "الدفع من المحفظة", pay_paypal: "الدفع عبر PayPal", pay_card: "الدفع بالبطاقة",
                 add_item_title: "إضافة إلى السلة", add_item_label: "أدخل الكمية", remove_item_title: "هل أنت متأكد؟", remove_item_text: "سيتم حذف هذا المنتج من سلتك!", remove_item_confirm: "نعم، احذفه!", remove_item_cancel: "إلغاء", item_removed_title: "تم الحذف!", item_removed_text: "تم حذف المنتج من السلة.",
                 reviews: "التقييمات", write_review: "كتابة تقييم", your_rating: "تقييمك", your_comment: "تعليقك", submit_review: "إرسال التقييم", already_rated: "لقد قمت بتقييم هذا المنتج مسبقًا.", no_reviews: "لا توجد تقييمات بعد.",
@@ -213,7 +209,11 @@
                 alert_payment_fail: "فشلت عملية الدفع."
             },
             es: {
-                store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", login: "Iniciar Sesión", language: "Idioma",
+                store_name: "Tienda Global", products_title: "Nuestros Productos", loading: "Cargando productos...", shipping_time: "Tiempo de envío", add_to_cart: "Añadir a la Cesta", home: "Inicio", syria_lebanon_store: "Tienda de Siria y Líbano", my_wallet: "Mi Billetera:", track_orders: "Rastrear Mis Pedidos", about_us: "Sobre Nosotros", contact_info: "Contacto", logout: "Cerrar Sesión", login: "Iniciar Sesión", language: "Idioma",
+                delivery_info_title: "Información de Entrega", delivery_syria_lebanon: "(Opcional, solo para Siria y Líbano)", fullname: "Nombre Completo", country: "País", city: "Ciudad", address_details: "Detalles de la Dirección (Calle, Edificio...)", phone_number: "Número de Teléfono", map_location: "Ubicación en el Mapa", select_on_map: "Seleccionar en el Mapa", location_not_set: "No establecido", confirm_and_pay: "Confirmar y Pagar",
+                form_field_required: "Este campo es obligatorio",
+                tracking_modal_title: "Mis Pedidos", order_id: "ID de Pedido", order_date: "Fecha", order_total: "Total", order_status: "Estado",
+                status_processing: "Procesando", status_shipped: "Enviado", status_delivered: "Entregado", no_orders_yet: "Aún no tienes pedidos.",
                 cart_title: "Mi Cesta", empty_cart: "Tu cesta está vacía.", product: "Producto", price: "Precio", quantity: "Cantidad", total: "Total", subtotal: "Subtotal", checkout: "Pagar", pay_wallet: "Pagar con Billetera", pay_paypal: "Pagar con PayPal", pay_card: "Pagar con Tarjeta",
                 add_item_title: "Añadir a la Cesta", add_item_label: "Introduzca la cantidad", remove_item_title: "¿Estás seguro?", remove_item_text: "¡Este producto será eliminado de tu cesta!", remove_item_confirm: "¡Sí, bórralo!", remove_item_cancel: "Cancelar", item_removed_title: "¡Eliminado!", item_removed_text: "El producto ha sido eliminado de tu cesta.",
                 reviews: "Reseñas", write_review: "Escribir una reseña", your_rating: "Tu valoración", your_comment: "Tu comentario", submit_review: "Enviar Reseña", already_rated: "Ya has valorado este producto.", no_reviews: "Aún no hay reseñas.",
@@ -241,14 +241,17 @@
                 alert_payment_fail: "El proceso de pago falló."
             }
         };
-        let currentLang = 'ar'; 
+        let currentLang = 'ar';
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
         const currentUser = Parse.User.current();
 
+        // Caching and state variables
         let productsCache = [];
         let uniqueCategories = [];
+        let deliveryLocation = null; // To store lat/lng from map
 
+        // DOM Elements
         const searchInput = document.getElementById('search-input');
         const categoryFilter = document.getElementById('category-filter');
         const noResultsDiv = document.getElementById('no-results');
@@ -281,14 +284,14 @@
             const productsGrid = document.getElementById('products-grid');
             loadingIndicator.style.display = 'block';
             productsGrid.innerHTML = '';
-            
+
             const Product = Parse.Object.extend("Things");
             const query = new Parse.Query(Product);
             query.select("name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", "category_ar", "category_en", "category_es", "price", "imageFile", "photos", "shippingTime", "averageRating", "ratingCount");
             try {
                 const products = await query.find();
                 productsCache = products;
-                
+
                 const categoryMap = new Map();
                 productsCache.forEach(p => {
                     const cat_en = p.get('category_en');
@@ -301,16 +304,16 @@
                     }
                 });
                 uniqueCategories = Array.from(categoryMap.values());
-                
+
                 populateCategoryFilter(currentLang);
                 applyFiltersAndRender();
 
             } catch (error) {
                 console.error("Error fetching products: ", error);
-                Swal.fire({ 
-                    title: translations[currentLang].alert_error_title, 
-                    html: `${translations[currentLang].alert_products_load_fail}<br><code class="text-xs">${error.message}</code>`, 
-                    icon: 'error' 
+                Swal.fire({
+                    title: translations[currentLang].alert_error_title,
+                    html: `${translations[currentLang].alert_products_load_fail}<br><code class="text-xs">${error.message}</code>`,
+                    icon: 'error'
                 });
             } finally {
                 loadingIndicator.style.display = 'none';
@@ -320,7 +323,7 @@
         function populateCategoryFilter(lang) {
             const selectedValue = categoryFilter.value;
             categoryFilter.innerHTML = '';
-            
+
             const allOption = document.createElement('option');
             allOption.value = 'all';
             allOption.textContent = translations[lang].all_categories;
@@ -328,11 +331,11 @@
 
             uniqueCategories.forEach(cat => {
                 const option = document.createElement('option');
-                option.value = cat.en; 
+                option.value = cat.en;
                 option.textContent = cat[lang] || cat.en;
                 categoryFilter.appendChild(option);
             });
-            
+
             categoryFilter.value = selectedValue || 'all';
         }
 
@@ -361,7 +364,7 @@
         function renderProducts(products, lang) {
             const productsGrid = document.getElementById('products-grid');
             productsGrid.innerHTML = '';
-            
+
             if (products.length === 0) {
                  noResultsDiv.style.display = 'block';
             } else {
@@ -382,27 +385,27 @@
                 for (let i = 1; i <= 5; i++) {
                     starsHTML += `<i class="fa-solid fa-star ${i <= averageRating ? 'text-yellow-400' : 'text-gray-300'}"></i>`;
                 }
-                
+
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
                     <div class="card-head">
                         <img src="${imageUrl}" alt="${name}" class="product-img">
                     </div>
-                    <div class="card-body"> 
-                        <div class="product-desc"> 
-                            <span class="product-title">${name}</span> 
+                    <div class="card-body">
+                        <div class="product-desc">
+                            <span class="product-title">${name}</span>
                             <span class="product-caption">${category}</span>
                             <div class="product-rating mt-2 flex items-center" dir="ltr">
                                 ${starsHTML}
                                 <span class="text-xs text-gray-500 ml-2">(${ratingCount})</span>
                             </div>
                             <p class="product-caption mt-1">${translations[lang].shipping_time}: ${shippingTime}</p>
-                        </div> 
-                        <div class="product-properties mt-2"> 
-                            <span class="product-price">$<b>${price.toFixed(2)}</b></span> 
-                            <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}"> ${translations[lang].add_to_cart} </button> 
-                        </div> 
+                        </div>
+                        <div class="product-properties mt-2">
+                            <span class="product-price">$<b>${price.toFixed(2)}</b></span>
+                            <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}"> ${translations[lang].add_to_cart} </button>
+                        </div>
                     </div>
                 `;
                 card.querySelector('.add-to-cart-btn').addEventListener('click', e => { e.stopPropagation(); promptForQuantity(product); });
@@ -410,7 +413,7 @@
                 productsGrid.appendChild(card);
             }
         }
-        
+
         async function fetchUserWallet() {
              try {
                 const user = await currentUser.fetch();
@@ -437,14 +440,14 @@
             let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
             let thumbnailsHTML = '';
             allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
-            
+
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
             query.equalTo("product", product);
             query.include("guest");
             query.descending("createdAt");
             let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
-            
+
             try {
                 const reviews = await query.find();
                 if (reviews.length === 0) {
@@ -464,11 +467,11 @@
                 reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
             }
             reviewsHTML += `</div></div>`;
-            
+
             const modalHTML = `<div class="flex flex-col md:flex-row gap-6"><div class="md:w-1/2"><img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain"><div class="flex gap-2 justify-center">${thumbnailsHTML}</div></div><div class="md:w-1/2 text-right"><h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2><p class="text-gray-600 mb-4">${description}</p><p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p><button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600">${translations[currentLang].write_review}</button></div></div>` + reviewsHTML;
             Swal.fire({ html: modalHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { const mainImage = document.getElementById('main-product-image'); document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); }); document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product)); }});
         }
-        
+
         async function promptForReview(product) {
             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_rate, 'warning'); return; }
             const Ratings = Parse.Object.extend("Ratings");
@@ -507,23 +510,23 @@
                 } catch(error) { Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_rating_submit_fail, 'error'); }
             }
         }
-        
+
         async function promptForQuantity(product) {
              if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_add, 'warning'); return; }
-            const { value: quantity } = await Swal.fire({ 
-                title: translations[currentLang].add_item_title, 
-                input: 'number', 
-                inputLabel: translations[currentLang].add_item_label, 
-                inputValue: 1, 
-                inputAttributes: { min: 1, step: 1 }, 
-                showCancelButton: true, 
+            const { value: quantity } = await Swal.fire({
+                title: translations[currentLang].add_item_title,
+                input: 'number',
+                inputLabel: translations[currentLang].add_item_label,
+                inputValue: 1,
+                inputAttributes: { min: 1, step: 1 },
+                showCancelButton: true,
                 confirmButtonText: translations[currentLang].add_to_cart,
                 cancelButtonText: translations[currentLang].remove_item_cancel,
-                inputValidator: (value) => { if (!value || value < 1) { return translations[currentLang].alert_invalid_quantity } } 
+                inputValidator: (value) => { if (!value || value < 1) { return translations[currentLang].alert_invalid_quantity } }
             });
             if (quantity) { addToCart(product, parseInt(quantity)); }
         }
-        
+
         async function addToCart(product, quantityToAdd) {
             Swal.fire({ title: translations[currentLang].alert_adding_to_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             const Net = Parse.Object.extend("Net");
@@ -532,7 +535,7 @@
             query.equalTo("product", product);
             try {
                 let cartItem = await query.first();
-                if (cartItem) { cartItem.increment("quantity", quantityToAdd); } 
+                if (cartItem) { cartItem.increment("quantity", quantityToAdd); }
                 else { cartItem = new Net(); cartItem.set("guest", currentUser); cartItem.set("product", product); cartItem.set("quantity", quantityToAdd); }
                 await cartItem.save();
                 updateCartCount();
@@ -544,7 +547,7 @@
                  Swal.fire({ title: translations[currentLang].alert_error_title, html: errorMessage + `<br><br><code class="text-xs text-left block" dir="ltr">${error.message}</code>`, icon: 'error' });
             }
         }
-        
+
         async function updateCartCount() {
             if(!currentUser) return;
             const Net = Parse.Object.extend("Net");
@@ -561,7 +564,7 @@
                 }
             } catch (error) { console.error("Error updating cart count:", error); }
         }
-        
+
         document.getElementById('cart-button').addEventListener('click', async () => {
              if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_view_cart, 'warning'); return; }
             showCartModal();
@@ -571,7 +574,7 @@
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
-            query.include("product"); 
+            query.include("product");
             Swal.fire({ title: translations[currentLang].alert_loading_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             try {
                 const cartItems = await query.find();
@@ -598,10 +601,12 @@
                     });
                      cartHTML += `</tbody></table></div>`;
                 }
-                const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition">${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition">${translations[currentLang].pay_card}</button></div></div>`;
-                Swal.fire({ title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => { 
-                    const payWalletBtn = document.getElementById('pay-wallet'); 
-                    if (payWalletBtn && cartItems.length > 0) { payWalletBtn.addEventListener('click', () => handleWalletPayment(subtotal, cartItems)); }
+                const footerHTML = `<div class="mt-6 text-right"><p class="text-lg">${translations[currentLang].subtotal}: <span class="font-bold text-xl text-blue-600">$${subtotal.toFixed(2)}</span></p></div><div class="mt-4 border-t pt-4"><h3 class="font-bold mb-2">${translations[currentLang].checkout}</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-2"><button id="pay-wallet-btn" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition">${translations[currentLang].pay_wallet}</button><button class="bg-yellow-500 text-white p-2 rounded-lg hover:bg-yellow-600 transition">${translations[currentLang].pay_paypal}</button><button class="bg-indigo-500 text-white p-2 rounded-lg hover:bg-indigo-600 transition">${translations[currentLang].pay_card}</button></div></div>`;
+                Swal.fire({ title: translations[currentLang].cart_title, html: cartHTML + footerHTML, width: '800px', showConfirmButton: false, showCloseButton: true, didOpen: () => {
+                    const payWalletBtn = document.getElementById('pay-wallet-btn');
+                    if (payWalletBtn && cartItems.length > 0) {
+                        payWalletBtn.addEventListener('click', () => promptForDeliveryInfo(subtotal, cartItems));
+                    }
                     document.querySelectorAll('.remove-from-cart-btn').forEach(btn => btn.addEventListener('click', (e) => confirmRemoveFromCart(e.currentTarget.dataset.cartItemId)));
                 }});
             } catch(error) {
@@ -609,7 +614,204 @@
                 Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_cart_display_fail, 'error');
             }
         }
-        
+
+        function promptForDeliveryInfo(totalCost, cartItems) {
+            deliveryLocation = null; // Reset location each time
+            const formHTML = `
+                <div id="delivery-form" class="text-left text-gray-800 p-2" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
+                    <p class="text-sm text-gray-500 text-center mb-4">${translations[currentLang].delivery_syria_lebanon}</p>
+                    <label class="font-bold">${translations[currentLang].fullname}:</label>
+                    <input type="text" id="fullname" class="delivery-form-input" required>
+                    <label class="font-bold mt-2 block">${translations[currentLang].country}:</label>
+                    <select id="country" class="delivery-form-input">
+                        <option value="Syria">Syria</option>
+                        <option value="Lebanon">Lebanon</option>
+                    </select>
+                    <label class="font-bold mt-2 block">${translations[currentLang].city}:</label>
+                    <input type="text" id="city" class="delivery-form-input" required>
+                    <label class="font-bold mt-2 block">${translations[currentLang].address_details}:</label>
+                    <input type="text" id="address" class="delivery-form-input" required>
+                    <label class="font-bold mt-2 block">${translations[currentLang].phone_number}:</label>
+                    <input type="tel" id="phone" class="delivery-form-input" required>
+                    <label class="font-bold mt-4 block">${translations[currentLang].map_location}:</label>
+                    <div class="flex items-center gap-4 mt-1">
+                        <button id="select-on-map-btn" type="button" class="bg-blue-500 text-white py-1 px-3 rounded">${translations[currentLang].select_on_map}</button>
+                        <span id="location-display" class="text-sm text-gray-600">${translations[currentLang].location_not_set}</span>
+                    </div>
+                </div>
+            `;
+
+            Swal.fire({
+                title: translations[currentLang].delivery_info_title,
+                html: formHTML,
+                confirmButtonText: translations[currentLang].confirm_and_pay,
+                showCancelButton: true,
+                cancelButtonText: translations[currentLang].remove_item_cancel,
+                customClass: { popup: 'w-full max-w-lg' },
+                didOpen: () => {
+                    document.getElementById('select-on-map-btn').addEventListener('click', showMapModal);
+                },
+                preConfirm: () => {
+                    const fullname = document.getElementById('fullname').value;
+                    const country = document.getElementById('country').value;
+                    const city = document.getElementById('city').value;
+                    const address = document.getElementById('address').value;
+                    const phone = document.getElementById('phone').value;
+
+                    if (!fullname || !city || !address || !phone) {
+                        Swal.showValidationMessage(translations[currentLang].form_field_required);
+                        return false;
+                    }
+
+                    const shippingDetails = { fullname, country, city, address, phone };
+                    return { shippingDetails, deliveryLocation, totalCost, cartItems };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { shippingDetails, deliveryLocation, totalCost, cartItems } = result.value;
+                    processOrder(totalCost, cartItems, shippingDetails, deliveryLocation);
+                }
+            });
+        }
+
+        function showMapModal() {
+            Swal.fire({
+                title: translations[currentLang].select_on_map,
+                html: '<div id="map"></div>',
+                width: '80%',
+                showConfirmButton: false,
+                showCloseButton: true,
+                didOpen: () => {
+                    // Default to Damascus location
+                    const map = L.map('map').setView([33.5138, 36.2765], 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    let marker;
+                    map.on('click', function(e) {
+                        if (marker) {
+                            map.removeLayer(marker);
+                        }
+                        marker = L.marker(e.latlng).addTo(map);
+                        deliveryLocation = e.latlng; // Save location
+                        document.getElementById('location-display').textContent = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+                    });
+                }
+            });
+        }
+
+        async function processOrder(totalCost, cartItems, shippingDetails, location) {
+             Swal.fire({ title: translations[currentLang].alert_processing_payment, allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+            try {
+                const user = await currentUser.fetch();
+                const balance = user.get('walletBalance') || 0;
+                if (balance < totalCost) {
+                    Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_insufficient_funds, 'error');
+                    return;
+                }
+
+                const Order = Parse.Object.extend("Orders");
+                const order = new Order();
+
+                const itemsSnapshot = cartItems.map(item => {
+                    const product = item.get("product");
+                    return {
+                        objectId: product.id,
+                        name: product.get(`name_en`), // Store a consistent name, e.g., English
+                        quantity: item.get("quantity"),
+                        price: product.get("price")
+                    };
+                });
+
+                order.set("customer", currentUser);
+                order.set("shippingDetails", shippingDetails);
+                if (location) {
+                    order.set("shippingLocation", new Parse.GeoPoint(location.lat, location.lng));
+                }
+                order.set("items", itemsSnapshot);
+                order.set("totalAmount", totalCost);
+                order.set("status", "Processing");
+
+                await order.save();
+
+                const newBalance = balance - totalCost;
+                currentUser.set('walletBalance', newBalance);
+                await currentUser.save();
+                await Parse.Object.destroyAll(cartItems);
+
+                fetchUserWallet();
+                updateCartCount();
+
+                const amount = `$${totalCost.toFixed(2)}`;
+                const successText = translations[currentLang].alert_payment_success_text.replace('{amount}', amount);
+                await Swal.fire(translations[currentLang].alert_payment_success_title, successText, 'success');
+                showCartModal(); // Refresh cart modal to show it's empty
+
+            } catch (error) {
+                console.error("Error during order processing:", error);
+                Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_payment_fail, 'error');
+            }
+        }
+
+        async function showTrackingModal() {
+            if (!currentUser) {
+                Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_view_cart, 'warning');
+                return;
+            }
+            Swal.fire({ title: translations[currentLang].loading, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const Order = Parse.Object.extend("Orders");
+            const query = new Parse.Query(Order);
+            query.equalTo("customer", currentUser);
+            query.descending("createdAt");
+
+            try {
+                const orders = await query.find();
+                let ordersHTML;
+
+                if (orders.length === 0) {
+                    ordersHTML = `<p class="text-center text-gray-600 p-4">${translations[currentLang].no_orders_yet}</p>`;
+                } else {
+                    ordersHTML = '<div class="space-y-4 text-left">';
+                    orders.forEach(order => {
+                        const status = order.get('status');
+                        const statusKey = `status_${status.toLowerCase()}`;
+                        const statusText = translations[currentLang][statusKey] || status;
+                        let statusColor = 'bg-gray-500';
+                        if (status === 'Processing') statusColor = 'bg-yellow-500';
+                        if (status === 'Shipped') statusColor = 'bg-blue-500';
+                        if (status === 'Delivered') statusColor = 'bg-green-500';
+
+                        ordersHTML += `
+                        <div class="border rounded-lg p-4 bg-white text-gray-800" dir="${currentLang === 'ar' ? 'rtl' : 'ltr'}">
+                            <div class="flex justify-between items-center">
+                                <p class="font-bold">${translations[currentLang].order_id}: <span class="font-normal">${order.id}</span></p>
+                                <span class="status-badge ${statusColor}">${statusText}</span>
+                            </div>
+                            <p class="text-sm text-gray-600">${translations[currentLang].order_date}: ${new Date(order.get('createdAt')).toLocaleDateString()}</p>
+                            <p class="text-sm text-gray-600">${translations[currentLang].order_total}: <span class="font-bold">$${order.get('totalAmount').toFixed(2)}</span></p>
+                        </div>`;
+                    });
+                    ordersHTML += '</div>';
+                }
+
+                Swal.fire({
+                    title: translations[currentLang].tracking_modal_title,
+                    html: ordersHTML,
+                    width: '90%',
+                    maxWidth: '600px',
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    background: '#f9fafb' // Use a light background for readability
+                });
+
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+                Swal.fire(translations[currentLang].alert_error_title, "Failed to fetch orders.", 'error');
+            }
+        }
+
         async function confirmRemoveFromCart(cartItemId) {
             const result = await Swal.fire({
                 title: translations[currentLang].remove_item_title,
@@ -633,32 +835,11 @@
             try {
                 await cartItem.destroy();
                 updateCartCount();
-                showCartModal(); 
+                showCartModal();
                 Swal.close();
             } catch (error) {
                 console.error("Error removing from cart:", error);
                 Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_delete_fail, 'error');
-            }
-        }
-        
-        async function handleWalletPayment(totalCost, cartItems) {
-            Swal.fire({ title: translations[currentLang].alert_processing_payment, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-            try {
-                const user = await currentUser.fetch();
-                const balance = user.get('walletBalance') || 0;
-                if (balance < totalCost) { Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_insufficient_funds, 'error'); return; }
-                const newBalance = balance - totalCost;
-                currentUser.set('walletBalance', newBalance);
-                await currentUser.save();
-                await Parse.Object.destroyAll(cartItems);
-                fetchUserWallet();
-                updateCartCount();
-                const amount = `$${totalCost.toFixed(2)}`;
-                const successText = translations[currentLang].alert_payment_success_text.replace('{amount}', amount);
-                Swal.fire(translations[currentLang].alert_payment_success_title, successText, 'success');
-            } catch (error) {
-                 console.error("Error during wallet payment:", error);
-                 Swal.fire(translations[currentLang].alert_error_title, translations[currentLang].alert_payment_fail, 'error');
             }
         }
 
@@ -691,43 +872,51 @@
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const langGlobeButton = document.getElementById('lang-globe-button');
         const mobileMenu = document.getElementById('mobile-menu');
+        const trackOrdersBtn = document.getElementById('track-orders-btn');
+        const trackOrdersBtnMobile = document.getElementById('track-orders-btn-mobile');
+
         if(mobileMenuButton) { mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden')); }
         if(langGlobeButton) { langGlobeButton.addEventListener('click', showLanguageSwitcherModal); }
-        
+        if(trackOrdersBtn) { trackOrdersBtn.addEventListener('click', showTrackingModal); }
+        if(trackOrdersBtnMobile) { trackOrdersBtnMobile.addEventListener('click', showTrackingModal); }
+
         document.querySelectorAll('.lang-switcher').forEach(s => s.addEventListener('click', e => {
             setLanguage(e.target.dataset.lang);
             if(mobileMenu) mobileMenu.classList.add('hidden');
         }));
-        
+
         const loginButtons = [document.getElementById('login-button'), document.getElementById('login-button-mobile')];
         const logoutButtons = [document.getElementById('logout-button'), document.getElementById('logout-button-mobile')];
-logoutButtons.forEach(btn => {
-    // نتأكد أولاً أن الزر موجود قبل إضافة المستمع لتجنب الأخطاء
-    if (btn) { 
-        btn.addEventListener('click', async () => {
-            console.log("Logout button clicked!"); // رسالة تأكيد أن الزر يعمل
-            try {
-                await Parse.User.logOut();
-                console.log("User logged out successfully from Parse."); // رسالة تأكيد نجاح تسجيل الخروج
-                window.location.reload();
-            } catch (error) {
-                // في حال فشلت عملية تسجيل الخروج، سيظهر الخطأ هنا
-                console.error("Logout failed:", error);
-                alert(`Logout failed! See console for details. Error: ${error.message}`);
+        logoutButtons.forEach(btn => {
+            if (btn) {
+                btn.addEventListener('click', async () => {
+                    console.log("Logout button clicked!");
+                    try {
+                        await Parse.User.logOut();
+                        console.log("User logged out successfully from Parse.");
+                        window.location.reload();
+                    } catch (error) {
+                        console.error("Logout failed:", error);
+                        alert(`Logout failed! See console for details. Error: ${error.message}`);
+                    }
+                });
             }
         });
-    }
-});
-        const walletLinks = [document.querySelector('a[href="bank.html"]'), document.querySelector('#mobile-menu a[href="bank.html"]')];
+        const walletLinks = [document.querySelector('a[href="wallet.html"]'), document.querySelector('#mobile-menu a[href="bank.html"]')];
 
         if (!currentUser) {
             logoutButtons.forEach(btn => btn.style.display = 'none');
             loginButtons.forEach(btn => btn.classList.remove('hidden'));
-            walletLinks.forEach(link => link.style.display = 'none');
+            walletLinks.forEach(link => { if(link) link.style.display = 'none' });
+            trackOrdersBtn.style.display = 'none';
+            trackOrdersBtnMobile.style.display = 'none';
+
         } else {
             loginButtons.forEach(btn => btn.style.display = 'none');
             logoutButtons.forEach(btn => btn.classList.remove('hidden'));
-            walletLinks.forEach(link => link.style.display = 'block'); // or flex/inline-block as needed
+            walletLinks.forEach(link => { if(link) link.style.display = 'block' });
+            trackOrdersBtn.style.display = 'inline'; // Or 'block' based on your layout
+            trackOrdersBtnMobile.style.display = 'block';
             fetchUserWallet();
             updateCartCount();
         }
