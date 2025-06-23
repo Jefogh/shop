@@ -106,7 +106,7 @@
             text-align: center;
             background-color: #f9fafb; /* gray-50 */
         }
-        .poll-image-option.selected, .poll-image-option:hover {
+         .poll-image-option.selected, .poll-image-option:hover {
             border-color: #3b82f6; /* blue-500 */
             transform: translateY(-5px);
         }
@@ -198,7 +198,6 @@
 
     <main class="container mx-auto p-4 sm:p-8">
         <h1 data-translate-key="syria_lebanon_store" class="text-3xl sm:text-4xl font-bold text-center text-white mb-6">متجر سوريا ولبنان</h1>
-
         <div id="filter-container" class="mb-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <input type="text" id="search-input" class="filter-input w-full sm:w-1/2 lg:w-1/3" placeholder="ابحث عن منتج...">
             <div class="flex items-center gap-2">
@@ -206,7 +205,6 @@
                 <select id="category-filter" class="filter-input"></select>
             </div>
         </div>
-
         <div id="products-grid" class="products-grid-container"></div>
         <div id="loading-indicator" class="text-center py-10">
             <p data-translate-key="loading" class="text-gray-400">جارِ تحميل المنتجات...</p>
@@ -590,11 +588,17 @@
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
-            query.equalTo("product", product);
+            query.equalTo("productsy", product); 
             try {
                 let cartItem = await query.first();
-                if (cartItem) { cartItem.increment("quantity", quantityToAdd); }
-                else { cartItem = new Net(); cartItem.set("guest", currentUser); cartItem.set("product", product); cartItem.set("quantity", quantityToAdd); }
+                if (cartItem) { 
+                    cartItem.increment("quantity", quantityToAdd); 
+                } else { 
+                    cartItem = new Net(); 
+                    cartItem.set("guest", currentUser); 
+                    cartItem.set("productsy", product); 
+                    cartItem.set("quantity", quantityToAdd); 
+                }
                 await cartItem.save();
                 updateCartCount();
                 Swal.fire(translations[currentLang].alert_added_to_cart_title, translations[currentLang].alert_added_to_cart_text, 'success');
@@ -627,7 +631,8 @@
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
-            query.include("product");
+            query.include("product"); 
+            query.include("productsy"); 
             Swal.fire({ title: translations[currentLang].alert_loading_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             try {
                 const cartItems = await query.find();
@@ -644,13 +649,13 @@
                         <th scope="col" class="px-2 py-3"></th>
                     </tr></thead><tbody>`;
                     cartItems.forEach(item => {
-                        const product = item.get("product");
-                        if (!product) return;
-                        const price = product.get("price") || 0;
+                        const productObject = item.get("product") || item.get("productsy");
+                        if (!productObject) return;
+                        const price = productObject.get("price") || 0;
                         const quantity = item.get("quantity");
                         const total = price * quantity;
                         subtotal += total;
-                        cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${product.get(`name_${currentLang}`)}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td><td class="px-2 py-4 text-center"><button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-cart-item-id="${item.id}"><i class="fas fa-trash-alt"></i></button></td></tr>`;
+                        cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${productObject.get(`name_${currentLang}`)}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td><td class="px-2 py-4 text-center"><button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-cart-item-id="${item.id}"><i class="fas fa-trash-alt"></i></button></td></tr>`;
                     });
                     cartHTML += `</tbody></table></div>`;
                 }
@@ -820,9 +825,11 @@
                 const Order = Parse.Object.extend("Orders");
                 const order = new Order();
                 const itemsSnapshot = cartItems.map(item => {
-                    const product = item.get("product");
-                    return { objectId: product.id, name: product.get(`name_en`), quantity: item.get("quantity"), price: product.get("price") };
-                });
+                    const productObject = item.get("product") || item.get("productsy");
+                    if (!productObject) return null;
+                    return { objectId: productObject.id, name: productObject.get(`name_en`), quantity: item.get("quantity"), price: productObject.get("price") };
+                }).filter(item => item !== null);
+                
                 order.set("customer", currentUser);
                 order.set("shippingDetails", shippingDetails);
                 if (location) { order.set("shippingLocation", new Parse.GeoPoint(location.lat, location.lng)); }
@@ -1017,7 +1024,6 @@
         function displayPollOptions(poll) {
             const question = poll.get(`question_${currentLang}`) || poll.get('question_en');
             let selectedOptionId = null;
-
             let optionsHTML = '<div class="poll-options-container text-gray-800">';
             for (let i = 1; i <= 3; i++) {
                 const imageFile = poll.get(`image${i}`);
@@ -1033,7 +1039,6 @@
                 }
             }
             optionsHTML += '</div>';
-
             Swal.fire({
                 title: question,
                 html: optionsHTML,
