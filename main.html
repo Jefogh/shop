@@ -294,10 +294,16 @@
             const productsGrid = document.getElementById('products-grid');
             loadingIndicator.style.display = 'block';
             productsGrid.innerHTML = '';
+            // -- تعديل --: استهداف جدول Things
             const Product = Parse.Object.extend("Things");
             const query = new Parse.Query(Product);
-            // -- تعديل --: جلب الحقول الجديدة للألوان والأحجام
-            query.select("name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", "category_ar", "category_en", "category_es", "price", "imageFile", "photos", "shippingTime", "averageRating", "ratingCount", "availableColors", "availableSizes");
+            // -- تعديل --: جلب كل الحقول الجديدة
+            query.select(
+                "name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", 
+                "category_ar", "category_en", "category_es", "price", "imageFile", "photos", 
+                "shippingTime", "averageRating", "ratingCount", 
+                "availableColors", "availableSizes", "img1", "img2", "img3"
+            );
             try {
                 const products = await query.find();
                 productsCache = products;
@@ -390,7 +396,6 @@
                             <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}">${translations[lang].add_to_cart}</button>
                         </div>
                     </div>`;
-                // -- تعديل --: زر الإضافة للسلة في البطاقة سيفتح دائماً تفاصيل المنتج أولاً
                 card.querySelector('.add-to-cart-btn').addEventListener('click', e => { e.stopPropagation(); showProductDetails(product); });
                 card.addEventListener('click', () => showProductDetails(product));
                 productsGrid.appendChild(card);
@@ -411,21 +416,36 @@
             }
         }
 
-        // -- تعديل --: تم تعديل الدالة بالكامل لإضافة خيارات اللون والحجم
+        // -- تعديل --: تم استبدال هذه الدالة بالكامل لتضمين كل الميزات الجديدة
         async function showProductDetails(product) {
             if (!product) return;
             const name = product.get(`name_${currentLang}`);
             const description = product.get(`description_${currentLang}`);
             const price = product.get('price');
+            
             const mainImageFile = product.get('imageFile');
-            const mainImageUrl = mainImageFile ? mainImageFile.url() : '';
-            const photos = product.get('photos') || [];
-            const photoArray = Array.isArray(photos) ? photos : [];
-            let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
-            let thumbnailsHTML = '';
-            allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
+            const mainImageUrl = mainImageFile ? mainImageFile.url() : 'https://via.placeholder.com/220';
 
-            // -- تعديل --: جلب وعرض خيارات اللون والحجم
+            const allImages = [];
+            if (mainImageFile) allImages.push(mainImageFile);
+            const img1 = product.get('img1');
+            const img2 = product.get('img2');
+            const img3 = product.get('img3');
+            if (img1) allImages.push(img1);
+            if (img2) allImages.push(img2);
+            if (img3) allImages.push(img3);
+            const photosArray = product.get('photos') || [];
+            if (Array.isArray(photosArray)) {
+                photosArray.forEach(photo => allImages.push(photo));
+            }
+
+            let thumbnailsHTML = '';
+            allImages.forEach(imgFile => {
+                if (imgFile && typeof imgFile.url === 'function') {
+                    thumbnailsHTML += `<img src="${imgFile.url()}" class="thumbnail-img w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500 rounded-md">`;
+                }
+            });
+
             const availableColors = product.get('availableColors') || [];
             const availableSizes = product.get('availableSizes') || [];
             let optionsHTML = '';
@@ -433,24 +453,20 @@
                 optionsHTML += `
                 <div class="mt-4">
                     <label for="color-select" class="block mb-2 text-sm font-bold text-gray-700">${translations[currentLang].label_color}:</label>
-                    <select id="color-select" class="w-full p-2 border rounded-md text-gray-800">
-                        ${availableColors.map(color => `<option value="${color}">${color}</option>`).join('')}
-                    </select>
+                    <select id="color-select" class="w-full p-2 border rounded-md text-gray-800">${availableColors.map(c => `<option value="${c}">${c}</option>`).join('')}</select>
                 </div>`;
             }
             if (availableSizes.length > 0) {
                 optionsHTML += `
                 <div class="mt-4">
                     <label for="size-select" class="block mb-2 text-sm font-bold text-gray-700">${translations[currentLang].label_size}:</label>
-                    <select id="size-select" class="w-full p-2 border rounded-md text-gray-800">
-                        ${availableSizes.map(size => `<option value="${size}">${size}</option>`).join('')}
-                    </select>
+                    <select id="size-select" class="w-full p-2 border rounded-md text-gray-800">${availableSizes.map(s => `<option value="${s}">${s}</option>`).join('')}</select>
                 </div>`;
             }
 
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
-            query.equalTo("product", product);
+            query.equalTo("product", product); // استهداف حقل "product" الصحيح
             query.include("guest");
             query.descending("createdAt");
             let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
@@ -475,34 +491,32 @@
             reviewsHTML += `</div></div>`;
             
             const modalHTML = `
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="md:w-1/2">
-                        <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain">
-                        <div class="flex gap-2 justify-center">${thumbnailsHTML}</div>
-                    </div>
-                    <div class="md:w-1/2 text-right">
-                        <h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2>
-                        <p class="text-gray-600 mb-4">${description}</p>
-                        <p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p>
-                        ${optionsHTML}
-                        <button id="add-to-cart-modal-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mt-6">${translations[currentLang].add_to_cart}</button>
-                        <button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 mt-2">${translations[currentLang].write_review}</button>
-                    </div>
-                </div>` + reviewsHTML;
-            
-            Swal.fire({ 
-                html: modalHTML, 
-                width: '800px', 
-                showConfirmButton: false, 
-                showCloseButton: true, 
-                didOpen: () => { 
-                    const mainImage = document.getElementById('main-product-image'); 
-                    document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => { 
-                        thumb.addEventListener('click', () => { mainImage.src = thumb.src; }); 
-                    }); 
-                    document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product)); 
-                    
-                    // -- تعديل --: إضافة منطق لزر الإضافة للسلة داخل النافذة
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/2">
+                    <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-80 object-contain">
+                    <div class="flex gap-2 justify-center flex-wrap">${thumbnailsHTML}</div>
+                </div>
+                <div class="md:w-1/2 text-right">
+                    <h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2>
+                    <div class="text-gray-600 mb-4">${description || ''}</div>
+                    <p class="text-3xl font-bold text-blue-600 my-6">$${price.toFixed(2)}</p>
+                    ${optionsHTML}
+                    <button id="add-to-cart-modal-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mt-6">${translations[currentLang].add_to_cart}</button>
+                    <button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 mt-2">${translations[currentLang].write_review}</button>
+                </div>
+            </div>` + reviewsHTML;
+
+            Swal.fire({
+                html: modalHTML,
+                width: '800px',
+                showConfirmButton: false,
+                showCloseButton: true,
+                didOpen: () => {
+                    const mainImage = document.getElementById('main-product-image');
+                    document.querySelectorAll('.thumbnail-img').forEach(thumb => {
+                        thumb.addEventListener('click', () => { mainImage.src = thumb.src; });
+                    });
+                    document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product));
                     document.getElementById('add-to-cart-modal-btn').addEventListener('click', () => {
                         const selectedColor = document.getElementById('color-select')?.value;
                         const selectedSize = document.getElementById('size-select')?.value;
@@ -512,12 +526,11 @@
             });
         }
 
-
         async function promptForReview(product) {
             if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_rate, 'warning'); return; }
             const Ratings = Parse.Object.extend("Ratings");
             const query = new Parse.Query(Ratings);
-            query.equalTo("product", product);
+            query.equalTo("product", product); // استهداف حقل "product" الصحيح
             query.equalTo("guest", currentUser);
             const existingRating = await query.first();
             if (existingRating) { Swal.fire(translations[currentLang].alert_info_title, translations[currentLang].already_rated, 'info'); return; }
@@ -543,7 +556,7 @@
                 const newRating = new Rating();
                 newRating.set("stars", parseInt(formValues.stars));
                 newRating.set("comment", formValues.comment);
-                newRating.set("product", product);
+                newRating.set("product", product); // استهداف حقل "product" الصحيح
                 newRating.set("guest", currentUser);
                 try {
                     await newRating.save();
@@ -566,20 +579,17 @@
                 cancelButtonText: translations[currentLang].remove_item_cancel,
                 inputValidator: (value) => { if (!value || value < 1) { return translations[currentLang].alert_invalid_quantity } }
             });
-            if (quantity) { 
-                addToCart(product, parseInt(quantity), selectedColor, selectedSize); 
-            }
+            if (quantity) { addToCart(product, parseInt(quantity), selectedColor, selectedSize); }
         }
 
-        // -- تعديل --: تم تعديل الدالة بالكامل للتعامل مع اللون والحجم
+        // -- تعديل --: الدالة الآن تحفظ اللون والحجم
         async function addToCart(product, quantityToAdd, selectedColor, selectedSize) {
             Swal.fire({ title: translations[currentLang].alert_adding_to_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
-            query.equalTo("product", product);
+            query.equalTo("product", product); // استهداف حقل "product" الصحيح
 
-            // -- تعديل --: البحث عن عنصر مطابق في السلة بناءً على المنتج واللون والحجم
             if (selectedColor) {
                 query.equalTo("selectedColor", selectedColor);
             } else {
@@ -593,14 +603,12 @@
 
             try {
                 let cartItem = await query.first();
-                if (cartItem) { 
-                    cartItem.increment("quantity", quantityToAdd); 
-                } else { 
+                if (cartItem) { cartItem.increment("quantity", quantityToAdd); }
+                else { 
                     cartItem = new Net(); 
                     cartItem.set("guest", currentUser); 
-                    cartItem.set("product", product); 
+                    cartItem.set("product", product); // استهداف حقل "product" الصحيح
                     cartItem.set("quantity", quantityToAdd);
-                    // -- تعديل --: حفظ اللون والحجم المختارين في السلة
                     if (selectedColor) cartItem.set("selectedColor", selectedColor);
                     if (selectedSize) cartItem.set("selectedSize", selectedSize);
                 }
@@ -632,12 +640,13 @@
             } catch (error) { console.error("Error updating cart count:", error); }
         }
 
-        // -- تعديل --: تم تعديل الدالة لعرض اللون والحجم في السلة
+        // -- تعديل --: الدالة الآن تعرض اللون والحجم
         async function showCartModal() {
             const Net = Parse.Object.extend("Net");
             const query = new Parse.Query(Net);
             query.equalTo("guest", currentUser);
             query.include("product");
+            query.include("productsy");
             Swal.fire({ title: translations[currentLang].alert_loading_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             try {
                 const cartItems = await query.find();
@@ -654,14 +663,13 @@
                         <th scope="col" class="px-2 py-3"></th>
                     </tr></thead><tbody>`;
                     cartItems.forEach(item => {
-                        const product = item.get("product");
-                        if (!product) return;
-                        const price = product.get("price") || 0;
+                        const productObject = item.get("product") || item.get("productsy");
+                        if (!productObject) return;
+                        const price = productObject.get("price") || 0;
                         const quantity = item.get("quantity");
                         const total = price * quantity;
                         subtotal += total;
 
-                        // -- تعديل --: جلب وعرض اللون والحجم
                         const color = item.get("selectedColor");
                         const size = item.get("selectedSize");
                         let detailsHTML = '';
@@ -671,15 +679,7 @@
                             detailsHTML = `<span class="text-xs text-gray-500 block">${colorText} ${sizeText}</span>`;
                         }
 
-                        cartHTML += `<tr class="bg-white border-b">
-                            <td class="px-6 py-4 font-medium text-gray-900">
-                                ${product.get(`name_${currentLang}`)}
-                                ${detailsHTML}
-                            </td>
-                            <td class="px-6 py-4">${quantity}</td>
-                            <td class="px-6 py-4">$${total.toFixed(2)}</td>
-                            <td class="px-2 py-4 text-center"><button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-cart-item-id="${item.id}"><i class="fas fa-trash-alt"></i></button></td>
-                        </tr>`;
+                        cartHTML += `<tr class="bg-white border-b"><td class="px-6 py-4 font-medium text-gray-900">${productObject.get(`name_${currentLang}`)} ${detailsHTML}</td><td class="px-6 py-4">${quantity}</td><td class="px-6 py-4">$${total.toFixed(2)}</td><td class="px-2 py-4 text-center"><button class="remove-from-cart-btn text-red-500 hover:text-red-700" data-cart-item-id="${item.id}"><i class="fas fa-trash-alt"></i></button></td></tr>`;
                     });
                     cartHTML += `</tbody></table></div>`;
                 }
@@ -834,7 +834,7 @@
             });
         }
         
-        // -- تعديل --: تم تعديل الدالة لحفظ اللون والحجم في الطلب النهائي
+        // -- تعديل --: الدالة الآن تحفظ اللون والحجم في الطلب
         async function processOrder(totalCost, cartItems, shippingDetails, location) {
             Swal.fire({ title: translations[currentLang].alert_processing_payment, allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
             try {
@@ -846,20 +846,17 @@
                 }
                 const Order = Parse.Object.extend("Orders");
                 const order = new Order();
-                
-                // -- تعديل --: إضافة اللون والحجم إلى snapshot الخاص بالطلب
                 const itemsSnapshot = cartItems.map(item => {
-                    const product = item.get("product");
+                    const productObject = item.get("product") || item.get("productsy");
                     return { 
-                        objectId: product.id, 
-                        name: product.get(`name_en`), 
+                        objectId: productObject.id, 
+                        name: productObject.get(`name_en`), 
                         quantity: item.get("quantity"), 
-                        price: product.get("price"),
+                        price: productObject.get("price"),
                         color: item.get("selectedColor") || 'N/A',
                         size: item.get("selectedSize") || 'N/A'
                     };
                 });
-                
                 order.set("customer", currentUser);
                 order.set("shippingDetails", shippingDetails);
                 if (location) { order.set("shippingLocation", new Parse.GeoPoint(location.lat, location.lng)); }
