@@ -494,124 +494,132 @@ document.getElementById('wallet-balance-mobile').textContent = '$0.00';
 }
 
 // -- تعديل --: الدالة الآن تعرض الألوان والأحجام والصور الإضافية
+// قم باستبدال الدالة القديمة بهذه الدالة الجديدة بالكامل
 async function showProductDetails(product) {
-if (!product) return;
-const name = product.get(`name_${currentLang}`);
-const description = product.get(`description_${currentLang}`);
-const price = product.get('price');
-const mainImageFile = product.get('imageFile');
-const mainImageUrl = mainImageFile ? mainImageFile.url() : '';
-const photos = product.get('photos') || [];
-const photoArray = Array.isArray(photos) ? photos : [];
-let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
-let thumbnailsHTML = '';
-allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
+    if (!product) return;
+    const name = product.get(`name_${currentLang}`);
+    const description = product.get(`description_${currentLang}`);
+    const price = product.get('price');
+    
+    // --- تعديل: بداية منطقة تجميع كل الصور ---
+    const mainImageFile = product.get('imageFile');
+    const mainImageUrl = mainImageFile ? mainImageFile.url() : 'https://via.placeholder.com/220'; // صورة افتراضية
 
-// منطق جلب خيارات اللون والحجم
-const availableColors = product.get('availableColors') || [];
-const availableSizes = product.get('availableSizes') || [];
-let optionsHTML = '';
-if (availableColors.length > 0) {
-optionsHTML += `
-<div class="mt-4">
-<label for="color-select" class="block mb-2 text-sm font-bold text-gray-700">${translations[currentLang].label_color}:</label>
-<select id="color-select" class="w-full p-2 border rounded-md text-gray-800">
-${availableColors.map(color => `<option value="${color}">${color}</option>`).join('')}
-</select>
-</div>`;
-}
-if (availableSizes.length > 0) {
-optionsHTML += `
-<div class="mt-4">
-<label for="size-select" class="block mb-2 text-sm font-bold text-gray-700">${translations[currentLang].label_size}:</label>
-<select id="size-select" class="w-full p-2 border rounded-md text-gray-800">
-${availableSizes.map(size => `<option value="${size}">${size}</option>`).join('')}
-</select>
-</div>`;
-}
+    // 1. إنشاء مصفوفة لتجميع كل الصور القابلة للعرض كصور مصغرة
+    const allImages = [];
+    if (mainImageFile) allImages.push(mainImageFile);
 
-// -- تعديل --: جلب الصور الإضافية وإنشاء كود HTML الخاص بها
-    let descriptionImagesHTML = '<div class="mt-4 border-t pt-4">';
+    // 2. إضافة الصور الإضافية img1, img2, img3 إلى المصفوفة
     const img1 = product.get('img1');
     const img2 = product.get('img2');
     const img3 = product.get('img3');
-
-    if (img1) {
-        descriptionImagesHTML += `<img src="${img1.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 1">`;
+    if (img1) allImages.push(img1);
+    if (img2) allImages.push(img2);
+    if (img3) allImages.push(img3);
+    
+    // 3. إضافة صور مصفوفة 'photos' إن وجدت
+    const photosArray = product.get('photos') || [];
+    if (Array.isArray(photosArray)) {
+        photosArray.forEach(photo => allImages.push(photo));
     }
-    if (img2) {
-        descriptionImagesHTML += `<img src="${img2.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 2">`;
+
+    // 4. إنشاء كود HTML للصور المصغرة من المصفوفة المجمعة
+    let thumbnailsHTML = '';
+    allImages.forEach(imgFile => {
+        if (imgFile && typeof imgFile.url === 'function') {
+            // أضفنا class جديد 'thumbnail-img' لسهولة الاستهداف
+            thumbnailsHTML += `<img src="${imgFile.url()}" class="thumbnail-img w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500 rounded-md">`;
+        }
+    });
+    // --- تعديل: نهاية منطقة تجميع كل الصور ---
+
+    // منطق جلب خيارات اللون والحجم (لا تغيير هنا)
+    const availableColors = product.get('availableColors') || [];
+    const availableSizes = product.get('availableSizes') || [];
+    let optionsHTML = '';
+    if (availableColors.length > 0) {
+        optionsHTML += `
+        <div class="mt-4">
+            <label for="color-select" class="block mb-2 text-sm font-bold text-gray-700">${translations[currentLang].label_color}:</label>
+            <select id="color-select" class="w-full p-2 border rounded-md text-gray-800">${availableColors.map(c => `<option value="${c}">${c}</option>`).join('')}</select>
+        </div>`;
     }
-    if (img3) {
-        descriptionImagesHTML += `<img src="${img3.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 3">`;
+    if (availableSizes.length > 0) {
+        optionsHTML += `
+        <div class="mt-4">
+            <label for="size-select" class="block mb-2 text-sm font-bold text-gray-700">${translations[currentLang].label_size}:</label>
+            <select id="size-select" class="w-full p-2 border rounded-md text-gray-800">${availableSizes.map(s => `<option value="${s}">${s}</option>`).join('')}</select>
+        </div>`;
     }
-    descriptionImagesHTML += '</div>';
 
+    // منطق جلب التقييمات (لا تغيير هنا)
+    const Ratings = Parse.Object.extend("Ratings");
+    const query = new Parse.Query(Ratings);
+    query.equalTo("productsy", product);
+    query.include("guest");
+    query.descending("createdAt");
+    let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
+    try {
+        const reviews = await query.find();
+        if (reviews.length === 0) {
+            reviewsHTML += `<p class="text-gray-500">${translations[currentLang].no_reviews}</p>`;
+        } else {
+            reviews.forEach(review => {
+                const user = review.get("guest");
+                const username = user ? (user.get("name") || user.get("username")) : "مستخدم";
+                const stars = review.get("stars");
+                const comment = review.get("comment");
+                let reviewStars = '';
+                for (let i = 1; i <= 5; i++) { reviewStars += `<i class="fa-solid fa-star ${i <= stars ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
+                reviewsHTML += `<div class="p-3 bg-gray-100 rounded-lg"><p class="font-semibold text-gray-800">${username}</p><div class="my-1" dir="ltr">${reviewStars}</div><p class="text-gray-700">${comment}</p></div>`;
+            });
+        }
+    } catch(e) {
+        reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
+    }
+    reviewsHTML += `</div></div>`;
+    
+    // بناء النافذة النهائية
+    const modalHTML = `
+    <div class="flex flex-col md:flex-row gap-6">
+        <div class="md:w-1/2">
+            <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-80 object-contain">
+            <div class="flex gap-2 justify-center flex-wrap">${thumbnailsHTML}</div>
+        </div>
+        <div class="md:w-1/2 text-right">
+            <h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2>
+            <div class="text-gray-600 mb-4">${description || ''}</div>
+            <p class="text-3xl font-bold text-blue-600 my-6">$${price.toFixed(2)}</p>
+            ${optionsHTML}
+            <button id="add-to-cart-modal-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mt-6">${translations[currentLang].add_to_cart}</button>
+            <button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 mt-2">${translations[currentLang].write_review}</button>
+        </div>
+    </div>` + reviewsHTML;
 
-const Ratings = Parse.Object.extend("Ratings");
-const query = new Parse.Query(Ratings);
-query.equalTo("productsy", product);
-query.include("guest");
-query.descending("createdAt");
-let reviewsHTML = `<div class="mt-8 pt-4 border-t border-gray-200"><h3 class="font-bold text-lg mb-2 text-gray-800">${translations[currentLang].reviews}</h3><div id="reviews-list" class="max-h-48 overflow-y-auto space-y-4">`;
-try {
-const reviews = await query.find();
-if (reviews.length === 0) {
-reviewsHTML += `<p class="text-gray-500">${translations[currentLang].no_reviews}</p>`;
-} else {
-reviews.forEach(review => {
-const user = review.get("guest");
-const username = user ? (user.get("name") || user.get("username")) : "مستخدم";
-const stars = review.get("stars");
-const comment = review.get("comment");
-let reviewStars = '';
-for (let i = 1; i <= 5; i++) { reviewStars += `<i class="fa-solid fa-star ${i <= stars ? 'text-yellow-400' : 'text-gray-300'}"></i>`; }
-reviewsHTML += `<div class="p-3 bg-gray-100 rounded-lg"><p class="font-semibold text-gray-800">${username}</p><div class="my-1" dir="ltr">${reviewStars}</div><p class="text-gray-700">${comment}</p></div>`;
-});
-}
-} catch(e) {
-reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
-}
-reviewsHTML += `</div></div>`;
+    Swal.fire({
+        html: modalHTML,
+        width: '800px',
+        showConfirmButton: false,
+        showCloseButton: true,
+        didOpen: () => {
+            // --- تعديل: إضافة منطق النقر على الصور المصغرة ---
+            const mainImage = document.getElementById('main-product-image');
+            // استهداف الصور المصغرة باستخدام الكلاس الجديد
+            document.querySelectorAll('.thumbnail-img').forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    // تغيير مصدر الصورة الرئيسية إلى مصدر الصورة المصغرة التي تم النقر عليها
+                    mainImage.src = thumb.src;
+                });
+            });
 
-// -- تعديل --: إضافة متغير الصور الإضافية إلى modalHTML
-const modalHTML = `
-<div class="flex flex-col md:flex-row gap-6">
-    <div class="md:w-1/2">
-        <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain">
-        <div class="flex gap-2 justify-center">${thumbnailsHTML}</div>
-    </div>
-    <div class="md:w-1/2 text-right">
-        <h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2>
-        <div class="text-gray-600 mb-4">${description || ''}</div>
-        
-        ${descriptionImagesHTML}
-        
-        <p class="text-3xl font-bold text-blue-600 my-6">$${price.toFixed(2)}</p>
-        ${optionsHTML}
-        <button id="add-to-cart-modal-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mt-6">${translations[currentLang].add_to_cart}</button>
-        <button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 mt-2">${translations[currentLang].write_review}</button>
-    </div>
-</div>` + reviewsHTML;
-
-Swal.fire({
-html: modalHTML,
-width: '800px',
-showConfirmButton: false,
-showCloseButton: true,
-didOpen: () => {
-const mainImage = document.getElementById('main-product-image');
-document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => {
-thumb.addEventListener('click', () => { mainImage.src = thumb.src; });
-});
-document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product));
-document.getElementById('add-to-cart-modal-btn').addEventListener('click', () => {
-const selectedColor = document.getElementById('color-select')?.value;
-const selectedSize = document.getElementById('size-select')?.value;
-promptForQuantity(product, selectedColor, selectedSize);
-});
-}
-});
+            document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product));
+            document.getElementById('add-to-cart-modal-btn').addEventListener('click', () => {
+                const selectedColor = document.getElementById('color-select')?.value;
+                const selectedSize = document.getElementById('size-select')?.value;
+                promptForQuantity(product, selectedColor, selectedSize);
+            });
+        }
+    });
 }
 
 async function promptForReview(product) {
