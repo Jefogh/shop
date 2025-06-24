@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المحفظة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; color: #1f2937; }
+        .payment-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .payment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <nav class="bg-gray-900 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="main.html" class="text-2xl font-bold">المتجر</a>
+            <a href="main.html" class="text-sm hover:underline">العودة للمتجر الرئيسي</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4 sm:p-8">
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8 text-center">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">رصيد محفظتي</h1>
+            <p id="wallet-balance-display" class="text-4xl font-extrabold text-blue-600">جارِ التحميل...</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">تغذية الرصيد</h2>
+            <p class="text-gray-600 mb-6">اختر إحدى الطرق التالية لإضافة رصيد إلى محفظتك. بعد التحويل، يرجى رفع صورة الإشعار.</p>
+            <div id="payment-methods-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">سجل طلبات التغذية</h2>
+            <div id="deposit-history-container" class="space-y-4">
+                </div>
+        </div>
+    </main>
+
+    <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
+        Parse.serverURL = "https://parseapi.back4app.com/";
+
+        const currentUser = Parse.User.current();
+        if (!currentUser) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const balanceDisplay = document.getElementById('wallet-balance-display');
+        const methodsContainer = document.getElementById('payment-methods-container');
+        const historyContainer = document.getElementById('deposit-history-container');
+
+        async function fetchUserWallet() {
+            try {
+                const user = await currentUser.fetch();
+                const balance = user.get('walletBalance') || 0;
+                balanceDisplay.textContent = `$${balance.toFixed(2)}`;
+            } catch (error) {
+                console.error("Error fetching wallet:", error);
+                balanceDisplay.textContent = "خطأ في التحميل";
+            }
+        }
+
+        async function loadPaymentMethods() {
+            methodsContainer.innerHTML = '<p>جارِ تحميل طرق الدفع...</p>';
+            const PaymentMethod = Parse.Object.extend("PaymentMethods");
+            const query = new Parse.Query(PaymentMethod);
+            query.equalTo("isActive", true);
+            try {
+                const methods = await query.find();
+                methodsContainer.innerHTML = '';
+                methods.forEach(method => {
+                    const logoUrl = method.get('logo') ? method.get('logo').url() : 'https://via.placeholder.com/100';
+                    const card = document.createElement('div');
+                    card.className = 'payment-card bg-gray-50 p-4 rounded-lg text-center cursor-pointer';
+                    card.innerHTML = `
+                        <img src="${logoUrl}" alt="${method.get('methodName_ar')}" class="h-16 w-auto mx-auto mb-4">
+                        <h3 class="font-bold text-gray-800">${method.get('methodName_ar')}</h3>
+                    `;
+                    card.addEventListener('click', () => promptForDeposit(method));
+                    methodsContainer.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Error loading payment methods:", error);
+                methodsContainer.innerHTML = '<p class="text-red-500">فشل تحميل طرق الدفع.</p>';
+            }
+        }
+
+        async function promptForDeposit(method) {
+            const formHTML = `
+                <div class="text-right p-2 space-y-4">
+                    <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded">
+                         <p class="font-bold">تعليمات التحويل:</p>
+                         <p>${method.get('instructions_ar')}</p>
+                    </div>
+                    <div>
+                        <label for="amount" class="font-bold text-gray-700">المبلغ المحوّل (بالدولار):</label>
+                        <input id="amount" type="number" step="0.01" class="swal2-input w-full" placeholder="0.00" required>
+                    </div>
+                    <div>
+                        <label for="receipt" class="font-bold text-gray-700">إشعار التحويل (صورة):</label>
+                        <input id="receipt" type="file" accept="image/*" class="swal2-file w-full" required>
+                    </div>
+                </div>`;
+
+            const { value: formValues } = await Swal.fire({
+                title: `تغذية عبر ${method.get('methodName_ar')}`,
+                html: formHTML,
+                confirmButtonText: 'تأكيد إرسال الطلب',
+                showCancelButton: true,
+                cancelButtonText: 'إلغاء',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const amount = document.getElementById('amount').value;
+                    const receiptFile = document.getElementById('receipt').files[0];
+                    if (!amount || !receiptFile) {
+                        Swal.showValidationMessage('الرجاء إدخال المبلغ ورفع صورة الإشعار');
+                        return false;
+                    }
+                    if (parseFloat(amount) <= 0) {
+                        Swal.showValidationMessage('الرجاء إدخال مبلغ صحيح');
+                        return false;
+                    }
+                    return { amount: parseFloat(amount), receiptFile };
+                }
+            });
+
+            if (formValues) {
+                Swal.fire({ title: 'جارِ رفع طلبك...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                const { amount, receiptFile } = formValues;
+                const receipt = new Parse.File(receiptFile.name, receiptFile);
+                
+                const DepositRequest = Parse.Object.extend("DepositRequests");
+                const request = new DepositRequest();
+                request.set("user", currentUser);
+                request.set("amount", amount);
+                request.set("paymentMethod", method);
+                request.set("receiptImage", receipt);
+                request.set("status", "Pending");
+
+                try {
+                    await request.save();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم استلام طلبك بنجاح!',
+                        text: 'سيتم مراجعة طلبك وإضافة الرصيد إلى محفظتك خلال 24-48 ساعة عمل.',
+                    });
+                    loadDepositHistory(); // Refresh history
+                } catch (error) {
+                    console.error("Error creating deposit request:", error);
+                    Swal.fire('خطأ!', 'فشل إرسال طلبك. الرجاء المحاولة مرة أخرى.', 'error');
+                }
+            }
+        }
+
+        async function loadDepositHistory() {
+            historyContainer.innerHTML = '<p>جارِ تحميل السجل...</p>';
+            const DepositRequest = Parse.Object.extend("DepositRequests");
+            const query = new Parse.Query(DepositRequest);
+            query.equalTo("user", currentUser);
+            query.descending("createdAt");
+            try {
+                const requests = await query.find();
+                if (requests.length === 0) {
+                    historyContainer.innerHTML = '<p class="text-gray-500">لا يوجد سجلات لعرضها.</p>';
+                    return;
+                }
+                historyContainer.innerHTML = '';
+                requests.forEach(req => {
+                    const status = req.get('status');
+                    let statusColor = 'bg-gray-400';
+                    if (status === 'Pending') statusColor = 'bg-yellow-400';
+                    if (status === 'Approved') statusColor = 'bg-green-500';
+                    if (status === 'Rejected') statusColor = 'bg-red-500';
+
+                    const requestDiv = document.createElement('div');
+                    requestDiv.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-md';
+                    requestDiv.innerHTML = `
+                        <div>
+                            <p class="font-bold text-gray-800">طلب بقيمة $${req.get('amount').toFixed(2)}</p>
+                            <p class="text-sm text-gray-500">${new Date(req.get('createdAt')).toLocaleString()}</p>
+                        </div>
+                        <span class="status-badge ${statusColor}">${status}</span>
+                    `;
+                    historyContainer.appendChild(requestDiv);
+                });
+            } catch (error) {
+                 console.error("Error loading deposit history:", error);
+                historyContainer.innerHTML = '<p class="text-red-500">فشل تحميل السجل.</p>';
+            }
+        }
+
+        // --- Initial Load ---
+        fetchUserWallet();
+        loadPaymentMethods();
+        loadDepositHistory();
+    });
+    </script>
+</body>
+</html>
