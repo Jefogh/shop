@@ -1306,7 +1306,7 @@ catch (error) { console.error("Logout failed:", error); alert(`Logout failed: ${
 });
 }
 });
-const walletLinks = [document.querySelector('a[href="wallet.html"]'), document.querySelector('#mobile-menu a[href="bank.html"]')];
+const walletLinks = [document.querySelector('a[href="wallet.html"]'), document.querySelector('#mobile-menu a[href="wallet.html"]')];
 
 if (!currentUser) {
 logoutButtons.forEach(btn => btn.style.display = 'none');
