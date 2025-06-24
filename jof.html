@@ -12,13 +12,16 @@
     <style>
         body { font-family: 'Tajawal', sans-serif; background-color: #f3f4f6; }
         .swal2-container { z-index: 9999; }
-        .tab-button { padding: 0.5rem 1rem; border-bottom: 2px solid transparent; font-weight: 500; color: #4b5563; transition: all 0.2s; }
+        .tab-button { padding: 0.5rem 1rem; border-bottom: 2px solid transparent; font-weight: 500; color: #4b5563; transition: all 0.2s; white-space: nowrap; }
         .tab-button.active, .tab-button:hover { border-color: #3b82f6; color: #3b82f6; }
+        td, th { vertical-align: middle; text-align: right; }
     </style>
 </head>
 <body class="bg-gray-100">
 
-    <div id="auth-gate" class="flex items-center justify-center h-screen"><p class="text-gray-600 text-lg">جارِ التحقق من الصلاحيات...</p></div>
+    <div id="auth-gate" class="flex items-center justify-center h-screen">
+        <p class="text-gray-600 text-lg">جارِ التحقق من الصلاحيات...</p>
+    </div>
 
     <div id="admin-panel" class="hidden">
         <header class="bg-white shadow">
@@ -42,7 +45,7 @@
             <div id="requests-tab" class="tab-content">
                  <h2 class="text-xl font-semibold text-gray-700 mb-4">طلبات التغذية المعلقة</h2>
                  <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500">
+                    <table class="w-full text-sm text-gray-500">
                          <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">المستخدم</th><th class="px-6 py-3">المبلغ</th><th class="px-6 py-3">الإشعار</th><th class="px-6 py-3">التاريخ</th><th class="px-6 py-3">إجراء</th></tr></thead>
                         <tbody id="requests-table-body"></tbody>
                     </table>
@@ -55,7 +58,7 @@
                     <button id="add-method-btn" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"><i class="fas fa-plus mr-2"></i>إضافة طريقة دفع</button>
                 </div>
                 <div class="bg-white p-4 rounded-lg shadow overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500">
+                    <table class="w-full text-sm text-gray-500">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-6 py-3">الشعار</th><th class="px-6 py-3">الاسم (EN)</th><th class="px-6 py-3">الحالة</th><th class="px-6 py-3">إجراءات</th></tr></thead>
                         <tbody id="methods-table-body"></tbody>
                     </table>
@@ -66,18 +69,20 @@
 
     <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', () => {
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
 
+        // --- DOM ELEMENTS (Defined early to prevent ReferenceError) ---
         const authGate = document.getElementById('auth-gate');
         const adminPanel = document.getElementById('admin-panel');
         const requestsTableBody = document.getElementById('requests-table-body');
         const methodsTableBody = document.getElementById('methods-table-body');
 
-        // --- AUTH & INIT ---
+        // --- AUTHENTICATION AND PERMISSION CHECK ---
         async function checkPermissions() {
-            if (!Parse.User.current()) {
+            const currentUser = Parse.User.current();
+            if (!currentUser) {
                 Swal.fire({ title: 'غير مصرح به', text: 'يجب عليك تسجيل الدخول أولاً.', icon: 'error', allowOutsideClick: false }).then(() => { window.location.href = 'index.html'; });
                 return;
             }
@@ -87,20 +92,25 @@
                     authGate.style.display = 'none';
                     adminPanel.style.display = 'block';
                     initializePanel();
-                } else { throw new Error("User is not an admin."); }
+                } else {
+                    throw new Error("User is not an admin.");
+                }
             } catch (error) {
+                console.error("Permission check failed:", error);
                 Swal.fire({ title: 'فشل الوصول', text: 'ليس لديك الصلاحيات اللازمة.', icon: 'error', allowOutsideClick: false }).then(() => { window.location.href = 'main.html'; });
             }
         }
 
+        // --- INITIALIZATION ---
         function initializePanel() {
             setupTabs();
             setupEventListeners();
-            loadDepositRequests();
+            loadDepositRequests(); // Load initial tab
         }
 
+        // --- TAB MANAGEMENT ---
         function setupTabs() {
-             document.querySelectorAll('.tab-button').forEach(tab => {
+            document.querySelectorAll('.tab-button').forEach(tab => {
                 tab.addEventListener('click', (e) => {
                     const tabName = e.currentTarget.dataset.tab;
                     document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
@@ -112,12 +122,13 @@
                 });
             });
         }
-
-        // --- DATA LOADING ---
+        
+        // --- DATA LOADING HELPERS ---
         const renderLoading = (tbody, colspan) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">جارِ التحميل...</td></tr>`; };
-        const renderError = (tbody, colspan) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4 text-red-500">فشل تحميل البيانات.</td></tr>`; };
+        const renderError = (tbody, colspan, error) => { console.error(error); tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4 text-red-500">فشل تحميل البيانات. تأكد من صلاحيات الوصول.</td></tr>`; };
         const renderEmpty = (tbody, colspan, message) => { tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center p-4">${message}</td></tr>`; };
 
+        // --- DATA LOADING FUNCTIONS ---
         async function loadDepositRequests() {
             renderLoading(requestsTableBody, 5);
             const DepositRequest = Parse.Object.extend("DepositRequests");
@@ -128,6 +139,7 @@
             try {
                 const requests = await query.find();
                 if (requests.length === 0) return renderEmpty(requestsTableBody, 5, "لا توجد طلبات تغذية معلقة.");
+                
                 const rowsHTML = requests.map(req => {
                     const user = req.get('user');
                     const receiptImage = req.get('receiptImage');
@@ -144,7 +156,7 @@
                         </tr>`;
                 }).join('');
                 requestsTableBody.innerHTML = rowsHTML;
-            } catch (e) { renderError(requestsTableBody, 5); }
+            } catch (e) { renderError(requestsTableBody, 5, e); }
         }
 
         async function loadPaymentMethods() {
@@ -155,9 +167,10 @@
             try {
                 const methods = await query.find();
                 if (methods.length === 0) return renderEmpty(methodsTableBody, 4, "لم يتم إضافة طرق دفع بعد.");
-                 const rowsHTML = methods.map(m => `
+                
+                const rowsHTML = methods.map(m => `
                     <tr class="bg-white border-b">
-                        <td class="px-6 py-4"><img src="${m.get('logo') ? m.get('logo').url() : ''}" class="h-10 w-auto"></td>
+                        <td class="px-6 py-4"><img src="${m.get('logo') ? m.get('logo').url() : ''}" class="h-10 w-auto bg-gray-200 p-1 rounded"></td>
                         <td class="px-6 py-4">${m.get('methodName_en')}</td>
                         <td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${m.get('isActive') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${m.get('isActive') ? 'نشط' : 'غير نشط'}</span></td>
                         <td class="px-6 py-4 space-x-2 space-x-reverse">
@@ -165,7 +178,7 @@
                         </td>
                     </tr>`).join('');
                 methodsTableBody.innerHTML = rowsHTML;
-            } catch (e) { renderError(methodsTableBody, 4); }
+            } catch (e) { renderError(methodsTableBody, 4, e); }
         }
         
         // --- EVENT HANDLING ---
@@ -182,7 +195,7 @@
             if (!requestId) return;
 
             if (target.matches('.approve-request-btn')) {
-                const { isConfirmed } = await Swal.fire({ title: 'تأكيد الموافقة', text: 'هل أنت متأكد من أنك تريد الموافقة على هذا الطلب وإضافة الرصيد للمستخدم؟', icon: 'question', showCancelButton: true, confirmButtonText: 'نعم، موافق!', cancelButtonText: 'إلغاء' });
+                const { isConfirmed } = await Swal.fire({ title: 'تأكيد الموافقة', text: 'هل أنت متأكد من الموافقة على هذا الطلب وإضافة الرصيد للمستخدم؟', icon: 'question', showCancelButton: true, confirmButtonText: 'نعم، موافق!', cancelButtonText: 'إلغاء' });
                 if (isConfirmed) {
                     Swal.fire({ title: 'جارِ المعالجة...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     try {
@@ -192,7 +205,7 @@
                     } catch (err) { Swal.fire('خطأ', `فشلت العملية: ${err.message}`, 'error'); }
                 }
             } else if (target.matches('.reject-request-btn')) {
-                const { isConfirmed } = await Swal.fire({ title: 'تأكيد الرفض', text: 'هل أنت متأكد من أنك تريد رفض هذا الطلب؟', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'نعم، ارفض الطلب!', cancelButtonText: 'إلغاء' });
+                const { isConfirmed } = await Swal.fire({ title: 'تأكيد الرفض', text: 'هل أنت متأكد من رفض هذا الطلب؟', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'نعم، ارفض الطلب!', cancelButtonText: 'إلغاء' });
                  if (isConfirmed) {
                     Swal.fire({ title: 'جارِ المعالجة...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     try {
@@ -210,8 +223,16 @@
             if (!methodId) return;
 
             if (target.matches('.delete-method-btn')) {
-                // ... Delete logic can be implemented here ...
-                Swal.fire('قيد التطوير', 'سيتم إضافة هذه الميزة قريباً.', 'info');
+                const { isConfirmed } = await Swal.fire({ title: 'هل أنت متأكد؟', text: 'سيتم حذف طريقة الدفع هذه نهائياً!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'نعم، احذفها!', cancelButtonText: 'إلغاء' });
+                if(isConfirmed) {
+                    const Method = Parse.Object.extend("PaymentMethods");
+                    const method = Method.createWithoutData(methodId);
+                    try {
+                        await method.destroy();
+                        Swal.fire('تم الحذف!', 'تم حذف طريقة الدفع.', 'success');
+                        loadPaymentMethods();
+                    } catch(err) { Swal.fire('خطأ', 'فشل حذف طريقة الدفع.', 'error'); }
+                }
             }
         }
         
@@ -219,14 +240,14 @@
             Swal.fire({
                 title: 'إضافة طريقة دفع جديدة',
                 html: `
-                    <div class="text-right space-y-2">
+                    <div class="text-right space-y-4 p-2">
                         <input id="methodName_ar" class="swal2-input" placeholder="اسم الطريقة (عربي)">
                         <input id="methodName_en" class="swal2-input" placeholder="Method Name (English)">
                         <textarea id="instructions_ar" class="swal2-textarea" placeholder="التعليمات (عربي)"></textarea>
                         <textarea id="instructions_en" class="swal2-textarea" placeholder="Instructions (English)"></textarea>
-                        <p class="text-sm">شعار الشركة:</p>
-                        <input id="logoFile" type="file" class="swal2-file" accept="image/*">
-                         <div class="flex items-center"><input type="checkbox" id="isActive" class="swal2-checkbox mr-2"><label for="isActive">تفعيل طريقة الدفع هذه؟</label></div>
+                        <div class="text-gray-600"><p class="text-sm">شعار الشركة:</p>
+                        <input id="logoFile" type="file" class="swal2-file" accept="image/*"></div>
+                        <div class="flex items-center justify-center"><input type="checkbox" id="isActive" class="swal2-checkbox mr-2"><label for="isActive" class="text-gray-600">تفعيل طريقة الدفع هذه؟</label></div>
                     </div>`,
                 showCancelButton: true, confirmButtonText: 'إضافة', cancelButtonText: 'إلغاء',
                 preConfirm: async () => {
