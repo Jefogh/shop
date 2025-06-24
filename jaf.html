@@ -199,7 +199,6 @@
         }
     }
 
-    // -- تعديل --: تم تحديث النموذج ليشمل الصور الفرعية
     async function showProductForm(product) {
         const isEditing = product !== null;
         const title = isEditing ? 'تعديل المنتج' : 'إضافة منتج جديد';
@@ -247,7 +246,6 @@
                 availableColors: document.getElementById('availableColors').value.split(',').map(s => s.trim()).filter(Boolean),
                 availableSizes: document.getElementById('availableSizes').value.split(',').map(s => s.trim()).filter(Boolean),
                 imageFile: document.getElementById('imageFile').files[0],
-                // -- تعديل --: قراءة بيانات الصور الفرعية
                 img1: document.getElementById('img1').files[0], 
                 img2: document.getElementById('img2').files[0], 
                 img3: document.getElementById('img3').files[0]
@@ -256,25 +254,21 @@
         if (formValues) saveProduct(product, formValues);
     }
 
-    // -- تعديل --: تم تحديث دالة الحفظ لتدعم رفع كل الصور
+    // -- تعديل --: تم تحسين معالجة الأخطاء هنا
     async function saveProduct(product, data) {
         Swal.fire({ title: 'جارِ الحفظ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const Product = Parse.Object.extend("Things");
         const productToSave = product ? product : new Product();
         try {
             const uploadPromises = [];
-            // قائمة بأسماء حقول الملفات لتسهيل العملية
             ['imageFile', 'img1', 'img2', 'img3'].forEach(fieldName => {
                 if (data[fieldName]) {
                     const file = new Parse.File(data[fieldName].name, data[fieldName]);
-                    // كل عملية رفع هي promise نضيفها للمصفوفة
                     uploadPromises.push(file.save().then(savedFile => productToSave.set(fieldName, savedFile)));
                 }
             });
-            // انتظار انتهاء جميع عمليات الرفع معاً
             await Promise.all(uploadPromises);
             
-            // تعيين باقي البيانات بعد التأكد من رفع الصور
             Object.keys(data).forEach(key => {
                 if (!key.toLowerCase().includes('file') && !key.toLowerCase().includes('img')) {
                     productToSave.set(key, data[key]);
@@ -285,7 +279,13 @@
             Swal.fire('تم الحفظ!', 'تم حفظ المنتج بنجاح.', 'success');
             loadProducts();
         } catch (error) {
-            Swal.fire('خطأ!', `فشل حفظ المنتج: ${error.message}`, 'error');
+            console.error('خطأ في حفظ المنتج:', error);
+            // كود Parse الخاص بـ "Object Not Found" هو 101
+            if (error.code === 101) {
+                Swal.fire('خطأ!', 'فشل الحفظ: المنتج الذي تحاول تعديله لم يعد موجوداً. ربما تم حذفه. يرجى تحديث الصفحة.', 'error');
+            } else {
+                Swal.fire('خطأ!', `فشل حفظ المنتج: ${error.message}`, 'error');
+            }
         }
     }
 
@@ -302,7 +302,7 @@
         }
     }
 
-    // --- 4. قسم إدارة الطلبات (مشترك ولا يحتاج تعديل) ---
+    // --- 4. قسم إدارة الطلبات (مشترك) ---
     async function loadOrders() {
         const tableBody = document.getElementById('orders-table-body');
         tableBody.innerHTML = '<tr><td colspan="6">جارِ تحميل الطلبات...</td></tr>';
