@@ -125,31 +125,36 @@
         }
 
         try {
+            // التحقق من أن المستخدم لديه دور "Admin"
             const adminRoleQuery = new Parse.Query(Parse.Role);
             adminRoleQuery.equalTo('name', 'Admin');
-            const adminRole = await adminRoleQuery.first({ useMasterKey: true }); // useMasterKey might be needed to query Roles
+            // -- تعديل --: تم حذف { useMasterKey: true } من هنا
+            const adminRole = await adminRoleQuery.first();
 
             if (!adminRole) {
-                loadingOverlay.innerHTML = '<div class="text-white text-xl">خطأ: دور "Admin" غير موجود.</div>';
+                loadingOverlay.innerHTML = '<div class="text-white text-xl">خطأ: دور "Admin" غير موجود أو لا يمكن الوصول إليه.</div>';
                 return;
             }
 
             const relation = adminRole.getUsers();
             const userInRoleQuery = relation.query();
             userInRoleQuery.equalTo('objectId', currentUser.id);
-            const userInRole = await userInRoleQuery.first({ useMasterKey: true });
+            // -- تعديل --: تم حذف { useMasterKey: true } من هنا
+            const userInRole = await userInRoleQuery.first();
             
             if (userInRole) {
+                // المستخدم هو مسؤول، اعرض لوحة التحكم
                 loadingOverlay.classList.add('hidden');
                 adminPanel.classList.remove('hidden');
                 initializeApp();
             } else {
+                // المستخدم ليس مسؤولاً، أعد توجيهه
                 loadingOverlay.innerHTML = '<div class="text-white text-xl">ليس لديك صلاحية الوصول.</div>';
                 setTimeout(() => window.location.href = 'main.html', 3000);
             }
         } catch (error) {
             console.error('خطأ أثناء التحقق من الصلاحيات:', error);
-            loadingOverlay.innerHTML = '<div class="text-white text-xl">حدث خطأ.</div>';
+            loadingOverlay.innerHTML = `<div class="text-white text-xl p-4">حدث خطأ أثناء التحقق من الصلاحيات. تأكد من تعديل أذونات جدول _Role في Back4App. <br> ${error.message}</div>`;
         }
     });
 
@@ -160,12 +165,10 @@
             window.location.href = 'index.html';
         });
         
-        // تحميل كل أقسام الإدارة
         loadLocalProducts();
         loadOrders();
         loadPolls();
 
-        // أزرار الإضافة
         document.getElementById('add-product-btn').addEventListener('click', () => showProductForm(null));
         document.getElementById('add-poll-btn').addEventListener('click', () => showPollForm(null));
     }
@@ -263,7 +266,7 @@
             });
             await Promise.all(uploadPromises);
             Object.keys(data).forEach(key => {
-                if (!key.toLowerCase().includes('file')) productToSave.set(key, data[key]);
+                if (!key.toLowerCase().includes('file') && !key.toLowerCase().includes('img')) productToSave.set(key, data[key]);
             });
             await productToSave.save();
             Swal.fire('تم الحفظ!', 'تم حفظ المنتج بنجاح.', 'success');
@@ -436,20 +439,27 @@
     async function togglePollStatus(pollId, currentStatus) {
         Swal.fire({ title: 'جارِ تحديث الحالة...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const Poll = Parse.Object.extend("Polls");
-        // Deactivate all other polls first
-        const deactivationQuery = new Parse.Query(Poll);
-        deactivationQuery.notEqualTo("objectId", pollId);
-        const pollsToDeactivate = await deactivationQuery.find();
-        pollsToDeactivate.forEach(p => p.set('isActive', false));
-        await Parse.Object.saveAll(pollsToDeactivate);
-        
-        // Now toggle the selected poll
-        const pollToToggle = await new Parse.Query(Poll).get(pollId);
-        pollToToggle.set('isActive', !currentStatus);
-        await pollToToggle.save();
-        
-        Swal.close();
-        loadPolls();
+        const query = new Parse.Query(Poll);
+        try {
+            if (!currentStatus) { // If we are activating this poll
+                // Deactivate all other polls first
+                const deactivationQuery = new Parse.Query(Poll);
+                deactivationQuery.notEqualTo("objectId", pollId);
+                const pollsToDeactivate = await deactivationQuery.find();
+                pollsToDeactivate.forEach(p => p.set('isActive', false));
+                await Parse.Object.saveAll(pollsToDeactivate);
+            }
+            
+            // Now toggle the selected poll
+            const pollToToggle = await query.get(pollId);
+            pollToToggle.set('isActive', !currentStatus);
+            await pollToToggle.save();
+            
+            Swal.close();
+            loadPolls();
+        } catch (error) {
+            Swal.fire('خطأ', 'فشل تحديث حالة الاستطلاع', 'error');
+        }
     }
     
     async function viewPollResults(pollId) {
@@ -498,21 +508,28 @@
     async function deletePoll(pollId) {
         if (!await Swal.fire({ title: 'هل أنت متأكد من حذف الاستطلاع؟', text: "سيتم حذف كل التصويتات المتعلقة به!", icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم، احذفه!', cancelButtonText: 'إلغاء' }).then(r => r.isConfirmed)) return;
         
-        const Poll = Parse.Object.extend("Polls");
-        const pollToDelete = Poll.createWithoutData(pollId);
+        Swal.fire({ title: 'جارِ الحذف...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        try {
+            const Poll = Parse.Object.extend("Polls");
+            const pollToDelete = Poll.createWithoutData(pollId);
 
-        // Delete associated votes first
-        const PollVote = Parse.Object.extend("PollVotes");
-        const voteQuery = new Parse.Query(PollVote);
-        voteQuery.equalTo('poll', pollToDelete);
-        const votes = await voteQuery.find();
-        await Parse.Object.destroyAll(votes);
-        
-        // Now delete the poll itself
-        await pollToDelete.destroy();
-        
-        Swal.fire('تم الحذف!', 'تم حذف الاستطلاع وتصويتاته.', 'success');
-        loadPolls();
+            // Delete associated votes first
+            const PollVote = Parse.Object.extend("PollVotes");
+            const voteQuery = new Parse.Query(PollVote);
+            voteQuery.equalTo('poll', pollToDelete);
+            const votes = await voteQuery.find();
+            if (votes.length > 0) {
+                await Parse.Object.destroyAll(votes);
+            }
+            
+            // Now delete the poll itself
+            await pollToDelete.destroy();
+            
+            Swal.fire('تم الحذف!', 'تم حذف الاستطلاع وتصويتاته.', 'success');
+            loadPolls();
+        } catch(error) {
+             Swal.fire('خطأ!', `فشل حذف الاستطلاع: ${error.message}`, 'error');
+        }
     }
 
     </script>
