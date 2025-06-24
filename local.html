@@ -531,26 +531,21 @@ ${availableSizes.map(size => `<option value="${size}">${size}</option>`).join(''
 }
 
 // -- تعديل --: جلب الصور الإضافية وإنشاء كود HTML الخاص بها
-let descriptionImagesHTML = '<div class="mt-4 border-t pt-4">';
-const img1 = product.get('img1');
-const img2 = product.get('img2');
-const img3 = product.get('img3');
+    let descriptionImagesHTML = '<div class="mt-4 border-t pt-4">';
+    const img1 = product.get('img1');
+    const img2 = product.get('img2');
+    const img3 = product.get('img3');
 
-if (img1) {
-    descriptionImagesHTML += `<img src="${img1.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 1">`;
-}
-if (img2) {
-    descriptionImagesHTML += `<img src="${img2.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 2">`;
-}
-if (img3) {
-    descriptionImagesHTML += `<img src="${img3.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 3">`;
-}
-descriptionImagesHTML += '</div>';
-
-// إذا لم يتم العثور على أي صور، اجعل المتغير فارغاً
-if (!img1 && !img2 && !img3) {
-    descriptionImagesHTML = '';
-}
+    if (img1) {
+        descriptionImagesHTML += `<img src="${img1.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 1">`;
+    }
+    if (img2) {
+        descriptionImagesHTML += `<img src="${img2.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 2">`;
+    }
+    if (img3) {
+        descriptionImagesHTML += `<img src="${img3.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 3">`;
+    }
+    descriptionImagesHTML += '</div>';
 
 
 const Ratings = Parse.Object.extend("Ratings");
