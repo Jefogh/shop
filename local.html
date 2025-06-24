@@ -253,7 +253,6 @@ alert_payment_success_title: "Payment Successful!", alert_payment_success_text: 
 alert_payment_fail: "Payment process failed.",
 confirm_receipt: "Confirm Receipt", confirm_receipt_title: "Confirm Order Receipt?", confirm_receipt_text: "This will confirm you have received the order. It will be hidden from this list.", confirm_receipt_button: "Yes, I Received It", archive_success_title: "Confirmed!", archive_success_text: "Receipt confirmed successfully.",
 poll_title: "Vote for the Next Design!", poll_no_active: "There are no active polls at the moment.", poll_submit_vote: "Submit Vote", poll_already_voted: "You have already voted in this poll.", poll_results: "Live Poll Results", poll_thank_you: "Thank you for voting!", poll_total_votes: "Votes", poll_login_required: "You must be logged in to vote.", poll_select_design: "Choose this Design", poll_select_option_error: "Please select at least one option to vote.",
-// -- تعديل --: إضافة مفاتيح ترجمة جديدة
 label_color: "Color", label_size: "Size"
 },
 ar: {
@@ -290,7 +289,6 @@ alert_payment_success_title: "تم الدفع بنجاح!", alert_payment_succes
 alert_payment_fail: "فشلت عملية الدفع.",
 confirm_receipt: "تأكيد الاستلام", confirm_receipt_title: "تأكيد استلام الطلب؟", confirm_receipt_text: "هذا سيؤكد استلامك للطلب. سيتم إخفاؤه من هذه القائمة.", confirm_receipt_button: "نعم، استلمته", archive_success_title: "تم التأكيد!", archive_success_text: "تم تأكيد الاستلام بنجاح.",
 poll_title: "صوّت للتصميم القادم!", poll_no_active: "لا يوجد استطلاعات رأي نشطة حالياً.", poll_submit_vote: "إرسال التصويت", poll_already_voted: "لقد قمت بالتصويت في هذا الاستطلاع مسبقاً.", poll_results: "نتائج التصويت الحية", poll_thank_you: "شكراً لتصويتك!", poll_total_votes: "أصوات", poll_login_required: "يجب تسجيل الدخول للتصويت.", poll_select_design: "اختر هذا التصميم", poll_select_option_error: "الرجاء اختيار تصميم واحد على الأقل للتصويت.",
-// -- تعديل --: إضافة مفاتيح ترجمة جديدة
 label_color: "اللون", label_size: "الحجم"
 },
 es: {
@@ -327,7 +325,6 @@ alert_payment_success_title: "¡Pago Exitoso!", alert_payment_success_text: "Se 
 alert_payment_fail: "El proceso de pago falló.",
 confirm_receipt: "Confirmar Recibo", confirm_receipt_title: "¿Confirmar la recepción del pedido?", confirm_receipt_text: "Esto confirmará que ha recibido el pedido. Se ocultará de esta lista.", confirm_receipt_button: "Sí, lo recibí", archive_success_title: "¡Confirmado!", archive_success_text: "Recepción confirmada con éxito.",
 poll_title: "Encuesta de la Comunidad", poll_no_active: "No hay encuestas activas en este momento.", poll_submit_vote: "Enviar Voto", poll_already_voted: "Ya has votado en esta encuesta.", poll_results: "Resultados de la Encuesta", poll_thank_you: "¡Gracias por votar!", poll_total_votes: "Votos Totales", poll_login_required: "Debes iniciar sesión para votar.", poll_select_design: "Elige este Diseño", poll_select_option_error: "Por favor, seleccione al menos una opción para votar.",
-// -- تعديل --: إضافة مفاتيح ترجمة جديدة
 label_color: "Color", label_size: "Tamaño"
 }
 };
@@ -375,8 +372,15 @@ loadingIndicator.style.display = 'block';
 productsGrid.innerHTML = '';
 const Product = Parse.Object.extend("Thingssy");
 const query = new Parse.Query(Product);
-// -- تعديل --: جلب الحقول الجديدة للألوان والأحجام
-query.select("name_ar", "name_en", "name_es", "description_ar", "description_en", "description_es", "category_ar", "category_en", "category_es", "price", "imageFile", "photos", "shippingTime", "averageRating", "ratingCount", "availableColors", "availableSizes","img1", "img2", "img3");
+// -- تعديل --: جلب كل الحقول المطلوبة بما في ذلك الصور الإضافية
+query.select(
+    "name_ar", "name_en", "name_es", 
+    "description_ar", "description_en", "description_es", 
+    "category_ar", "category_en", "category_es", 
+    "price", "imageFile", "photos", "shippingTime", 
+    "averageRating", "ratingCount", "availableColors", "availableSizes",
+    "img1", "img2", "img3"
+);
 try {
 const products = await query.find();
 productsCache = products;
@@ -469,7 +473,6 @@ card.innerHTML = `
 <button class="add-to-cart-btn bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition" data-product-id="${product.id}">${translations[lang].add_to_cart}</button>
 </div>
 </div>`;
-// -- تعديل --: زر الإضافة للسلة في البطاقة سيفتح دائماً تفاصيل المنتج أولاً
 card.querySelector('.add-to-cart-btn').addEventListener('click', e => { e.stopPropagation(); showProductDetails(product); });
 card.addEventListener('click', () => showProductDetails(product));
 productsGrid.appendChild(card);
@@ -490,7 +493,7 @@ document.getElementById('wallet-balance-mobile').textContent = '$0.00';
 }
 }
 
-// -- تعديل --: تم تعديل الدالة بالكامل لإضافة خيارات اللون والحجم
+// -- تعديل --: الدالة الآن تعرض الألوان والأحجام والصور الإضافية
 async function showProductDetails(product) {
 if (!product) return;
 const name = product.get(`name_${currentLang}`);
@@ -502,30 +505,9 @@ const photos = product.get('photos') || [];
 const photoArray = Array.isArray(photos) ? photos : [];
 let allImages = mainImageFile ? [mainImageFile, ...photoArray] : photoArray;
 let thumbnailsHTML = '';
-let descriptionImagesHTML = '<div class="mt-4 border-t pt-4">';
-const img1 = product.get('img1');
-const img2 = product.get('img2');
-const img3 = product.get('img3');
-
-if (img1) {
-    descriptionImagesHTML += `<img src="${img1.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 1">`;
-}
-if (img2) {
-    descriptionImagesHTML += `<img src="${img2.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 2">`;
-}
-if (img3) {
-    descriptionImagesHTML += `<img src="${img3.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 3">`;
-}
-descriptionImagesHTML += '</div>';
-
-// إذا لم يتم العثور على أي صور، اجعل المتغير فارغاً
-if (!img1 && !img2 && !img3) {
-    descriptionImagesHTML = '';
-}
-  
 allImages.forEach((imgFile) => { if (imgFile && typeof imgFile.url === 'function') { thumbnailsHTML += `<img src="${imgFile.url()}" class="w-16 h-16 object-cover cursor-pointer border-2 border-transparent hover:border-blue-500">`; }});
 
-// -- تعديل --: جلب وعرض خيارات اللون والحجم
+// منطق جلب خيارات اللون والحجم
 const availableColors = product.get('availableColors') || [];
 const availableSizes = product.get('availableSizes') || [];
 let optionsHTML = '';
@@ -547,6 +529,29 @@ ${availableSizes.map(size => `<option value="${size}">${size}</option>`).join(''
 </select>
 </div>`;
 }
+
+// -- تعديل --: جلب الصور الإضافية وإنشاء كود HTML الخاص بها
+let descriptionImagesHTML = '<div class="mt-4 border-t pt-4">';
+const img1 = product.get('img1');
+const img2 = product.get('img2');
+const img3 = product.get('img3');
+
+if (img1) {
+    descriptionImagesHTML += `<img src="${img1.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 1">`;
+}
+if (img2) {
+    descriptionImagesHTML += `<img src="${img2.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 2">`;
+}
+if (img3) {
+    descriptionImagesHTML += `<img src="${img3.url()}" class="w-full rounded-lg my-3 shadow-md" alt="صورة إضافية 3">`;
+}
+descriptionImagesHTML += '</div>';
+
+// إذا لم يتم العثور على أي صور، اجعل المتغير فارغاً
+if (!img1 && !img2 && !img3) {
+    descriptionImagesHTML = '';
+}
+
 
 const Ratings = Parse.Object.extend("Ratings");
 const query = new Parse.Query(Ratings);
@@ -573,37 +578,27 @@ reviewsHTML += `<div class="p-3 bg-gray-100 rounded-lg"><p class="font-semibold 
 reviewsHTML += `<p class="text-red-500">${translations[currentLang].alert_reviews_load_fail}</p>`;
 }
 reviewsHTML += `</div></div>`;
+
+// -- تعديل --: إضافة متغير الصور الإضافية إلى modalHTML
 const modalHTML = `
 <div class="flex flex-col md:flex-row gap-6">
     <div class="md:w-1/2">
-        </div>
+        <img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain">
+        <div class="flex gap-2 justify-center">${thumbnailsHTML}</div>
+    </div>
     <div class="md:w-1/2 text-right">
         <h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2>
-            
-        <div class="text-gray-600 mb-4">${description}</div>
-            
-        ${descriptionImagesHTML} 
-            
+        <div class="text-gray-600 mb-4">${description || ''}</div>
+        
+        ${descriptionImagesHTML}
+        
         <p class="text-3xl font-bold text-blue-600 my-6">$${price.toFixed(2)}</p>
         ${optionsHTML}
         <button id="add-to-cart-modal-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mt-6">${translations[currentLang].add_to_cart}</button>
         <button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 mt-2">${translations[currentLang].write_review}</button>
     </div>
 </div>` + reviewsHTML;
-<div class="flex flex-col md:flex-row gap-6">
-<div class="md:w-1/2">
-<img id="main-product-image" src="${mainImageUrl}" class="w-full rounded-lg mb-4 h-64 object-contain">
-<div class="flex gap-2 justify-center">${thumbnailsHTML}</div>
-</div>
-<div class="md:w-1/2 text-right">
-<h2 class="text-3xl font-bold mb-2 text-gray-800">${name}</h2>
-<p class="text-gray-600 mb-4">${description}</p>
-<p class="text-3xl font-bold text-blue-600 mb-6">$${price.toFixed(2)}</p>
-${optionsHTML}
-<button id="add-to-cart-modal-btn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 mt-6">${translations[currentLang].add_to_cart}</button>
-<button id="write-review-btn" class="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 mt-2">${translations[currentLang].write_review}</button>
-</div>
-</div>` + reviewsHTML;
+
 Swal.fire({
 html: modalHTML,
 width: '800px',
@@ -615,8 +610,6 @@ document.querySelectorAll('.swal2-container img.w-16').forEach(thumb => {
 thumb.addEventListener('click', () => { mainImage.src = thumb.src; });
 });
 document.getElementById('write-review-btn').addEventListener('click', () => promptForReview(product));
-
-// -- تعديل --: إضافة منطق لزر الإضافة للسلة داخل النافذة
 document.getElementById('add-to-cart-modal-btn').addEventListener('click', () => {
 const selectedColor = document.getElementById('color-select')?.value;
 const selectedSize = document.getElementById('size-select')?.value;
@@ -665,7 +658,6 @@ Swal.fire(translations[currentLang].alert_rating_submit_success_title, translati
 }
 }
 
-// -- تعديل --: الدالة الآن تقبل اللون والحجم
 async function promptForQuantity(product, selectedColor, selectedSize) {
 if(!currentUser) { Swal.fire(translations[currentLang].alert_warning_title, translations[currentLang].alert_must_login_to_add, 'warning'); return; }
 const { value: quantity } = await Swal.fire({
@@ -684,16 +676,13 @@ addToCart(product, parseInt(quantity), selectedColor, selectedSize);
 }
 }
 
-// -- تعديل --: تم تعديل الدالة بالكامل للتعامل مع اللون والحجم
 async function addToCart(product, quantityToAdd, selectedColor, selectedSize) {
 Swal.fire({ title: translations[currentLang].alert_adding_to_cart, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
 const Net = Parse.Object.extend("Net");
 const query = new Parse.Query(Net);
 query.equalTo("guest", currentUser);
-// -- تعديل --: التأكد من أن حقل الإشارة هو productsy
 query.equalTo("productsy", product);
 
-// -- تعديل --: البحث عن عنصر مطابق في السلة بناءً على المنتج واللون والحجم
 if (selectedColor) {
 query.equalTo("selectedColor", selectedColor);
 } else {
@@ -712,10 +701,8 @@ cartItem.increment("quantity", quantityToAdd);
 } else {
 cartItem = new Net();
 cartItem.set("guest", currentUser);
-// -- تعديل --: التأكد من أن حقل الإشارة هو productsy
 cartItem.set("productsy", product);
 cartItem.set("quantity", quantityToAdd);
-// -- تعديل --: حفظ اللون والحجم المختارين في السلة
 if (selectedColor) cartItem.set("selectedColor", selectedColor);
 if (selectedSize) cartItem.set("selectedSize", selectedSize);
 }
@@ -747,7 +734,6 @@ document.getElementById('cart-count').classList.add('hidden');
 } catch (error) { console.error("Error updating cart count:", error); }
 }
 
-// -- تعديل --: تم تعديل الدالة لعرض اللون والحجم في السلة
 async function showCartModal() {
 const Net = Parse.Object.extend("Net");
 const query = new Parse.Query(Net);
@@ -777,7 +763,6 @@ const quantity = item.get("quantity");
 const total = price * quantity;
 subtotal += total;
 
-// -- تعديل --: جلب وعرض اللون والحجم
 const color = item.get("selectedColor");
 const size = item.get("selectedSize");
 let detailsHTML = '';
@@ -946,7 +931,6 @@ options
 }
 });
 }
-// -- تعديل --: تم تعديل الدالة لحفظ اللون والحجم في الطلب النهائي
 async function processOrder(totalCost, cartItems, shippingDetails, location) {
 Swal.fire({ title: translations[currentLang].alert_processing_payment, allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 try {
@@ -958,7 +942,6 @@ return;
 }
 const Order = Parse.Object.extend("Orders");
 const order = new Order();
-// -- تعديل --: إضافة اللون والحجم إلى snapshot الخاص بالطلب
 const itemsSnapshot = cartItems.map(item => {
 const productObject = item.get("product") || item.get("productsy");
 if (!productObject) return null;
