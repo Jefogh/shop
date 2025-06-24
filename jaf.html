@@ -60,8 +60,7 @@
                             <th>إجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="polls-table-body">
-                        </tbody>
+                    <tbody id="polls-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -81,8 +80,7 @@
                             <th>إجراءات</th>
                         </tr>
                     </thead>
-                    <tbody id="products-table-body">
-                        </tbody>
+                    <tbody id="products-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -101,8 +99,7 @@
                             <th>تغيير الحالة</th>
                         </tr>
                     </thead>
-                    <tbody id="orders-table-body">
-                        </tbody>
+                    <tbody id="orders-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -110,7 +107,7 @@
 
     <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
     <script>
-    // --- 1. الإعداد والتحقق من الأمان (لا تغيير هنا) ---
+    // --- 1. الإعداد والتحقق من الأمان ---
     document.addEventListener('DOMContentLoaded', async () => {
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
@@ -160,7 +157,7 @@
             window.location.href = 'index.html';
         });
         
-        loadProducts(); // تعديل اسم الدالة
+        loadProducts();
         loadOrders();
         loadPolls();
 
@@ -172,7 +169,6 @@
     async function loadProducts() {
         const tableBody = document.getElementById('products-table-body');
         tableBody.innerHTML = '<tr><td colspan="4">جارِ تحميل المنتجات...</td></tr>';
-        // تعديل: استهداف جدول Things
         const Product = Parse.Object.extend("Things"); 
         const query = new Parse.Query(Product);
         query.descending("createdAt");
@@ -203,6 +199,7 @@
         }
     }
 
+    // -- تعديل --: تم تحديث النموذج ليشمل الصور الفرعية
     async function showProductForm(product) {
         const isEditing = product !== null;
         const title = isEditing ? 'تعديل المنتج' : 'إضافة منتج جديد';
@@ -210,17 +207,15 @@
             title: title,
             html: `
                 <div class="text-right space-y-4 max-h-[70vh] overflow-y-auto pr-4">
-                    <h3 class="font-bold text-lg text-blue-600 border-b pb-2">اللغة العربية</h3>
+                    <h3 class="font-bold text-lg text-blue-600 border-b pb-2">بيانات اللغات</h3>
                     <div><label>الاسم (عربي):</label><input id="name_ar" class="form-input" value="${isEditing ? product.get('name_ar') || '' : ''}"></div>
                     <div><label>الوصف (عربي):</label><textarea id="description_ar" class="form-input">${isEditing ? product.get('description_ar') || '' : ''}</textarea></div>
                     <div><label>النوع (عربي):</label><input id="category_ar" class="form-input" value="${isEditing ? product.get('category_ar') || '' : ''}"></div>
-                    
-                    <h3 class="font-bold text-lg text-blue-600 border-b pb-2 mt-4">اللغة الإنجليزية</h3>
+                    <hr>
                     <div><label>الاسم (انجليزي):</label><input id="name_en" class="form-input" value="${isEditing ? product.get('name_en') || '' : ''}"></div>
                     <div><label>الوصف (انجليزي):</label><textarea id="description_en" class="form-input">${isEditing ? product.get('description_en') || '' : ''}</textarea></div>
                     <div><label>النوع (انجليزي):</label><input id="category_en" class="form-input" value="${isEditing ? product.get('category_en') || '' : ''}"></div>
-
-                    <h3 class="font-bold text-lg text-blue-600 border-b pb-2 mt-4">اللغة الإسبانية</h3>
+                    <hr>
                     <div><label>الاسم (اسباني):</label><input id="name_es" class="form-input" value="${isEditing ? product.get('name_es') || '' : ''}"></div>
                     <div><label>الوصف (اسباني):</label><textarea id="description_es" class="form-input">${isEditing ? product.get('description_es') || '' : ''}</textarea></div>
                     <div><label>النوع (اسباني):</label><input id="category_es" class="form-input" value="${isEditing ? product.get('category_es') || '' : ''}"></div>
@@ -233,10 +228,10 @@
                     <h3 class="font-bold text-lg text-blue-600 border-b pb-2 mt-4">الصور</h3>
                     <div><label>الصورة الرئيسية:</label><input id="imageFile" type="file" class="form-input"></div>
                     <div class="border-t pt-4 mt-4">
-                        <p class="font-bold text-gray-700">الصور الإضافية (في الوصف)</p>
-                        <div><label>صورة إضافية 1:</label><input id="img1" type="file" class="form-input"></div>
-                        <div><label>صورة إضافية 2:</label><input id="img2" type="file" class="form-input"></div>
-                        <div><label>صورة إضافية 3:</label><input id="img3" type="file" class="form-input"></div>
+                        <p class="font-bold text-gray-700">الصور الفرعية (تظهر في صفحة التفاصيل)</p>
+                        <div><label>صورة فرعية 1:</label><input id="img1" type="file" class="form-input"></div>
+                        <div><label>صورة فرعية 2:</label><input id="img2" type="file" class="form-input"></div>
+                        <div><label>صورة فرعية 3:</label><input id="img3" type="file" class="form-input"></div>
                     </div>
                 </div>
             `,
@@ -252,31 +247,40 @@
                 availableColors: document.getElementById('availableColors').value.split(',').map(s => s.trim()).filter(Boolean),
                 availableSizes: document.getElementById('availableSizes').value.split(',').map(s => s.trim()).filter(Boolean),
                 imageFile: document.getElementById('imageFile').files[0],
-                img1: document.getElementById('img1').files[0], img2: document.getElementById('img2').files[0], img3: document.getElementById('img3').files[0]
+                // -- تعديل --: قراءة بيانات الصور الفرعية
+                img1: document.getElementById('img1').files[0], 
+                img2: document.getElementById('img2').files[0], 
+                img3: document.getElementById('img3').files[0]
             })
         });
         if (formValues) saveProduct(product, formValues);
     }
 
+    // -- تعديل --: تم تحديث دالة الحفظ لتدعم رفع كل الصور
     async function saveProduct(product, data) {
         Swal.fire({ title: 'جارِ الحفظ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-        // تعديل: استهداف جدول Things
         const Product = Parse.Object.extend("Things");
         const productToSave = product ? product : new Product();
         try {
             const uploadPromises = [];
+            // قائمة بأسماء حقول الملفات لتسهيل العملية
             ['imageFile', 'img1', 'img2', 'img3'].forEach(fieldName => {
                 if (data[fieldName]) {
                     const file = new Parse.File(data[fieldName].name, data[fieldName]);
+                    // كل عملية رفع هي promise نضيفها للمصفوفة
                     uploadPromises.push(file.save().then(savedFile => productToSave.set(fieldName, savedFile)));
                 }
             });
+            // انتظار انتهاء جميع عمليات الرفع معاً
             await Promise.all(uploadPromises);
+            
+            // تعيين باقي البيانات بعد التأكد من رفع الصور
             Object.keys(data).forEach(key => {
                 if (!key.toLowerCase().includes('file') && !key.toLowerCase().includes('img')) {
                     productToSave.set(key, data[key]);
                 }
             });
+
             await productToSave.save();
             Swal.fire('تم الحفظ!', 'تم حفظ المنتج بنجاح.', 'success');
             loadProducts();
@@ -287,7 +291,6 @@
 
     async function deleteProduct(productId) {
         if (!await Swal.fire({ title: 'هل أنت متأكد؟', text: "لن تتمكن من التراجع!", icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم، احذفه!', cancelButtonText: 'إلغاء' }).then(r => r.isConfirmed)) return;
-        // تعديل: استهداف جدول Things
         const Product = Parse.Object.extend("Things");
         try {
             const product = await new Parse.Query(Product).get(productId);
@@ -351,7 +354,7 @@
         }
     }
 
-    // --- 5. قسم إدارة الاستطلاعات (مشترك ولا يحتاج تعديل) ---
+    // --- 5. قسم إدارة الاستطلاعات (مشترك) ---
     async function loadPolls() {
         const tableBody = document.getElementById('polls-table-body');
         tableBody.innerHTML = '<tr><td colspan="3">جارِ تحميل الاستطلاعات...</td></tr>';
