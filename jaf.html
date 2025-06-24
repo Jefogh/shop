@@ -107,7 +107,6 @@
 
     <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
     <script>
-    // --- 1. الإعداد والتحقق من الأمان ---
     document.addEventListener('DOMContentLoaded', async () => {
         Parse.initialize("a10tYxDiUFIaigtshCBuVOjYvqkUedYrS2bbwxV7", "LW1t1PMFgqMJqwiwe78vvgN9mvkxP1LuhbxGNLUY");
         Parse.serverURL = "https://parseapi.back4app.com/";
@@ -150,7 +149,6 @@
         }
     });
 
-    // --- 2. تهيئة لوحة التحكم ---
     function initializeApp() {
         document.getElementById('logout-button').addEventListener('click', async () => {
             await Parse.User.logOut();
@@ -165,7 +163,6 @@
         document.getElementById('add-poll-btn').addEventListener('click', () => showPollForm(null));
     }
 
-    // --- 3. قسم إدارة المنتجات العالمية (Things) ---
     async function loadProducts() {
         const tableBody = document.getElementById('products-table-body');
         tableBody.innerHTML = '<tr><td colspan="4">جارِ تحميل المنتجات...</td></tr>';
@@ -199,6 +196,7 @@
         }
     }
 
+    // -- تعديل --: تم إضافة حقل لوقت الشحن
     async function showProductForm(product) {
         const isEditing = product !== null;
         const title = isEditing ? 'تعديل المنتج' : 'إضافة منتج جديد';
@@ -221,6 +219,7 @@
 
                     <h3 class="font-bold text-lg text-blue-600 border-b pb-2 mt-4">بيانات عامة</h3>
                     <div><label>السعر:</label><input id="price" type="number" step="0.01" class="form-input" value="${isEditing ? product.get('price') || 0 : ''}"></div>
+                    <div><label>وقت الشحن (مثال: 3-5 أيام):</label><input id="shippingTime" type="text" class="form-input" value="${isEditing ? product.get('shippingTime') || '' : ''}"></div>
                     <div><label>الألوان المتاحة (افصل بفاصلة ,):</label><input id="availableColors" class="form-input" value="${isEditing ? (product.get('availableColors') || []).join(',') : ''}"></div>
                     <div><label>الأحجام المتاحة (افصل بفاصلة ,):</label><input id="availableSizes" class="form-input" value="${isEditing ? (product.get('availableSizes') || []).join(',') : ''}"></div>
                     
@@ -243,6 +242,8 @@
                 name_en: document.getElementById('name_en').value, description_en: document.getElementById('description_en').value, category_en: document.getElementById('category_en').value,
                 name_es: document.getElementById('name_es').value, description_es: document.getElementById('description_es').value, category_es: document.getElementById('category_es').value,
                 price: parseFloat(document.getElementById('price').value),
+                // الإضافة هنا
+                shippingTime: document.getElementById('shippingTime').value,
                 availableColors: document.getElementById('availableColors').value.split(',').map(s => s.trim()).filter(Boolean),
                 availableSizes: document.getElementById('availableSizes').value.split(',').map(s => s.trim()).filter(Boolean),
                 imageFile: document.getElementById('imageFile').files[0],
@@ -254,7 +255,6 @@
         if (formValues) saveProduct(product, formValues);
     }
 
-    // -- تعديل --: تم تحسين معالجة الأخطاء هنا
     async function saveProduct(product, data) {
         Swal.fire({ title: 'جارِ الحفظ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         const Product = Parse.Object.extend("Things");
@@ -280,7 +280,6 @@
             loadProducts();
         } catch (error) {
             console.error('خطأ في حفظ المنتج:', error);
-            // كود Parse الخاص بـ "Object Not Found" هو 101
             if (error.code === 101) {
                 Swal.fire('خطأ!', 'فشل الحفظ: المنتج الذي تحاول تعديله لم يعد موجوداً. ربما تم حذفه. يرجى تحديث الصفحة.', 'error');
             } else {
@@ -302,7 +301,7 @@
         }
     }
 
-    // --- 4. قسم إدارة الطلبات (مشترك) ---
+    // --- الدوال الأخرى تبقى كما هي ---
     async function loadOrders() {
         const tableBody = document.getElementById('orders-table-body');
         tableBody.innerHTML = '<tr><td colspan="6">جارِ تحميل الطلبات...</td></tr>';
@@ -354,7 +353,6 @@
         }
     }
 
-    // --- 5. قسم إدارة الاستطلاعات (مشترك) ---
     async function loadPolls() {
         const tableBody = document.getElementById('polls-table-body');
         tableBody.innerHTML = '<tr><td colspan="3">جارِ تحميل الاستطلاعات...</td></tr>';
